@@ -1,0 +1,48 @@
+<div class="{% if section.settings.include_horizontal_margins %}container{% endif %} {% if section.settings.include_vertical_margins %}vertical-breather{% endif %} {% if section.settings.custom_class != blank %}{{ section.settings.custom_class }}{% endif %}">
+  {%- for block in section.blocks -%}
+    {%- render block -%}
+  {%- endfor -%}
+</div>
+
+{% schema %}
+{
+  "name": "Apps",
+  "class": "shopify-section--apps",
+  "disabled_on": {
+    "groups": ["custom.overlay"]
+  },
+  "settings": [
+    {
+      "type": "text",
+      "id": "custom_class",
+      "label": "Custom CSS Class",
+      "info": "Add a custom class to this section instance."
+    },
+    {
+      "type": "checkbox",
+      "id": "include_horizontal_margins",
+      "label": "Include horizontal margins",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "include_vertical_margins",
+      "label": "Include vertical margins",
+      "default": true
+    }
+  ],
+  "blocks": [
+    {
+      "type": "@app"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Apps"
+    },
+    {
+      "name": "Your Section Name"
+    }
+  ]
+}
+{% endschema %}

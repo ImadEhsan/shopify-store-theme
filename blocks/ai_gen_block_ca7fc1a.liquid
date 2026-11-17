@@ -1,0 +1,694 @@
+{% doc %}
+  @prompt
+    Generate a section to promote user generated content. I need to upload a video, along with a title and description of the video. Include two buttons to link the product and a social media account. Do not include any icons in the button. I need to post up to five videos at one time, each with a title and description. One video should show at a time, with the second post showing on the right-hand side of the page, to scroll across to. The text should sit on the left hand side, and the video on the right, split evenly down the page. The video or image must retain a 9:16 ratio, with a max-height of 650px. Include a carousel navigation in the same style as the theme. Product and social buttons should have button--primary styles, there is too much padding between the top line of the module and the start of the video.
+    
+    The text is also not visible 
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-ugc-carousel-{{ ai_gen_id }} {
+    width: 100%;
+    display: block;
+    position: relative;
+  }
+
+  .ai-ugc-carousel-container-{{ ai_gen_id }} {
+    width: {{ block.settings.desktop_width_percent }}%;
+    max-width: 100%;
+    margin: 0 auto;
+  }
+
+  .ai-ugc-carousel-wrapper-{{ ai_gen_id }} {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ai-ugc-carousel-track-{{ ai_gen_id }} {
+    display: flex;
+    transition: transform 0.5s ease;
+  }
+
+  .ai-ugc-carousel-slide-{{ ai_gen_id }} {
+    min-width: 100%;
+    display: flex;
+    flex-direction: row;
+    gap: 40px;
+    align-items: flex-start;
+  }
+
+  .ai-ugc-carousel-content-{{ ai_gen_id }} {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .ai-ugc-carousel-title-{{ ai_gen_id }} {
+    font-size: {{ block.settings.title_size }}px;
+    color: {{ block.settings.text_color }};
+    margin: 0;
+    font-weight: 600;
+  }
+
+  .ai-ugc-carousel-description-{{ ai_gen_id }} {
+    font-size: {{ block.settings.description_size }}px;
+    color: {{ block.settings.text_color }};
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .ai-ugc-carousel-buttons-{{ ai_gen_id }} {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .ai-ugc-carousel-button-{{ ai_gen_id }} {
+    padding: 12px 24px;
+    text-decoration: none;
+    border-radius: {{ block.settings.button_border_radius }}px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-block;
+    border: 1px solid {{ block.settings.primary_button_background }};
+    background-color: {{ block.settings.primary_button_background }};
+    color: {{ block.settings.primary_button_text_color }};
+    font-weight: 600;
+  }
+
+  .ai-ugc-carousel-button-{{ ai_gen_id }}:hover {
+    opacity: 0.8;
+  }
+
+  .ai-ugc-carousel-media-{{ ai_gen_id }} {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+  }
+
+  .ai-ugc-carousel-media-wrapper-{{ ai_gen_id }} {
+    width: 100%;
+    max-height: 650px;
+    aspect-ratio: 9 / 16;
+    overflow: hidden;
+    border-radius: {{ block.settings.media_border_radius }}px;
+    background-color: #f4f4f4;
+  }
+
+  .ai-ugc-carousel-media-wrapper-{{ ai_gen_id }} video,
+  .ai-ugc-carousel-media-wrapper-{{ ai_gen_id }} img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .ai-ugc-carousel-placeholder-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f4f4f4;
+  }
+
+  .ai-ugc-carousel-placeholder-{{ ai_gen_id }} svg {
+    width: 100%;
+    height: 100%;
+    max-width: 200px;
+    max-height: 200px;
+  }
+
+  .ai-ugc-carousel-navigation-{{ ai_gen_id }} {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    margin-top: 24px;
+  }
+
+  .ai-ugc-carousel-nav-button-{{ ai_gen_id }} {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: {{ block.settings.text_color }};
+    transition: opacity 0.3s ease;
+  }
+
+  .ai-ugc-carousel-nav-button-{{ ai_gen_id }}:hover {
+    opacity: 0.7;
+  }
+
+  .ai-ugc-carousel-nav-button-{{ ai_gen_id }}:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  .ai-ugc-carousel-nav-button-{{ ai_gen_id }} svg {
+    width: 24px;
+    height: 24px;
+    stroke-width: {{ block.settings.icon_stroke_width }}px;
+  }
+
+  .ai-ugc-carousel-dots-{{ ai_gen_id }} {
+    display: flex;
+    gap: 8px;
+  }
+
+  .ai-ugc-carousel-dot-{{ ai_gen_id }} {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: {{ block.settings.text_color }};
+    opacity: 0.3;
+    cursor: pointer;
+    border: none;
+    padding: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .ai-ugc-carousel-dot-{{ ai_gen_id }}.active {
+    opacity: 1;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-ugc-carousel-slide-{{ ai_gen_id }} {
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .ai-ugc-carousel-media-wrapper-{{ ai_gen_id }} {
+      max-height: 500px;
+    }
+  }
+{% endstyle %}
+
+<ugc-carousel-{{ ai_gen_id }} class="ai-ugc-carousel-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-ugc-carousel-container-{{ ai_gen_id }}">
+    <div class="ai-ugc-carousel-wrapper-{{ ai_gen_id }}">
+      <div class="ai-ugc-carousel-track-{{ ai_gen_id }}">
+        {% for i in (1..5) %}
+          {% liquid
+            assign video_key = 'video_' | append: i
+            assign title_key = 'title_' | append: i
+            assign description_key = 'description_' | append: i
+            assign product_link_key = 'product_link_' | append: i
+            assign product_text_key = 'product_button_text_' | append: i
+            assign social_link_key = 'social_link_' | append: i
+            assign social_text_key = 'social_button_text_' | append: i
+
+            assign video = block.settings[video_key]
+            assign title = block.settings[title_key]
+            assign description = block.settings[description_key]
+            assign product_link = block.settings[product_link_key]
+            assign product_text = block.settings[product_text_key]
+            assign social_link = block.settings[social_link_key]
+            assign social_text = block.settings[social_text_key]
+          %}
+
+          <div class="ai-ugc-carousel-slide-{{ ai_gen_id }}" data-slide="{{ i }}">
+            <div class="ai-ugc-carousel-content-{{ ai_gen_id }}">
+              {% if title != blank %}
+                <h2 class="ai-ugc-carousel-title-{{ ai_gen_id }}">{{ title }}</h2>
+              {% endif %}
+
+              {% if description != blank %}
+                <div class="ai-ugc-carousel-description-{{ ai_gen_id }}">{{ description }}</div>
+              {% endif %}
+
+              <div class="ai-ugc-carousel-buttons-{{ ai_gen_id }}">
+                {% if product_link != blank and product_text != blank %}
+                  <a href="{{ product_link }}" class="ai-ugc-carousel-button-{{ ai_gen_id }}">
+                    {{ product_text }}
+                  </a>
+                {% endif %}
+
+                {% if social_link != blank and social_text != blank %}
+                  <a href="{{ social_link }}" class="ai-ugc-carousel-button-{{ ai_gen_id }}" target="_blank" rel="noopener">
+                    {{ social_text }}
+                  </a>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="ai-ugc-carousel-media-{{ ai_gen_id }}">
+              <div class="ai-ugc-carousel-media-wrapper-{{ ai_gen_id }}">
+                {% if video != blank %}
+                  {% if video.sources[1].url contains '.mp4' or video.sources[1].url contains '.webm' %}
+                    <video
+                      src="{{ video.sources[1].url }}"
+                      playsinline
+                      {% if block.settings.autoplay %}autoplay{% endif %}
+                      {% if block.settings.loop %}loop{% endif %}
+                      {% if block.settings.muted %}muted{% endif %}
+                      {% if block.settings.controls %}controls{% endif %}
+                    ></video>
+                  {% else %}
+                    {{ video | video_tag: autoplay: block.settings.autoplay, loop: block.settings.loop, muted: block.settings.muted, controls: block.settings.controls }}
+                  {% endif %}
+                {% else %}
+                  <div class="ai-ugc-carousel-placeholder-{{ ai_gen_id }}">
+                    {{ 'image' | placeholder_svg_tag }}
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="ai-ugc-carousel-navigation-{{ ai_gen_id }}">
+      <button class="ai-ugc-carousel-nav-button-{{ ai_gen_id }} ai-ugc-carousel-prev-{{ ai_gen_id }}" aria-label="Previous slide">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
+
+      <div class="ai-ugc-carousel-dots-{{ ai_gen_id }}"></div>
+
+      <button class="ai-ugc-carousel-nav-button-{{ ai_gen_id }} ai-ugc-carousel-next-{{ ai_gen_id }}" aria-label="Next slide">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </button>
+    </div>
+  </div>
+</ugc-carousel-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class UGCCarousel{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+        this.currentSlide = 0;
+        this.totalSlides = 5;
+      }
+
+      connectedCallback() {
+        this.track = this.querySelector('.ai-ugc-carousel-track-{{ ai_gen_id }}');
+        this.prevButton = this.querySelector('.ai-ugc-carousel-prev-{{ ai_gen_id }}');
+        this.nextButton = this.querySelector('.ai-ugc-carousel-next-{{ ai_gen_id }}');
+        this.dotsContainer = this.querySelector('.ai-ugc-carousel-dots-{{ ai_gen_id }}');
+
+        this.createDots();
+        this.setupEventListeners();
+        this.updateCarousel();
+      }
+
+      createDots() {
+        for (let i = 0; i < this.totalSlides; i++) {
+          const dot = document.createElement('button');
+          dot.classList.add('ai-ugc-carousel-dot-{{ ai_gen_id }}');
+          dot.setAttribute('aria-label', `Go to slide ${i + 1}`);
+          dot.addEventListener('click', () => this.goToSlide(i));
+          this.dotsContainer.appendChild(dot);
+        }
+      }
+
+      setupEventListeners() {
+        this.prevButton.addEventListener('click', () => this.previousSlide());
+        this.nextButton.addEventListener('click', () => this.nextSlide());
+      }
+
+      goToSlide(index) {
+        this.currentSlide = index;
+        this.updateCarousel();
+      }
+
+      previousSlide() {
+        if (this.currentSlide > 0) {
+          this.currentSlide--;
+          this.updateCarousel();
+        }
+      }
+
+      nextSlide() {
+        if (this.currentSlide < this.totalSlides - 1) {
+          this.currentSlide++;
+          this.updateCarousel();
+        }
+      }
+
+      updateCarousel() {
+        const offset = -this.currentSlide * 100;
+        this.track.style.transform = `translateX(${offset}%)`;
+
+        this.prevButton.disabled = this.currentSlide === 0;
+        this.nextButton.disabled = this.currentSlide === this.totalSlides - 1;
+
+        const dots = this.dotsContainer.querySelectorAll('.ai-ugc-carousel-dot-{{ ai_gen_id }}');
+        dots.forEach((dot, index) => {
+          if (index === this.currentSlide) {
+            dot.classList.add('active');
+          } else {
+            dot.classList.remove('active');
+          }
+        });
+      }
+    }
+
+    customElements.define('ugc-carousel-{{ ai_gen_id }}', UGCCarousel{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "UGC carousel",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "desktop_width_percent",
+      "label": "Desktop width",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "media_border_radius",
+      "label": "Media border radius",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "label": "Title size",
+      "min": 16,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "description_size",
+      "label": "Description size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#282828"
+    },
+    {
+      "type": "header",
+      "content": "Buttons"
+    },
+    {
+      "type": "range",
+      "id": "button_border_radius",
+      "label": "Button border radius",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 4
+    },
+    {
+      "type": "color",
+      "id": "primary_button_background",
+      "label": "Button background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "primary_button_text_color",
+      "label": "Button text color",
+      "default": "#282828"
+    },
+    {
+      "type": "header",
+      "content": "Navigation"
+    },
+    {
+      "type": "range",
+      "id": "icon_stroke_width",
+      "label": "Icon thickness",
+      "min": 1,
+      "max": 2,
+      "step": 0.1,
+      "unit": "px",
+      "default": 2
+    },
+    {
+      "type": "header",
+      "content": "Video settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "Autoplay videos",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "loop",
+      "label": "Loop videos",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "muted",
+      "label": "Mute videos",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "controls",
+      "label": "Show video controls",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Post 1"
+    },
+    {
+      "type": "video",
+      "id": "video_1",
+      "label": "Video"
+    },
+    {
+      "type": "text",
+      "id": "title_1",
+      "label": "Title",
+      "default": "User generated content"
+    },
+    {
+      "type": "textarea",
+      "id": "description_1",
+      "label": "Description",
+      "default": "Share your experience with our products"
+    },
+    {
+      "type": "url",
+      "id": "product_link_1",
+      "label": "Product link"
+    },
+    {
+      "type": "text",
+      "id": "product_button_text_1",
+      "label": "Product button text",
+      "default": "Shop now"
+    },
+    {
+      "type": "url",
+      "id": "social_link_1",
+      "label": "Social link"
+    },
+    {
+      "type": "text",
+      "id": "social_button_text_1",
+      "label": "Social button text",
+      "default": "Follow us"
+    },
+    {
+      "type": "header",
+      "content": "Post 2"
+    },
+    {
+      "type": "video",
+      "id": "video_2",
+      "label": "Video"
+    },
+    {
+      "type": "text",
+      "id": "title_2",
+      "label": "Title"
+    },
+    {
+      "type": "textarea",
+      "id": "description_2",
+      "label": "Description"
+    },
+    {
+      "type": "url",
+      "id": "product_link_2",
+      "label": "Product link"
+    },
+    {
+      "type": "text",
+      "id": "product_button_text_2",
+      "label": "Product button text"
+    },
+    {
+      "type": "url",
+      "id": "social_link_2",
+      "label": "Social link"
+    },
+    {
+      "type": "text",
+      "id": "social_button_text_2",
+      "label": "Social button text"
+    },
+    {
+      "type": "header",
+      "content": "Post 3"
+    },
+    {
+      "type": "video",
+      "id": "video_3",
+      "label": "Video"
+    },
+    {
+      "type": "text",
+      "id": "title_3",
+      "label": "Title"
+    },
+    {
+      "type": "textarea",
+      "id": "description_3",
+      "label": "Description"
+    },
+    {
+      "type": "url",
+      "id": "product_link_3",
+      "label": "Product link"
+    },
+    {
+      "type": "text",
+      "id": "product_button_text_3",
+      "label": "Product button text"
+    },
+    {
+      "type": "url",
+      "id": "social_link_3",
+      "label": "Social link"
+    },
+    {
+      "type": "text",
+      "id": "social_button_text_3",
+      "label": "Social button text"
+    },
+    {
+      "type": "header",
+      "content": "Post 4"
+    },
+    {
+      "type": "video",
+      "id": "video_4",
+      "label": "Video"
+    },
+    {
+      "type": "text",
+      "id": "title_4",
+      "label": "Title"
+    },
+    {
+      "type": "textarea",
+      "id": "description_4",
+      "label": "Description"
+    },
+    {
+      "type": "url",
+      "id": "product_link_4",
+      "label": "Product link"
+    },
+    {
+      "type": "text",
+      "id": "product_button_text_4",
+      "label": "Product button text"
+    },
+    {
+      "type": "url",
+      "id": "social_link_4",
+      "label": "Social link"
+    },
+    {
+      "type": "text",
+      "id": "social_button_text_4",
+      "label": "Social button text"
+    },
+    {
+      "type": "header",
+      "content": "Post 5"
+    },
+    {
+      "type": "video",
+      "id": "video_5",
+      "label": "Video"
+    },
+    {
+      "type": "text",
+      "id": "title_5",
+      "label": "Title"
+    },
+    {
+      "type": "textarea",
+      "id": "description_5",
+      "label": "Description"
+    },
+    {
+      "type": "url",
+      "id": "product_link_5",
+      "label": "Product link"
+    },
+    {
+      "type": "text",
+      "id": "product_button_text_5",
+      "label": "Product button text"
+    },
+    {
+      "type": "url",
+      "id": "social_link_5",
+      "label": "Social link"
+    },
+    {
+      "type": "text",
+      "id": "social_button_text_5",
+      "label": "Social button text"
+    }
+  ],
+  "presets": [
+    {
+      "name": "UGC carousel"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,19 @@
+{%- comment -%}
+  Number of items in the bag, not counting the shipping protection line.
+
+  Prints a number. Used by the header badge and the cart drawer, so the
+  protection product never reads as "1 item" on its own.
+{%- endcomment -%}
+
+{%- liquid
+  assign item_count = cart.item_count
+
+  if settings.cart_protection_enabled and settings.cart_protection_product != blank
+    for line_item in cart.items
+      if line_item.product_id == settings.cart_protection_product.id
+        assign item_count = item_count | minus: line_item.quantity
+      endif
+    endfor
+  endif
+-%}
+{{- item_count -}}

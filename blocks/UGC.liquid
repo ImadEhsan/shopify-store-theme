@@ -1,0 +1,697 @@
+{% doc %}
+  @prompt
+    Generate a section to promote user generated content. I need to upload a video or image, along with a title and description of the video. Include two buttons to link the product and a social media account. Do not include any icons in the button. I need to post up to five videos at one time, each with a title and description. One video should show at a time, with the second post showing on the right-hand side of the page, to scroll across to. The text should sit on the left hand side, and the video on the right, split evenly down the page. The video or image must retain a 9:16 ratio, with a max-height of 650px. Include a carousel navigation in the same style as the theme. Product and social buttons should have button--primary styles
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% liquid
+  if settings.block_border_radius == 'none'
+    assign border_radius = '0'
+  elsif settings.block_border_radius == 'small'
+    assign border_radius = '8px'
+  elsif settings.block_border_radius == 'medium'
+    assign border_radius = '16px'
+  else
+    assign border_radius = '24px'
+  endif
+%}
+
+{% style %}
+  .ai-ugc-carousel-{{ ai_gen_id }} {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .ai-ugc-carousel__wrapper-{{ ai_gen_id }} {
+    display: flex;
+    transition: transform 0.5s ease;
+  }
+
+  .ai-ugc-carousel__slide-{{ ai_gen_id }} {
+    min-width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    padding: 0 20px;
+  }
+
+  .ai-ugc-carousel__content-{{ ai_gen_id }} {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .ai-ugc-carousel__title-{{ ai_gen_id }} {
+    margin: 0;
+    color: {{ settings.heading_color }};
+    font-family: {{ settings.heading_font.family }}, {{ settings.heading_font.fallback_families }};
+    font-weight: {{ settings.heading_font.weight }};
+    font-size: 32px;
+    line-height: 1.2;
+  }
+
+  .ai-ugc-carousel__description-{{ ai_gen_id }} {
+    margin: 0;
+    color: {{ settings.text_color }};
+    font-family: {{ settings.text_font.family }}, {{ settings.text_font.fallback_families }};
+    font-weight: {{ settings.text_font.weight }};
+    font-size: {{ settings.text_font_size }}px;
+    line-height: 1.6;
+  }
+
+  .ai-ugc-carousel__buttons-{{ ai_gen_id }} {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .ai-ugc-carousel__button-{{ ai_gen_id }} {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 28px;
+    text-decoration: none;
+    border: 1px solid {{ settings.primary_button_background }};
+    background-color: {{ settings.primary_button_background }};
+    color: {{ settings.primary_button_text_color }};
+    border-radius: {{ settings.button_border_radius }}px;
+    font-family: {{ settings.text_font.family }}, {{ settings.text_font.fallback_families }};
+    font-weight: {{ settings.text_font.weight }};
+    font-size: {{ settings.text_font_size }}px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .ai-ugc-carousel__button-{{ ai_gen_id }}:hover {
+    opacity: 0.85;
+  }
+
+  .ai-ugc-carousel__media-{{ ai_gen_id }} {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .ai-ugc-carousel__media-container-{{ ai_gen_id }} {
+    position: relative;
+    width: 100%;
+    max-width: 365px;
+    aspect-ratio: 9 / 16;
+    max-height: 650px;
+    overflow: hidden;
+    border-radius: {{ border_radius }};
+  }
+
+  .ai-ugc-carousel__image-{{ ai_gen_id }},
+  .ai-ugc-carousel__video-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .ai-ugc-carousel__placeholder-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    background-color: {{ settings.secondary_background }};
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ai-ugc-carousel__placeholder-{{ ai_gen_id }} svg {
+    width: 60%;
+    height: 60%;
+    opacity: 0.3;
+  }
+
+  .ai-ugc-carousel__navigation-{{ ai_gen_id }} {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    margin-top: 32px;
+  }
+
+  .ai-ugc-carousel__nav-button-{{ ai_gen_id }} {
+    width: 44px;
+    height: 44px;
+    border: 1px solid {{ settings.text_color }};
+    background-color: transparent;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 0;
+  }
+
+  .ai-ugc-carousel__nav-button-{{ ai_gen_id }}:hover:not(:disabled) {
+    background-color: {{ settings.text_color }};
+    color: {{ settings.background }};
+  }
+
+  .ai-ugc-carousel__nav-button-{{ ai_gen_id }}:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  .ai-ugc-carousel__nav-button-{{ ai_gen_id }} svg {
+    width: 20px;
+    height: 20px;
+    stroke: currentColor;
+    stroke-width: {{ settings.icon_stroke_width }};
+  }
+
+  .ai-ugc-carousel__dots-{{ ai_gen_id }} {
+    display: flex;
+    gap: 8px;
+  }
+
+  .ai-ugc-carousel__dot-{{ ai_gen_id }} {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: {{ settings.text_color }};
+    opacity: 0.3;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+  }
+
+  .ai-ugc-carousel__dot-{{ ai_gen_id }}.active {
+    opacity: 1;
+  }
+
+  @media screen and (max-width: 989px) {
+    .ai-ugc-carousel__slide-{{ ai_gen_id }} {
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .ai-ugc-carousel__title-{{ ai_gen_id }} {
+      font-size: 24px;
+    }
+
+    .ai-ugc-carousel__media-container-{{ ai_gen_id }} {
+      max-width: 100%;
+      max-height: 500px;
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-ugc-carousel__slide-{{ ai_gen_id }} {
+      padding: 0 16px;
+    }
+
+    .ai-ugc-carousel__title-{{ ai_gen_id }} {
+      font-size: 20px;
+    }
+
+    .ai-ugc-carousel__buttons-{{ ai_gen_id }} {
+      flex-direction: column;
+    }
+
+    .ai-ugc-carousel__button-{{ ai_gen_id }} {
+      width: 100%;
+    }
+  }
+{% endstyle %}
+
+<ugc-carousel-{{ ai_gen_id }} class="ai-ugc-carousel-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-ugc-carousel__wrapper-{{ ai_gen_id }}" data-wrapper>
+    {% for i in (1..5) %}
+      {% liquid
+        assign slide_enabled_key = 'slide_' | append: i | append: '_enabled'
+        assign slide_title_key = 'slide_' | append: i | append: '_title'
+        assign slide_description_key = 'slide_' | append: i | append: '_description'
+        assign slide_media_key = 'slide_' | append: i | append: '_media'
+        assign slide_video_key = 'slide_' | append: i | append: '_video'
+        assign slide_product_link_key = 'slide_' | append: i | append: '_product_link'
+        assign slide_product_text_key = 'slide_' | append: i | append: '_product_text'
+        assign slide_social_link_key = 'slide_' | append: i | append: '_social_link'
+        assign slide_social_text_key = 'slide_' | append: i | append: '_social_text'
+
+        assign slide_enabled = block.settings[slide_enabled_key]
+        assign slide_title = block.settings[slide_title_key]
+        assign slide_description = block.settings[slide_description_key]
+        assign slide_media = block.settings[slide_media_key]
+        assign slide_video = block.settings[slide_video_key]
+        assign slide_product_link = block.settings[slide_product_link_key]
+        assign slide_product_text = block.settings[slide_product_text_key]
+        assign slide_social_link = block.settings[slide_social_link_key]
+        assign slide_social_text = block.settings[slide_social_text_key]
+      %}
+
+      {% if slide_enabled %}
+        <div class="ai-ugc-carousel__slide-{{ ai_gen_id }}" data-slide="{{ i }} ugc-slide-section">
+          <div class="ai-ugc-carousel__content-{{ ai_gen_id }} slide-container">
+            {% if slide_title != blank %}
+              <h2 class="ai-ugc-carousel__title-{{ ai_gen_id }} slide-title">{{ slide_title }}</h2>
+            {% endif %}
+
+            {% if slide_description != blank %}
+              <div class="ai-ugc-carousel__description-{{ ai_gen_id }} slide_meta">{{ slide_description }}</div>
+            {% endif %}
+
+            <div class="ai-ugc-carousel__buttons-{{ ai_gen_id }} ugc-buttons">
+              {% if slide_product_link != blank and slide_product_text != blank %}
+                <a href="{{ slide_product_link }}" class="ai-ugc-carousel__button-{{ ai_gen_id }} button product-link">
+                  {{ slide_product_text }}
+                </a>
+              {% endif %}
+
+              {% if slide_social_link != blank and slide_social_text != blank %}
+                <a href="{{ slide_social_link }}" class="ai-ugc-carousel__button-{{ ai_gen_id }} button social-link" target="_blank" rel="noopener noreferrer">
+                  {{ slide_social_text }}
+                </a>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="ai-ugc-carousel__media-{{ ai_gen_id }}">
+            <div class="ai-ugc-carousel__media-container-{{ ai_gen_id }}">
+              {% if slide_video != blank %}
+                <video
+                  class="ai-ugc-carousel__video-{{ ai_gen_id }}"
+                  playsinline
+                  muted
+                  loop
+                  autoplay
+                >
+                  {% for source in slide_video.sources %}
+                    <source src="{{ source.url }}" type="{{ source.mime_type }}">
+                  {% endfor %}
+                </video>
+              {% elsif slide_media != blank %}
+                <img
+                  class="ai-ugc-carousel__image-{{ ai_gen_id }}"
+                  src="{{ slide_media | image_url: width: 730 }}"
+                  alt="{{ slide_media.alt | escape }}"
+                  loading="lazy"
+                  width="{{ slide_media.width }}"
+                  height="{{ slide_media.height }}"
+                >
+              {% else %}
+                <div class="ai-ugc-carousel__placeholder-{{ ai_gen_id }}">
+                  {{ 'image' | placeholder_svg_tag }}
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+
+  <div class="ai-ugc-carousel__navigation-{{ ai_gen_id }}">
+    <button
+      class="ai-ugc-carousel__nav-button-{{ ai_gen_id }}"
+      data-prev
+      aria-label="Previous slide"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+      </svg>
+    </button>
+
+    <div class="ai-ugc-carousel__dots-{{ ai_gen_id }}" data-dots></div>
+
+    <button
+      class="ai-ugc-carousel__nav-button-{{ ai_gen_id }}"
+      data-next
+      aria-label="Next slide"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+      </svg>
+    </button>
+  </div>
+</ugc-carousel-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class UGCCarousel{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+        this.currentSlide = 0;
+        this.slides = [];
+      }
+
+      connectedCallback() {
+        this.wrapper = this.querySelector('[data-wrapper]');
+        this.slides = Array.from(this.querySelectorAll('[data-slide]'));
+        this.prevButton = this.querySelector('[data-prev]');
+        this.nextButton = this.querySelector('[data-next]');
+        this.dotsContainer = this.querySelector('[data-dots]');
+
+        if (this.slides.length === 0) return;
+
+        this.createDots();
+        this.updateCarousel();
+        this.setupEventListeners();
+      }
+
+      createDots() {
+        this.slides.forEach((slide, index) => {
+          const dot = document.createElement('button');
+          dot.className = 'ai-ugc-carousel__dot-{{ ai_gen_id }}';
+          dot.setAttribute('aria-label', `Go to slide ${index + 1}`);
+          dot.addEventListener('click', () => this.goToSlide(index));
+          this.dotsContainer.appendChild(dot);
+        });
+      }
+
+      setupEventListeners() {
+        this.prevButton.addEventListener('click', () => this.previousSlide());
+        this.nextButton.addEventListener('click', () => this.nextSlide());
+
+        let startX = 0;
+        let endX = 0;
+
+        this.wrapper.addEventListener('touchstart', (e) => {
+          startX = e.touches[0].clientX;
+        });
+
+        this.wrapper.addEventListener('touchend', (e) => {
+          endX = e.changedTouches[0].clientX;
+          if (startX - endX > 50) {
+            this.nextSlide();
+          } else if (endX - startX > 50) {
+            this.previousSlide();
+          }
+        });
+      }
+
+      goToSlide(index) {
+        this.currentSlide = index;
+        this.updateCarousel();
+      }
+
+      previousSlide() {
+        if (this.currentSlide > 0) {
+          this.currentSlide--;
+          this.updateCarousel();
+        }
+      }
+
+      nextSlide() {
+        if (this.currentSlide < this.slides.length - 1) {
+          this.currentSlide++;
+          this.updateCarousel();
+        }
+      }
+
+      updateCarousel() {
+        const offset = -this.currentSlide * 100;
+        this.wrapper.style.transform = `translateX(${offset}%)`;
+
+        this.prevButton.disabled = this.currentSlide === 0;
+        this.nextButton.disabled = this.currentSlide === this.slides.length - 1;
+
+        const dots = this.dotsContainer.querySelectorAll('.ai-ugc-carousel__dot-{{ ai_gen_id }}');
+        dots.forEach((dot, index) => {
+          if (index === this.currentSlide) {
+            dot.classList.add('active');
+          } else {
+            dot.classList.remove('active');
+          }
+        });
+      }
+    }
+
+    customElements.define('ugc-carousel-{{ ai_gen_id }}', UGCCarousel{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "UGC video",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Slide 1"
+    },
+    {
+      "type": "checkbox",
+      "id": "slide_1_enabled",
+      "label": "Enable slide 1",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "slide_1_title",
+      "label": "Title",
+      "default": "User Generated Content"
+    },
+    {
+      "type": "textarea",
+      "id": "slide_1_description",
+      "label": "Description",
+      "default": "Share your experience with our products and join our community."
+    },
+    {
+      "type": "image_picker",
+      "id": "slide_1_media",
+      "label": "Image"
+    },
+    {
+      "type": "video",
+      "id": "slide_1_video",
+      "label": "Video"
+    },
+    {
+      "type": "text",
+      "id": "slide_1_product_text",
+      "label": "Product button text",
+      "default": "Shop Product"
+    },
+    {
+      "type": "url",
+      "id": "slide_1_product_link",
+      "label": "Product button link"
+    },
+    {
+      "type": "text",
+      "id": "slide_1_social_text",
+      "label": "Social button text",
+      "default": "Follow Us"
+    },
+    {
+      "type": "url",
+      "id": "slide_1_social_link",
+      "label": "Social button link"
+    },
+    {
+      "type": "header",
+      "content": "Slide 2"
+    },
+    {
+      "type": "checkbox",
+      "id": "slide_2_enabled",
+      "label": "Enable slide 2",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "slide_2_title",
+      "label": "Title"
+    },
+    {
+      "type": "textarea",
+      "id": "slide_2_description",
+      "label": "Description"
+    },
+    {
+      "type": "image_picker",
+      "id": "slide_2_media",
+      "label": "Image"
+    },
+    {
+      "type": "video",
+      "id": "slide_2_video",
+      "label": "Video"
+    },
+    {
+      "type": "text",
+      "id": "slide_2_product_text",
+      "label": "Product button text"
+    },
+    {
+      "type": "url",
+      "id": "slide_2_product_link",
+      "label": "Product button link"
+    },
+    {
+      "type": "text",
+      "id": "slide_2_social_text",
+      "label": "Social button text"
+    },
+    {
+      "type": "url",
+      "id": "slide_2_social_link",
+      "label": "Social button link"
+    },
+    {
+      "type": "header",
+      "content": "Slide 3"
+    },
+    {
+      "type": "checkbox",
+      "id": "slide_3_enabled",
+      "label": "Enable slide 3",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "slide_3_title",
+      "label": "Title"
+    },
+    {
+      "type": "textarea",
+      "id": "slide_3_description",
+      "label": "Description"
+    },
+    {
+      "type": "image_picker",
+      "id": "slide_3_media",
+      "label": "Image"
+    },
+    {
+      "type": "video",
+      "id": "slide_3_video",
+      "label": "Video"
+    },
+    {
+      "type": "text",
+      "id": "slide_3_product_text",
+      "label": "Product button text"
+    },
+    {
+      "type": "url",
+      "id": "slide_3_product_link",
+      "label": "Product button link"
+    },
+    {
+      "type": "text",
+      "id": "slide_3_social_text",
+      "label": "Social button text"
+    },
+    {
+      "type": "url",
+      "id": "slide_3_social_link",
+      "label": "Social button link"
+    },
+    {
+      "type": "header",
+      "content": "Slide 4"
+    },
+    {
+      "type": "checkbox",
+      "id": "slide_4_enabled",
+      "label": "Enable slide 4",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "slide_4_title",
+      "label": "Title"
+    },
+    {
+      "type": "textarea",
+      "id": "slide_4_description",
+      "label": "Description"
+    },
+    {
+      "type": "image_picker",
+      "id": "slide_4_media",
+      "label": "Image"
+    },
+    {
+      "type": "video",
+      "id": "slide_4_video",
+      "label": "Video"
+    },
+    {
+      "type": "text",
+      "id": "slide_4_product_text",
+      "label": "Product button text"
+    },
+    {
+      "type": "url",
+      "id": "slide_4_product_link",
+      "label": "Product button link"
+    },
+    {
+      "type": "text",
+      "id": "slide_4_social_text",
+      "label": "Social button text"
+    },
+    {
+      "type": "url",
+      "id": "slide_4_social_link",
+      "label": "Social button link"
+    },
+    {
+      "type": "header",
+      "content": "Slide 5"
+    },
+    {
+      "type": "checkbox",
+      "id": "slide_5_enabled",
+      "label": "Enable slide 5",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "slide_5_title",
+      "label": "Title"
+    },
+    {
+      "type": "textarea",
+      "id": "slide_5_description",
+      "label": "Description"
+    },
+    {
+      "type": "image_picker",
+      "id": "slide_5_media",
+      "label": "Image"
+    },
+    {
+      "type": "video",
+      "id": "slide_5_video",
+      "label": "Video"
+    },
+    {
+      "type": "text",
+      "id": "slide_5_product_text",
+      "label": "Product button text"
+    },
+    {
+      "type": "url",
+      "id": "slide_5_product_link",
+      "label": "Product button link"
+    },
+    {
+      "type": "text",
+      "id": "slide_5_social_text",
+      "label": "Social button text"
+    },
+    {
+      "type": "url",
+      "id": "slide_5_social_link",
+      "label": "Social button link"
+    }
+  ],
+  "presets": [
+    {
+      "name": "UGC video"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,243 @@
+{%- liquid
+  assign has_posts = false
+  for block in section.blocks
+    if block.settings.image != blank or block.settings.video != blank
+      assign has_posts = true
+      break
+    endif
+  endfor
+-%}
+
+{%- if has_posts or request.design_mode -%}
+  {%- comment -%}
+    Inside the guard on purpose. "Section hides entirely when no posts are
+    configured" (spec) has to include the payload: above the guard these two
+    tags shipped a render-blocking stylesheet and a script to every product
+    page on the store for markup that was never emitted.
+  {%- endcomment -%}
+  {{ 'ugc-community.css' | asset_url | stylesheet_tag }}
+  <script src="{{ 'cau-drag-scroll.js' | asset_url }}" defer></script>
+<script src="{{ 'ugc-community.js' | asset_url }}" defer></script>
+
+  <section class="ugc" data-ugc>
+    <div class="container">
+      <div class="ugc__head">
+        <h2 class="ugc__title">{{ section.settings.heading | escape }}</h2>
+
+        {%- if section.settings.handle != blank -%}
+          <a class="ugc__handle"
+             href="{{ section.settings.handle_url | default: '#' }}"
+             {% if section.settings.handle_url != blank %}target="_blank" rel="noopener"{% endif %}>
+            <svg class="ugc__glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="2"/>
+              <circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/>
+              <circle cx="17.5" cy="6.5" r="1.2" fill="currentColor"/>
+            </svg>
+            Follow {{ section.settings.handle | escape }}
+          </a>
+        {%- endif -%}
+        <div class="ugc__arrows" data-ugc-arrows hidden>
+          <button type="button" class="ugc__arrow" data-ugc-prev aria-label="Previous">
+            <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M10 2L4 8l6 6" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+          </button>
+          <button type="button" class="ugc__arrow" data-ugc-next aria-label="Next">
+            <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M6 2l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="ugc__track" data-ugc-track data-cau-drag-scroll tabindex="0" role="group" aria-label="{{ section.settings.heading | escape }}">
+{%- capture ugc_placeholder -%}
+      <svg class="ugc__glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="2"/>
+        <circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/>
+        <circle cx="17.5" cy="6.5" r="1.2" fill="currentColor"/>
+      </svg>
+      <span>PLACEHOLDER</span>
+{%- endcapture -%}
+{%- assign tile_count = 0 -%}
+{%- for block in section.blocks -%}
+  {%- liquid
+    assign tile_alt = block.settings.caption | default: section.settings.heading | escape
+    assign media_image = block.settings.image
+    assign is_video = false
+    if block.settings.video != blank
+      assign is_video = true
+      assign media_image = block.settings.video.preview_image
+    endif
+  -%}
+
+  {%- if media_image != blank -%}
+    {%- capture tile_inner -%}
+      <div class="ugc__media">
+        {%- comment -%}
+          alt is hoisted above. A `|` inside a filter's argument list does not
+          chain onto the argument - it ends the list and pipes image_tag's own
+          output onward, so `| escape` here HTML-escaped the whole <img> tag and
+          every tile rendered its markup as visible text.
+        {%- endcomment -%}
+        {{ media_image | image_url: width: 800 | image_tag:
+             loading: 'lazy',
+             widths: '280,400,560,800',
+             sizes: '(min-width: 901px) 25vw, 62vw',
+             alt: tile_alt }}
+      </div>
+
+      {%- if is_video -%}
+        <span class="ugc__badge">
+          <svg class="ugc__play" viewBox="0 0 10 12" aria-hidden="true" focusable="false">
+            <path d="M0 0l10 6-10 6z" fill="currentColor"/>
+          </svg>
+          {%- if block.settings.duration != blank %} {{ block.settings.duration | escape }}{% endif -%}
+        </span>
+      {%- endif -%}
+
+      {%- if block.settings.caption != blank or block.settings.sub_line != blank -%}
+        <div class="ugc__caption">
+          {%- if block.settings.caption != blank -%}
+            <span class="ugc__caption-main">{{ block.settings.caption | escape }}</span>
+          {%- endif -%}
+          {%- if block.settings.sub_line != blank -%}
+            <span class="ugc__caption-sub">{{ block.settings.sub_line | escape }}</span>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+    {%- endcapture -%}
+
+    {%- liquid
+      assign video_src = ''
+      if is_video
+        for source in block.settings.video.sources
+          if source.format == 'mp4'
+            assign video_src = source.url
+            break
+          endif
+        endfor
+      endif
+      assign prod = block.settings.product
+    -%}
+
+    {%- capture tile_data -%}
+ data-ugc-tile
+ data-video="{{ video_src }}"
+ data-cap="{{ block.settings.caption | escape }}"
+ data-sub="{{ block.settings.sub_line | escape }}"
+ data-reel="{{ block.settings.duration | escape }}"
+      {%- if prod != blank %} data-product-url="{{ prod.url }}" data-product-title="{{ prod.title | escape }}" data-product-price="{{ prod.price | money }}" data-product-image="{{ prod.featured_image | image_url: width: 96 }}"{% endif -%}
+    {%- endcapture -%}
+
+    {%- assign tile_count = tile_count | plus: 1 -%}
+    {%- if prod != blank -%}
+      <a class="ugc__tile" href="{{ prod.url }}"{{ tile_data }} {{ block.shopify_attributes }}>{{ tile_inner }}</a>
+    {%- else -%}
+      <button type="button" class="ugc__tile"{{ tile_data }} {{ block.shopify_attributes }}>{{ tile_inner }}</button>
+    {%- endif -%}
+  {%- elsif request.design_mode -%}
+    {%- assign tile_count = tile_count | plus: 1 -%}
+    <div class="ugc__tile ugc__tile--empty" {{ block.shopify_attributes }}>{{ ugc_placeholder }}</div>
+  {%- endif -%}
+{%- endfor -%}
+
+{%- comment -%}
+  An empty or barely-filled section should still look like a carousel in the editor,
+  so Kyle can see the shape of what he is filling. Pad to UGC_MIN_TILES. Editor only:
+  on the storefront the section either has real posts or does not render at all.
+{%- endcomment -%}
+{%- if request.design_mode -%}
+  {%- assign ugc_min_tiles = 3 -%}
+  {%- if tile_count < ugc_min_tiles -%}
+    {%- assign ugc_pad = ugc_min_tiles | minus: tile_count -%}
+    {%- for i in (1..ugc_pad) -%}
+      <div class="ugc__tile ugc__tile--empty">{{ ugc_placeholder }}</div>
+    {%- endfor -%}
+  {%- endif -%}
+{%- endif -%}
+      </div>
+      <div class="ugc__progress" data-ugc-progress hidden><span data-ugc-thumb></span></div>
+
+      {%- comment -%}
+        Ported from the prototype's #ugcModal. One per section; the JS fills it from the
+        clicked tile's data-* attributes, so nothing here is per-post.
+      {%- endcomment -%}
+      <div class="ugcbox" data-ugc-modal hidden>
+        <div class="ugcbox__panel" data-ugc-panel role="dialog" aria-modal="true" aria-label="Instagram post">
+          <button type="button" class="ugcbox__close" data-ugc-close aria-label="Close">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+          </button>
+
+          <div class="ugcbox__media" data-ugc-media>
+            <img data-ugc-img alt="" width="800" height="1000">
+            <video data-ugc-vid playsinline muted loop controls preload="none" hidden></video>
+            <span class="ugc__badge" data-ugc-badge hidden></span>
+          </div>
+
+          <div class="ugcbox__body">
+            {%- if section.settings.handle != blank -%}
+              <div class="ugcbox__user"><b>{{ section.settings.handle | escape }}</b></div>
+            {%- endif -%}
+
+            <p class="ugcbox__cap" data-ugc-cap></p>
+
+            <a class="ugcbox__shop" data-ugc-shop href="#" hidden>
+              <img data-ugc-shop-img alt="" width="48" height="48">
+              <span class="ugcbox__sp">
+                <b data-ugc-shop-name></b>
+                <span data-ugc-shop-price class="pdp-v2__tnum"></span>
+              </span>
+              <span class="ugcbox__shopcta">Shop this look &rsaquo;</span>
+            </a>
+
+            <div class="ugcbox__nav">
+              <button type="button" class="ugc__arrow" data-ugc-box-prev aria-label="Previous post">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+              </button>
+              <span data-ugc-box-count aria-live="polite"></span>
+              <button type="button" class="ugc__arrow" data-ugc-box-next aria-label="Next post">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+              </button>
+            </div>
+
+            {%- if section.settings.handle_url != blank -%}
+              <a class="ugcbox__ig" href="{{ section.settings.handle_url }}" target="_blank" rel="noopener">View on Instagram &#8599;</a>
+            {%- endif -%}
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Worn by the community",
+  "tag": "section",
+  "class": "shopify-section--ugc-community",
+  "enabled_on": { "templates": ["product"] },
+  "max_blocks": 24,
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Worn by the community" },
+    { "type": "text", "id": "handle", "label": "Instagram handle", "default": "@copped.au" },
+    { "type": "url", "id": "handle_url", "label": "Instagram URL" }
+  ],
+  "blocks": [
+    {
+      "type": "post",
+      "name": "Post",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "video", "id": "video", "label": "Video", "info": "When set, this replaces the image." },
+        { "type": "text", "id": "caption", "label": "Caption" },
+        { "type": "text", "id": "sub_line", "label": "Sub-line", "default": "@copped.au" },
+        { "type": "product", "id": "product", "label": "Linked product", "info": "Optional. Makes the tile clickable." },
+        { "type": "text", "id": "duration", "label": "Duration label", "info": "e.g. 0:18. Shown on video posts only." }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Worn by the community",
+      "blocks": [ { "type": "post" }, { "type": "post" }, { "type": "post" }, { "type": "post" } ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,211 @@
+{%- comment -%}
+  The size chart trigger and panel for the product page.
+  In: product (required), section_id (required)
+  Renders nothing when the product resolves to no chart.
+
+  Opening the trigger shows the chart itself: the height x weight grid with the
+  finder offered below it, or — for a chart with no grid, such as shoe sizes —
+  the measurements table alone. The chart is what was asked for; the finder is
+  for people who would rather answer two questions.
+
+  Resolution is inline rather than in its own snippet: Shopify forbids
+  {% include %} inside a {% render %}ed snippet, and {% render %} cannot
+  hand an object back to its caller. The panel is the only consumer, so
+  there is nothing to share.
+
+  Order: the product's own override, then the first matching rule by
+  position, then nothing. There is deliberately no fallback chart —
+  showing a chart that may not describe the item is worse than none.
+{%- endcomment -%}
+
+{%- assign sc_chart = nil -%}
+
+{%- comment -%}
+  Which chart a product gets.
+
+  Order: the product's own override, then the first matching rule by position,
+  then nothing. There is deliberately no fallback chart — showing one that may
+  not describe the item is worse than showing none.
+
+  A rule is a set of optional conditions, and it matches only when EVERY
+  condition it sets matches. Conditions left empty are ignored. That is what
+  lets one brand carry two charts: "Nike + tag Men's Sneakers" at position 10
+  wins over plain "Nike" at position 90, because brand alone is too coarse —
+  Nike here is 54 footwear and 5 clothing.
+
+  match_type/match_value are the original single-condition form and are still
+  honoured, so rules written before this change behave exactly as they did.
+{%- endcomment -%}
+
+{%- if product.metafields.custom.size_chart_override.value != blank -%}
+  {%- assign sc_chart = product.metafields.custom.size_chart_override.value -%}
+{%- else -%}
+  {%- assign sc_rules = shop.metaobjects.size_chart_rule.values | sort: 'position' -%}
+  {%- assign sc_vendor = product.vendor | downcase | strip -%}
+  {%- assign sc_type = product.type | downcase | strip -%}
+
+  {%- for rule in sc_rules -%}
+    {%- assign matched = true -%}
+    {%- assign has_condition = false -%}
+
+    {%- if rule.brand != blank -%}
+      {%- assign has_condition = true -%}
+      {%- assign want = rule.brand | downcase | strip -%}
+      {%- unless want == sc_vendor -%}{%- assign matched = false -%}{%- endunless -%}
+    {%- endif -%}
+
+    {%- if rule.product_type != blank -%}
+      {%- assign has_condition = true -%}
+      {%- assign want = rule.product_type | downcase | strip -%}
+      {%- unless want == sc_type -%}{%- assign matched = false -%}{%- endunless -%}
+    {%- endif -%}
+
+    {%- if rule.tag != blank -%}
+      {%- assign has_condition = true -%}
+      {%- assign want = rule.tag | downcase | strip -%}
+      {%- assign tag_hit = false -%}
+      {%- for t in product.tags -%}
+        {%- assign have = t | downcase | strip -%}
+        {%- if have == want -%}{%- assign tag_hit = true -%}{%- break -%}{%- endif -%}
+      {%- endfor -%}
+      {%- unless tag_hit -%}{%- assign matched = false -%}{%- endunless -%}
+    {%- endif -%}
+
+    {%- comment -%}
+      Title keywords. This is the only thing that separates an Essentials hoodie
+      from an Essentials tee: all of them carry the garment in the title, while
+      product type is "Clothing" for every one of them and no tag says which.
+
+      Several words separated by commas must ALL appear: "hoodie, ss22". The
+      season is what picks between Essentials charts — there is one hoodie
+      chart per season — so the garment alone is not enough. A single word
+      behaves exactly as it did before.
+    {%- endcomment -%}
+    {%- if rule.title_contains != blank -%}
+      {%- assign has_condition = true -%}
+      {%- assign sc_title = product.title | downcase -%}
+      {%- assign words = rule.title_contains | downcase | split: ',' -%}
+      {%- for word in words -%}
+        {%- assign want = word | strip -%}
+        {%- if want != blank -%}
+          {%- unless sc_title contains want -%}{%- assign matched = false -%}{%- endunless -%}
+        {%- endif -%}
+      {%- endfor -%}
+    {%- endif -%}
+
+    {%- comment -%} The original single-condition form. {%- endcomment -%}
+    {%- if rule.match_type != blank and rule.match_value != blank -%}
+      {%- assign has_condition = true -%}
+      {%- assign want = rule.match_value | downcase | strip -%}
+      {%- if rule.match_type == 'brand' -%}
+        {%- unless want == sc_vendor -%}{%- assign matched = false -%}{%- endunless -%}
+      {%- elsif rule.match_type == 'product_type' -%}
+        {%- unless want == sc_type -%}{%- assign matched = false -%}{%- endunless -%}
+      {%- elsif rule.match_type == 'tag' -%}
+        {%- assign tag_hit = false -%}
+        {%- for t in product.tags -%}
+          {%- assign have = t | downcase | strip -%}
+          {%- if have == want -%}{%- assign tag_hit = true -%}{%- break -%}{%- endif -%}
+        {%- endfor -%}
+        {%- unless tag_hit -%}{%- assign matched = false -%}{%- endunless -%}
+      {%- elsif rule.match_type == 'title_contains' -%}
+        {%- assign sc_title = product.title | downcase -%}
+        {%- unless sc_title contains want -%}{%- assign matched = false -%}{%- endunless -%}
+      {%- elsif rule.match_type == 'collection' -%}
+        {%- assign coll_hit = false -%}
+        {%- for coll in product.collections -%}
+          {%- if coll.handle == want -%}{%- assign coll_hit = true -%}{%- break -%}{%- endif -%}
+        {%- endfor -%}
+        {%- unless coll_hit -%}{%- assign matched = false -%}{%- endunless -%}
+      {%- else -%}
+        {%- assign matched = false -%}
+      {%- endif -%}
+    {%- endif -%}
+
+    {%- comment -%}
+      A rule with no conditions at all would match everything, which is how a
+      half-finished rule silently puts the wrong chart on the whole catalogue.
+      It matches nothing instead.
+    {%- endcomment -%}
+    {%- if has_condition and matched and rule.chart.value != blank -%}
+      {%- assign sc_chart = rule.chart.value -%}
+      {%- break -%}
+    {%- endif -%}
+  {%- endfor -%}
+{%- endif -%}
+
+{%- if sc_chart -%}
+  {%- assign panel_id = 'size-chart-' | append: section_id | append: '-' | append: product.id -%}
+
+  {%- comment -%}
+    Two callers, two shells.
+
+    Embedded, the panel is a view inside the size sheet, so it emits its body
+    alone — the sheet already supplies the overlay, the bar and the close
+    button. A second set of them is what made the old arrangement fight itself:
+    the guide button had to close one popover and open another on a timer, and
+    anything that slowed the close left the guide opening into nothing.
+
+    Standalone, it emits only the trigger link that sits beside the SIZE label.
+    The script points that at the sheet too, so there is one chart on the page
+    and one way in.
+  {%- endcomment -%}
+
+  {%- if embedded -%}
+    {%- comment -%}
+      The host wrapper belongs here, not in the caller: rendered there it
+      appeared even on products that resolve to no chart, and the script that
+      reveals the "Size guide" button only checks that a host exists — so the
+      button offered an empty panel.
+    {%- endcomment -%}
+    <div class="size-chart__host" data-size-chart-host hidden>
+    <div class="popover__content size-chart__panel" data-size-chart-views>
+      <div data-size-chart-view="chart">
+        {%- if sc_chart.grid != blank -%}
+          <section class="size-chart__section">
+            <h2 class="size-chart__heading">Height &amp; weight</h2>
+            {%- render 'size-chart-grid', raw: sc_chart.grid, caption: sc_chart.grid_note -%}
+          </section>
+
+          <button type="button" class="size-chart__nav" data-size-chart-to="finder">
+            <span>Not sure? Find my size</span>
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+          </button>
+        {%- elsif sc_chart.measurements != blank -%}
+          {%- comment -%}
+            A chart with no height x weight grid — shoe conversions, garment
+            measurements — is a plain table, so it is shown as one. There is
+            nothing for the finder to look up in it, so it offers none. It goes
+            through the grid snippet for the scroller: shoe tables run six
+            columns, too wide for a phone.
+          {%- endcomment -%}
+          <section class="size-chart__section">
+            <h2 class="size-chart__heading">Size chart</h2>
+            {%- render 'size-chart-grid', raw: sc_chart.measurements, caption: sc_chart.measurements_note -%}
+          </section>
+        {%- endif -%}
+      </div>
+
+      {%- if sc_chart.grid != blank -%}
+        <div data-size-chart-view="finder" hidden>
+          <button type="button" class="size-chart__nav size-chart__nav--back" data-size-chart-to="chart">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+            <span>Back to the chart</span>
+          </button>
+
+          <section class="size-chart__section">
+            <h2 class="size-chart__heading">Find my size</h2>
+            {%- render 'size-chart-finder', raw: sc_chart.grid, measurements: sc_chart.measurements, row_label: sc_chart.row_label, col_label: sc_chart.col_label, id_suffix: panel_id -%}
+          </section>
+        </div>
+      {%- endif -%}
+    </div>
+    </div>
+  {%- else -%}
+    <button
+      type="button"
+      class="product-form__option-link size-chart__trigger link text--subdued"
+      data-open-size-chart-link
+    >{{ 'product.general.size_chart' | t }}</button>
+  {%- endif -%}
+{%- endif -%}

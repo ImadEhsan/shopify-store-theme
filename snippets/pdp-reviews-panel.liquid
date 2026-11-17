@@ -1,0 +1,108 @@
+{%- comment -%}
+  The reviews panel: score, breakdown, tools and the card rail/grid.
+
+  Accepts: section, slider, is_modal.
+{%- endcomment -%}
+
+<div class="pdp-reviews__panel" data-pdp-reviews-panel hidden>
+  <div class="pdp-reviews__top">
+    <div class="pdp-reviews__big">
+      <span class="pdp-reviews__avg pdp-v2__tnum" data-pdp-reviews-avg></span>
+      <div class="pdp-reviews__score-meta">
+        <span class="pdp-v2__stars pdp-reviews__bigstars" style="--pct: 0%" aria-hidden="true"></span>
+        <span class="pdp-reviews__basis" data-pdp-reviews-basis></span>
+      </div>
+    </div>
+
+    {%- if is_modal and section.settings.show_distribution -%}
+      <ul class="pdp-reviews__dist" data-pdp-reviews-dist>
+        {%- comment -%}
+          Rendered highest-first, the way every rating breakdown is read.
+          The rows are real buttons: each one filters the list to that
+          star, and aria-pressed carries the state.
+        {%- endcomment -%}
+        {%- for i in (1..5) reversed -%}
+          <li class="pdp-reviews__distrow">
+            <button type="button" class="pdp-reviews__distbtn"
+                    data-pdp-reviews-star="{{ i }}" aria-pressed="false">
+              <span class="pdp-reviews__distlabel">{{ i }}<span aria-hidden="true">&#9733;</span></span>
+              <span class="pdp-reviews__bar"><span style="--w: 0%"></span></span>
+              <span class="pdp-reviews__distnum pdp-v2__tnum">0</span>
+            </button>
+          </li>
+        {%- endfor -%}
+      </ul>
+    {%- endif -%}
+
+    {%- if is_modal -%}
+      <div class="pdp-reviews__trust">
+        <svg class="pdp-reviews__trusticon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          <path d="m9 12 2 2 4-4"/>
+        </svg>
+        <div class="pdp-reviews__trusttext">
+          <strong class="pdp-reviews__trusttitle">100% Verified Buyers</strong>
+          <span class="pdp-reviews__trustsub">Authentic customer reviews</span>
+        </div>
+      </div>
+    {%- endif -%}
+  </div>
+
+  {%- comment -%}
+    Everything the score block is not. In the popup this is the second column,
+    so the score and the breakdown stay put while the rail is swiped; inline it
+    is simply the next block down and the wrapper does nothing.
+  {%- endcomment -%}
+  <div class="pdp-reviews__main">
+    {%- if is_modal -%}
+      <div class="pdp-reviews__tools">
+        <button type="button" class="pdp-reviews__clear" data-pdp-reviews-clear hidden>
+          <span data-pdp-reviews-clear-label></span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </button>
+
+        <label class="pdp-reviews__sortwrap">
+          <span class="pdp-reviews__sortlabel">Sort</span>
+          <select class="pdp-reviews__sort" data-pdp-reviews-sort>
+            <option value="featured">Featured</option>
+            <option value="date">Most recent</option>
+            <option value="rating">Highest rated</option>
+            <option value="rating:asc">Lowest rated</option>
+          </select>
+        </label>
+      </div>
+    {%- elsif slider -%}
+      <div class="pdp-reviews__tools">
+        <div class="pdp-reviews__arrows" data-pdp-reviews-arrows hidden>
+          <button type="button" class="pdp-reviews__arrow" data-pdp-reviews-prev aria-label="Previous reviews">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+          </button>
+          <button type="button" class="pdp-reviews__arrow" data-pdp-reviews-next aria-label="More reviews">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+          </button>
+        </div>
+      </div>
+    {%- endif -%}
+
+    {%- comment -%}
+      One element, two layouts. As a slider it is the scroll rail; as a grid
+      it is the two-column grid. The JS reads data-layout rather than
+      sniffing the class, so the markup stays the same either way.
+    {%- endcomment -%}
+    <div class="pdp-reviews__grid" data-pdp-reviews-list
+      {%- if slider and is_modal == false %} data-cau-drag-scroll tabindex="0" role="group" aria-label="Customer reviews"{% endif -%}
+    ></div>
+
+    {%- if slider and is_modal == false -%}
+      <div class="pdp-reviews__progress" data-pdp-reviews-progress hidden>
+        <span data-pdp-reviews-thumb></span>
+      </div>
+    {%- endif -%}
+
+    <p class="pdp-reviews__note" data-pdp-reviews-note hidden role="status"></p>
+
+    <button type="button" class="pdp-reviews__more" data-pdp-reviews-more hidden>
+      <span data-pdp-reviews-more-label>Load more reviews</span>
+    </button>
+  </div>
+</div>

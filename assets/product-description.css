@@ -1,0 +1,128 @@
+/* The details & about this piece (matching PDP prototype).
+   2-column grid (.pair) with The details (specs) on the left, About this piece (prose) on the right.
+   Stacks to 1 column on mobile (<= 900px). */
+
+.pdp-desc {
+  padding-block: var(--cau-section-pad, 24px);
+  border-top: 1px solid var(--cau-hairline);
+  scroll-margin-top: calc(var(--cau-header-h, 70px) + var(--cau-s4, 16px));
+}
+
+@media screen and (min-width: 901px) {
+  .pdp-desc {
+    padding-block: var(--cau-s12, 48px);
+  }
+}
+
+.pdp-desc__pair {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--cau-s12, 48px);
+  align-items: start;
+}
+
+@media screen and (min-width: 901px) {
+  .pdp-desc__pair {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--cau-s12, 48px) clamp(32px, 5vw, 80px);
+  }
+}
+
+.pdp-desc__title {
+  font-family: var(--heading-font-family, inherit);
+  font-size: clamp(1.25rem, 3vw, 1.5rem);
+  font-weight: 600;
+  letter-spacing: -.01em;
+  color: var(--cau-ink-900);
+  margin: 0 0 6px;
+}
+
+.pdp-desc__lead {
+  margin: 0 0 var(--cau-s8, 32px);
+  color: var(--cau-ink-400);
+  font-size: .9375rem;
+  line-height: 1.5;
+  max-width: 60ch;
+}
+
+/* ---------- Specs table ---------- */
+
+.pdp-specs {
+  margin: 0;
+  border: 1px solid var(--cau-hairline);
+  border-radius: var(--cau-r-lg, 13px);
+  overflow: hidden;
+  font-size: .9375rem;
+}
+
+.pdp-specs__row {
+  display: grid;
+  grid-template-columns: 130px minmax(0, 1fr);
+}
+
+@media screen and (min-width: 600px) {
+  .pdp-specs__row {
+    grid-template-columns: 160px minmax(0, 1fr);
+  }
+}
+
+.pdp-specs__row:nth-child(odd) {
+  background: var(--cau-mist, #F4F4F3);
+}
+
+.pdp-specs__row > * {
+  margin: 0;
+  padding: 12px var(--cau-s4, 16px);
+}
+
+.pdp-specs dt {
+  color: var(--cau-ink-400);
+  font-weight: 600;
+}
+
+.pdp-specs dd {
+  color: var(--cau-ink-900);
+  overflow-wrap: anywhere;
+}
+
+/* ---------- Prose (About this piece) ---------- */
+
+.pdp-desc__prose {
+  max-width: 68ch;
+  font-size: 1rem;
+  line-height: 1.65;
+  color: var(--cau-ink-700);
+}
+
+.pdp-desc__pair .pdp-desc__prose {
+  margin-top: var(--cau-s4, 16px);
+}
+
+.pdp-desc__prose p {
+  margin: 0 0 1em;
+}
+
+.pdp-desc__prose.rte p + p {
+  margin-top: 0;
+}
+
+.pdp-desc__prose > :last-child {
+  margin-bottom: 0;
+}
+
+.pdp-desc__prose strong {
+  color: var(--cau-ink-900);
+  font-weight: 700;
+}
+
+.pdp-desc__prose :is(p, li, div):empty,
+.pdp-desc__prose ul:not(:has(li:not(:empty))) {
+  display: none;
+}
+
+/* ---------- Single block fallback (when no specs) ---------- */
+
+.pdp-desc__single .pdp-desc__prose {
+  margin-top: var(--cau-s3, 12px);
+  max-width: 68ch;
+}

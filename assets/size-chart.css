@@ -1,0 +1,757 @@
+/* Size chart — tables, grid and finder. Focal 10.3.1. */
+
+.size-chart__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+.size-chart__caption {
+  caption-side: top;
+  text-align: left;
+  font-size: 0.75rem;
+  color: rgba(var(--text-color), 0.65);
+  padding-bottom: 0.75rem;
+}
+.size-chart__th {
+  text-align: right;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(var(--text-color), 0.65);
+  padding: 0 0 0.5rem;
+  white-space: nowrap;
+}
+.size-chart__th--row,
+.size-chart__rowhead {
+  text-align: left;
+}
+.size-chart__rowhead {
+  font-size: 0.875rem;
+  font-weight: 700;
+  padding: 0.6875rem 0;
+  border-top: 1px solid rgba(var(--text-color), 0.1);
+}
+.size-chart__td {
+  text-align: right;
+  font-size: 0.875rem;
+  padding: 0.6875rem 0;
+  border-top: 1px solid rgba(var(--text-color), 0.1);
+}
+
+/* Grid — wide charts that scroll sideways with the first column pinned. */
+.size-chart__scroller {
+  overflow-x: auto;
+  padding-bottom: 0.625rem;
+  scrollbar-width: thin;
+}
+.size-chart__scroller:focus-visible {
+  outline: 2px solid rgb(var(--text-color));
+  outline-offset: 2px;
+}
+.size-chart__grid {
+  /* Default is the honest one: natural width, no wrapping, and the scroller
+     around it takes over. Squeezing 12 columns into a phone makes every cell
+     unreadable, so below 700px we scroll instead. */
+  border-collapse: separate;
+  border-spacing: 0;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.size-chart__grid .size-chart__gth--pin {
+  white-space: nowrap;
+}
+
+/* Above 700px there is room to fit the whole grid, so fill the panel and
+   drop the sideways scroll. */
+@media screen and (min-width: 701px) {
+  .size-chart__grid {
+    width: 100%;
+    table-layout: fixed;
+    white-space: normal;
+  }
+  /* Wide enough for the header, not just the body labels. "Measurement" is
+     0.8125rem bold - about 88px - while 4.75rem left only ~66px of content box
+     after the right padding. With white-space: nowrap and table-layout: fixed
+     the overflow could not wrap, so it crossed the pinned column's border
+     instead. The body labels (Chest, Shoulder) always fitted, which is why only
+     the header row showed it. */
+  .size-chart__grid .size-chart__gth--pin { width: 7rem; }
+
+  /* The label is merchant-editable (size-chart-finder.liquid:30 defaults it to
+     "Measurement"), so it can always be set longer than any width chosen here.
+     It wraps inside its own cell rather than crossing the border — an ellipsis
+     cut "US/AU Men's / Unisex" on the Asics chart down to "US/AU Men's / Uni…",
+     which loses the half of the label that says what the column is. */
+  .size-chart__grid thead .size-chart__gth--pin {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  /* Column headings stay on one line. Twelve columns share the panel, so each
+     gets ~69px, and the 11px side padding left "40–45" a few pixels short — it
+     broke at the dash into "40–" over "45" across the whole header row. The
+     cells below are a single size each, so the heading is the widest thing in
+     its column and the padding can come in. */
+  .size-chart__grid thead .size-chart__gth:not(.size-chart__gth--pin) {
+    white-space: nowrap;
+    padding-inline: 0.25rem;
+    vertical-align: bottom;
+  }
+}
+
+.size-chart__gth {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: rgba(var(--text-color), 0.65);
+  padding: 0 0.6875rem 0.5rem;
+}
+
+.size-chart__gth--pin {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background: rgb(var(--background));
+  text-align: left;
+  padding-left: 0;
+  padding-right: 0.625rem;
+  border-right: 1px solid rgba(var(--text-color), 0.12);
+}
+tbody .size-chart__gth--pin {
+  font-size: 0.875rem;
+  color: rgb(var(--text-color));
+  padding-top: 0.5625rem;
+  padding-bottom: 0.5625rem;
+  border-top: 1px solid rgba(var(--text-color), 0.1);
+}
+.size-chart__gtd {
+  text-align: center;
+  font-size: 0.875rem;
+  font-weight: 600;
+  padding: 0.625rem 0.6875rem;
+  border-top: 1px solid rgba(var(--text-color), 0.1);
+}
+
+/* Panel — the trigger beside the size selector, and the popover it opens. */
+.size-chart__trigger {
+  display: inline-flex;
+  align-items: center;
+  align-self: center;
+  min-height: 44px;
+  margin-inline-start: auto;
+  margin-inline-end: -0.5rem;
+  padding: 0 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  color: inherit;
+}
+.size-chart__panel { padding: 1.25rem; }
+.size-chart__section + .size-chart__section { margin-top: 1.75rem; }
+.size-chart__heading {
+  margin: 0 0 0.1875rem;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* A hidden panel view is hidden, full stop.
+
+   Both views carry explicit display rules on desktop, and an explicit display
+   beats the browser's [hidden] rule no matter the source order. This has to
+   be unconditional and !important or the finder leaks onto the chart screen.
+   Opening the size chart must show the chart alone. */
+[data-size-chart-view][hidden] {
+  display: none !important;
+}
+
+/* The size chart panel sits above page content at every width.
+
+   The size selector is raised to z-index 30 further down (so it clears the
+   bundle app's badge), and Focal only gives .popover a z-index of 10 — which
+   let the select box show through the chart on mobile. */
+.popover.size-chart__popover {
+  z-index: 60;
+}
+.popover.size-chart__popover > .popover__overlay {
+  z-index: 59;
+}
+
+/* ---------------------------------------------------------------------------
+   Desktop: a centred modal instead of Focal's anchored popover.
+
+   Focal anchors .popover beside its trigger above 1000px, which is right for
+   a short menu and wrong for an 11-column table — it renders narrow, clipped,
+   and overlapping whatever sits below the size selector.
+
+   Scoped to .size-chart__popover so every other popover in the theme keeps
+   Focal's behaviour. Below 1000px nothing here applies and Focal's bottom
+   sheet stands, which is the correct pattern on a phone.
+   --------------------------------------------------------------------------- */
+@media screen and (min-width: 1000px) {
+  /* Centred with inset + auto margins, NOT transform. A transformed element
+     becomes the containing block for position:fixed descendants, which would
+     anchor the scrim to this box instead of the viewport. */
+  .popover.size-chart__popover {
+    position: fixed;
+    inset: 0;
+    margin: auto;
+    width: min(950px, 94vw);
+    height: fit-content;
+    max-height: 86vh;
+    display: flex;
+    flex-direction: column;
+    border-radius: 12px;
+    /* Opaque, or the scrim behind shows through and tints the whole panel. */
+    background: rgb(var(--background));
+    box-shadow: 0 10px 34px -10px rgba(0, 0, 0, 0.28);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s;
+    z-index: 100;
+  }
+  .popover.size-chart__popover[open] {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  /* Full-screen scrim. Focal hides the overlay on desktop; the size chart
+     needs it back, because a centred modal over live page content without a
+     scrim reads as a rendering fault. */
+  .popover.size-chart__popover > .popover__overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.45);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.25s ease, visibility 0.25s;
+    z-index: -1;
+  }
+  .popover.size-chart__popover[open] > .popover__overlay {
+    visibility: visible;
+  }
+
+  .popover.size-chart__popover .popover__content {
+    overflow-y: auto;
+    flex-grow: 1;
+  }
+}
+
+@media screen and (prefers-reduced-motion: reduce) {
+  .popover.size-chart__popover,
+  .popover.size-chart__popover > .popover__overlay {
+    transition: none;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Desktop layout inside the modal.
+
+   Stacked, the measurements table stretches three columns across the full
+   width and the grid leaves a dead gutter beside it. Side by side, both fit
+   without scrolling and the modal looks composed rather than overflowing.
+   --------------------------------------------------------------------------- */
+@media screen and (min-width: 1000px) {
+  /* Header stays put; only the content scrolls. */
+  /* Focal hides .popover__header above 1000px — fine for a small anchored
+     menu, but this is a modal and needs its title and close button. */
+  .popover.size-chart__popover .popover__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-shrink: 0;
+    min-height: 0;
+    padding: 1.125rem 1.5rem;
+    border-bottom: 1px solid rgba(var(--text-color), 0.12);
+  }
+  .popover.size-chart__popover .popover__title {
+    margin: 0;
+    text-align: left;
+  }
+  .popover.size-chart__popover .popover__close-button {
+    margin-inline-start: auto;
+    margin-inline-end: -0.5rem;
+  }
+  .popover.size-chart__popover .size-chart__panel { padding: 1.75rem; }
+
+  .popover.size-chart__popover .size-chart__table {
+    width: auto;
+  }
+  .popover.size-chart__popover .size-chart__th:not(:first-child),
+  .popover.size-chart__popover .size-chart__td:not(:first-child) {
+    padding-left: 1.5rem;
+  }
+
+}
+
+/* Measurements read better with a little breathing room between rows and a
+   tint on the size column, at any width. */
+.size-chart__rowhead { white-space: nowrap; }
+.size-chart__table tbody tr:nth-child(odd) th,
+.size-chart__table tbody tr:nth-child(odd) td {
+  background: rgba(var(--text-color), 0.025);
+}
+
+/* Size options: name left, stock right. */
+.combo-box__option-item.size-option {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.size-option__stock {
+  /* Pushed right by its own margin rather than the row's justify-content, so
+     it stays on the right even on the selected row, which also holds a tick. */
+  margin-inline-start: auto;
+  padding: 0.1875rem 0.5625rem;
+  border-radius: 999px;
+  background: rgba(var(--text-color), 0.07);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: rgba(var(--text-color), 0.75);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.size-option__stock--out {
+  background: transparent;
+  border: 1px solid rgba(var(--text-color), 0.18);
+  color: rgba(var(--text-color), 0.5);
+}
+.size-option__stock--low {
+  /* The theme's Error colour, so it follows the merchant's palette rather
+     than hard-coding a red that fights it. */
+  background: rgb(var(--error-color));
+  color: #fff;
+}
+
+
+
+/* Label and size-chart link on one baseline.
+
+   The trigger is an inline-flex box with a 44px min-height for the touch
+   target, so its baseline sits well below the label's. Making the row a
+   flex container and centring it aligns them; the negative block margins
+   stop the 44px target from growing the row. */
+.product-form__option-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.product-form__option-info .size-chart__trigger {
+  margin-block: -0.625rem;
+}
+
+/* Keep the stock pills in one column.
+
+   Focal draws the selected tick as an ::after flex child, so it only exists
+   on the selected row and shoves that row's pill left. Reserve the tick's
+   space on every row and take it out of the flow. */
+.combo-box__option-item.size-option {
+  padding-inline-end: 2.625rem;
+}
+.combo-box__option-item.size-option[aria-selected="true"]::after {
+  position: absolute;
+  inset-inline-end: 1.125rem;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-inline-start: 0;
+}
+
+/* Size-first buy path: express checkout is hidden until a size is chosen,
+   because it would otherwise buy the pre-selected default in one tap. */
+.product-form[data-size-first="locked"] .shopify-payment-button,
+.product-form[data-size-first="locked"] .product-form__payment-container .shopify-payment-button {
+  display: none;
+}
+.product-form[data-size-first="locked"] [data-product-add-to-cart-button] {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+/* On an early tap, draw the eye to the size row rather than throwing an error. */
+.product-form__option-selector[data-size-first-nudge] {
+  animation: size-first-nudge 0.5s ease;
+}
+@keyframes size-first-nudge {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-5px); }
+  40%, 80% { transform: translateX(5px); }
+}
+@media screen and (prefers-reduced-motion: reduce) {
+  .product-form__option-selector[data-size-first-nudge] { animation: none; outline: 2px solid rgb(var(--text-color)); outline-offset: 4px; }
+}
+
+/* Finder — two dropdowns derived from the grid's own headings. */
+.size-chart__finder-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+.size-chart__finder-field { margin: 0; }
+.size-chart__finder-label {
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  margin-bottom: 0.375rem;
+}
+.size-chart__finder-select {
+  width: 100%;
+  min-height: 48px;
+  padding: 0 0.75rem;
+  border: 1px solid rgba(var(--text-color), 0.22);
+  border-radius: 8px;
+  background: rgb(var(--background));
+  color: rgb(var(--text-color));
+  font: inherit;
+  font-size: 0.9375rem;
+}
+/* The answer, as approved: caption, the size, what was chosen, and what that
+   size measures. */
+.size-chart__answer {
+  margin-top: 1.375rem;
+  padding: 1.375rem 1rem;
+  border: 1px solid rgba(var(--text-color), 0.14);
+  border-radius: 12px;
+  background: rgba(var(--text-color), 0.025);
+  text-align: center;
+}
+.size-chart__answer-empty {
+  margin: 0;
+  padding: 0.75rem 0;
+  font-size: 0.875rem;
+  color: rgba(var(--text-color), 0.6);
+}
+.size-chart__answer-caption {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: rgba(var(--text-color), 0.7);
+}
+.size-chart__answer-size {
+  margin: 0.375rem 0 0;
+  font-size: 2.75rem;
+  font-weight: 700;
+  line-height: 1;
+}
+.size-chart__answer-context {
+  margin: 0.625rem 0 0;
+  font-size: 0.8125rem;
+  color: rgba(var(--text-color), 0.6);
+  font-variant-numeric: tabular-nums;
+}
+.size-chart__answer-measures {
+  margin: 0.875rem 0 0;
+  padding-top: 0.875rem;
+  border-top: 1px solid rgba(var(--text-color), 0.12);
+  font-size: 0.8125rem;
+  color: rgba(var(--text-color), 0.8);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Moving between the chart and the finder. */
+.size-chart__nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  width: 100%;
+  min-height: 48px;
+  margin-top: 1.5rem;
+  padding: 0 0.875rem;
+  border: 1.5px solid rgb(var(--text-color));
+  border-radius: 8px;
+  background: transparent;
+  color: rgb(var(--text-color));
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.size-chart__nav--back {
+  justify-content: flex-start;
+  margin-top: 0;
+  margin-bottom: 1.25rem;
+  min-height: 44px;
+  border: 0;
+  padding-left: 0;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.size-chart__nav:focus-visible {
+  outline: 2px solid rgb(var(--text-color));
+  outline-offset: 2px;
+}
+
+@media screen and (min-width: 1000px) {
+  .popover.size-chart__popover [data-size-chart-view="finder"] {
+    max-width: 420px;
+    margin-inline: auto;
+  }
+  /* the panel itself is no longer the grid — the chart view is */
+  .popover.size-chart__popover .size-chart__panel {
+    display: block;
+  }
+}
+
+/* The size-picker header is laid out by pdp.css as a three-column grid, which
+   is what keeps "Size guide", the title and the close button on one row. The
+   only rule left here is the hidden state, which the script toggles. */
+.combo-box__size-guide[hidden] { display: none; }
+
+
+/* ---- the size picker sheet itself, moved out of pdp.css ----
+
+   The same sheet renders on every template that puts a size picker on the
+   page: the product page (main-product), the homepage's featured product,
+   and the quick-buy drawer on collection and shop-the-look sections. All
+   three go through product-info / product-form, but pdp.css loads only from
+   main-product and these rules were .pdp-v2-scoped on top of that — so off
+   the product page the sheet fell back to Focal's 10px corners, hard edge
+   and lighter scrim while the product page had the rounded, lifted one.
+   The header above was moved here for exactly this reason; the sheet it
+   sits in belongs with it.
+
+   Deliberately ahead of the is-guide modal below: between 561px and 740px
+   both apply, and the modal's radius has to win on source order.
+   --------------------------------------------------------------------- */
+
+/* The grab handle. Decorative — the drag itself is implemented in pdp.js,
+   which loads only on the product page, so elsewhere this reads as the
+   sheet's top marker and supplies the 16px of air above the header. */
+.pdp-v2__grab {
+  flex: 0 0 auto;
+  width: 36px;
+  height: 4px;
+  margin: 10px auto 2px;
+  border-radius: var(--cau-r-pill, 999px);
+  background: var(--cau-hairline);
+}
+
+.combo-box.is-dragging { transition: none; }
+
+@media screen and (max-width: 740px) {
+  /* .select-wrapper matches joshtheme2025's `.select-wrapper .combo-box`,
+     which squares the top and rounds the bottom. Equal specificity, and
+     size-chart.css loads after it, so the tie falls this way. */
+  .select-wrapper .combo-box {
+    border-radius: 22px 22px 0 0;
+    background: var(--cau-paper);
+    box-shadow: 0 -18px 44px -18px rgba(10, 10, 12, .32);
+  }
+
+  .combo-box[open] > .combo-box__overlay { opacity: 0; }
+}
+
+@media screen and (min-width: 741px) {
+  /* Above Focal's switch the picker is a dropdown, not a sheet. */
+  .pdp-v2__grab { display: none; }
+}
+
+
+
+/* The size guide as a centred modal on desktop.
+
+   Moved here from pdp.css, and un-scoped from .pdp-v2. The guide opens from
+   any size picker - the homepage's featured product and the quick-buy drawer
+   render the same combo-box - but pdp.css loads only on the product page and
+   its rules required a .pdp-v2 ancestor, so everywhere else the guide stayed
+   in the narrow anchored dropdown. size-chart.css is loaded globally from
+   theme.liquid, which is where the guide's own styling belongs.
+
+   is-guide is only ever set on the size picker by size-chart.js, so dropping
+   the .pdp-v2 prefix widens this to the right elements and no others.
+
+/* 561px, not Focal's 741px. Focal turns the picker into a bottom sheet below
+   741px and the guide rode along inside it - a twelve-column table in a sheet
+   scrolls sideways and reads badly on anything wider than a phone. The guide
+   is a centred modal from 561px up; only real phone widths keep the sheet. */
+@media screen and (min-width: 561px) {
+  .combo-box.is-guide {
+    position: fixed;
+    /* Horizontally centred by auto margins. Vertically pinned rather than
+       centred: auto margins cannot centre a max-content height, and the
+       transform that would do it becomes the containing block for the fixed
+       scrim inside this element. */
+    inset-block-start: clamp(24px, 9vh, 72px);
+    inset-block-end: auto;
+    inset-inline: 0;
+    margin-inline: auto;
+    width: min(950px, 94vw);
+    height: max-content;
+    max-height: min(82vh, 660px);
+    z-index: 100;
+    /* Fallback matters here: --cau-* is defined in pdp.css, which does not
+       load off the product page. */
+    border-radius: var(--cau-r-lg, 13px);
+    box-shadow: 0 30px 80px -30px rgba(0, 0, 0, .5);
+    overflow: hidden;
+  }
+  /* The header carries Back and the close button, so it returns in guide mode. */
+  .combo-box.is-guide .combo-box__header { display: grid; }
+
+  /* [open] only: is-guide outlives a close, and a visible scrim on a closed
+     picker swallows every click on the page. */
+  .combo-box.is-guide[open] .combo-box__overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    width: 100%;
+    height: 100%;
+    opacity: 1;
+    visibility: visible;
+  }
+  /* pdp.css rounds only the sheet's top corners below 741px at (0,3,0),
+     which outranks a bare .combo-box.is-guide. Matched here so the modal is
+     not a sheet with two square corners. */
+  .pdp-v2 .select-wrapper .combo-box.is-guide,
+  .combo-box.is-guide { border-radius: var(--cau-r-lg, 13px); }
+
+  .combo-box.is-guide .size-chart__host {
+    overflow: auto;
+    max-height: calc(min(80vh, 640px) - 56px);
+  }
+}
+
+
+
+/* ---- size picker header, moved out of pdp.css ----
+
+   These were .pdp-v2-scoped, so the guide modal off the product page had an
+   unstyled header: Back, the title and the close button stacked instead of
+   sharing a row. The guide opens from any size picker, so its chrome belongs
+   beside the rest of the guide's styling, in this globally loaded file.
+
+   The --cau-* tokens below resolve everywhere now: cau-tokens.css is loaded
+   from theme.liquid on every page.
+*/
+
+/* ---------- size picker header ----------
+
+   Focal centres the title with flex and pins its close button at a fixed
+   top: 24px, and last session's "Size guide" button was centred at 50%. Three
+   different vertical anchors, so the three never shared a row. A grid gives
+   the title the centre column and puts the other two in their own, so all
+   three are centred against the same line. */
+
+/* Focal switches the picker at 740/741px, not at our 901px: below it the
+   picker is a bottom sheet with this header, above it a plain dropdown with
+   the header set to display: none. The grid therefore belongs to the sheet
+   only, and is switched back off at 741px to match. */
+.combo-box__header {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 8px;
+  min-height: 52px;
+  /* Symmetric block padding. It was 0 top / 10px bottom, which pushed Back,
+     the title and the close button to sit against the top edge of the bar
+     instead of on its centre line — visible on the phone sheet, where the
+     header is the first thing under the grab handle. */
+  padding: 5px 10px 5px 20px;
+  border-bottom: 1px solid var(--cau-hairline);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.combo-box__size-guide {
+  position: static;
+  inset-inline-start: auto;
+  top: auto;
+  transform: none;
+  justify-self: start;
+  margin: 0;
+  padding: 0 2px;
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: .875rem;
+  font-weight: 500;
+  color: var(--cau-ink-700);
+  text-decoration: underline;
+  text-decoration-color: var(--cau-ink-300);
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+.combo-box__size-guide:hover { color: var(--cau-ink-900); text-decoration-color: currentColor; }
+
+.combo-box__title {
+  justify-self: center;
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: -.01em;
+  text-align: center;
+  white-space: nowrap;
+}
+.combo-box__close-button {
+  /* Relative, not static: Focal's .tap-area:before is absolute, and with a
+     static button it sized itself to the fixed guide modal — the whole modal
+     became the close button. */
+  position: relative;
+  /* Focal's right: 24px / left: 24px were inert while this was static; as
+     relative they would shove the button inward. */
+  inset: auto;
+  justify-self: end;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  color: var(--cau-ink-900);
+}
+.combo-box__close-button svg { width: 16px; height: 16px; }
+
+@media screen and (min-width: 741px) {
+  /* Above Focal's switch the picker is a dropdown and has no header, so the
+     "Size guide" button lives only on the sheet. The "Size chart" link beside
+     the label is the way in at this width. */
+  .combo-box__header { display: none; }
+}
+
+/* The size guide lives inside the sheet as a second view. */
+.size-chart__host[hidden],
+.combo-box__option-list[hidden] { display: none; }
+.size-chart__host { padding: 0 20px 10px; }
+
+/* On a phone the guide has to be its own scroller.
+
+   Focal puts .lock-mobile on <html> while the sheet is open, and that sets
+   touch-action: none. A swipe only scrolls if a scroll container sits between
+   the finger and <html>; Focal's option list is one, which is why the sizes
+   scroll. The guide was not: it had no height limit, so it grew past the 75vh
+   sheet, nothing under the finger could scroll, and <html>'s touch-action
+   swallowed every swipe — vertical through the chart, and sideways across a
+   six-column shoe table.
+
+   Bounded by the sheet (flex child with min-height: 0), it scrolls itself, and
+   the grid's sideways scroller inside it works because a scroller now stands
+   between it and <html>. The panel's own overflow: auto from .popover__content
+   is turned off so there is one vertical scroller, not two nested ones.
+
+   Phone widths only: from 561px the guide is the centred modal, which has its
+   own overflow rule above. */
+@media screen and (max-width: 560px) {
+  .size-chart__host {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    touch-action: pan-x pan-y;
+    padding-block-end: max(10px, env(safe-area-inset-bottom, 0px) + 10px);
+  }
+  .size-chart__host .size-chart__panel { overflow: visible; }
+  .size-chart__host .size-chart__scroller {
+    touch-action: pan-x pan-y;
+    overscroll-behavior-x: contain;
+  }
+}

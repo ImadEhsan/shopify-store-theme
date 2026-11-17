@@ -1,0 +1,98 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "show_title": false,
+        "page_width": "medium"
+      }
+    },
+    "fea985a6-a81d-4fba-8979-97b32d9f54f1": {
+      "type": "rich-text",
+      "settings": {
+        "custom_class": "about-us",
+        "subheading": "",
+        "title": "The Authentication Process",
+        "content": "<p>At <strong>CoppedAU</strong>, we take the authenticity of our products very seriously. We understand that our customers expect only the best, and we're committed to delivering the highest quality products possible. That's why we have a rigorous authentication process in place to ensure that every item we sell is 100% authentic. We are so confident that we guarantee all our customers a 100% authenticity or money-back guarantee.</p>",
+        "button_text": "",
+        "button_link": "",
+        "background_type": "full_width",
+        "text_width": "medium",
+        "text_position": "center",
+        "text_alignment": "left",
+        "background": "rgba(0,0,0,0)",
+        "text_color": "rgba(0,0,0,0)",
+        "button_background": "rgba(0,0,0,0)",
+        "button_text_color": "rgba(0,0,0,0)",
+        "padding_top": 8,
+        "padding_bottom": 8,
+        "mbl_padding_top": 6,
+        "mbl_padding_bottom": 6
+      }
+    },
+    "rich_text_3AM8Jb": {
+      "type": "rich-text",
+      "name": "Rich text",
+      "settings": {
+        "custom_class": "about-us",
+        "subheading": "",
+        "title": "Sourcing",
+        "content": "<p>We work with a network of trusted and reliable suppliers who provide us with the latest and most sought-after streetwear items. Our suppliers have been carefully vetted to ensure that they only offer authentic products. We have established long-term relationships with our suppliers, which allows us to access limited edition and hard-to-find pieces.</p>",
+        "button_text": "",
+        "button_link": "",
+        "background_type": "boxed",
+        "text_width": "medium",
+        "text_position": "center",
+        "text_alignment": "left",
+        "background": "rgba(0,0,0,0)",
+        "text_color": "rgba(0,0,0,0)",
+        "button_background": "rgba(0,0,0,0)",
+        "button_text_color": "rgba(0,0,0,0)",
+        "padding_top": 8,
+        "padding_bottom": 8,
+        "mbl_padding_top": 6,
+        "mbl_padding_bottom": 6
+      }
+    },
+    "rich_text_D8L6Hq": {
+      "type": "rich-text",
+      "name": "Rich text",
+      "settings": {
+        "custom_class": "about-us bottom",
+        "subheading": "",
+        "title": "Authentication proccess",
+        "content": "<p>Our in-house team of experts has over 20 years of combined experience in the sneaker and streetwear industry. They're passionate about the culture and have a keen eye for detail. Every piece of item that enters our warehouse is inspected by our team of experts to ensure that it meets our strict standards of authenticity.</p><p>Our authentication process includes a thorough inspection of every aspect of the product, including the materials used, stitching, and overall quality. We also use industry-standard tools and techniques to check the product's authenticity, such as UV light and hologram verification where applicable.</p><p>We take pride in our authentication process and are confident that our customers can shop with us knowing that they're getting 100% authentic products. We stand behind every item we sell and offer a money-back guarantee if any item is found to be not authentic.</p><p>Thank you for choosing CoppedAU for your streetwear needs. We're committed to providing you with the best possible shopping experience and ensuring that you're getting only the best and most authentic products.</p>",
+        "button_text": "",
+        "button_link": "",
+        "background_type": "boxed",
+        "text_width": "medium",
+        "text_position": "center",
+        "text_alignment": "left",
+        "background": "rgba(0,0,0,0)",
+        "text_color": "rgba(0,0,0,0)",
+        "button_background": "rgba(0,0,0,0)",
+        "button_text_color": "rgba(0,0,0,0)",
+        "padding_top": 8,
+        "padding_bottom": 8,
+        "mbl_padding_top": 6,
+        "mbl_padding_bottom": 6
+      }
+    }
+  },
+  "order": [
+    "main",
+    "fea985a6-a81d-4fba-8979-97b32d9f54f1",
+    "rich_text_3AM8Jb",
+    "rich_text_D8L6Hq"
+  ]
+}

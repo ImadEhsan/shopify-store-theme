@@ -1,0 +1,968 @@
+/* CoppedAU product page.
+
+   Everything here is scoped under .pdp-v2, which sits on the product section.
+   Two classes beat Focal's one-class rules, so we win on structure rather than
+   on !important. Remove the class and the redesign is off — that is the
+   rollback.
+
+   Mobile first: the base is the phone, and one min-width query adds desktop.
+   The prototype was written the other way round; it is inverted here so the
+   phone downloads nothing it has to override. */
+
+:root {
+  /* Every PDP section pads itself by this on both sides, so two neighbours
+     always meet at twice it: 48px on phones, 64px from 901px. */
+  --cau-section-pad: 24px;
+
+  --cau-e2: 0 -1px 0 rgba(0, 0, 0, .06), 0 -14px 30px -20px rgba(0, 0, 0, .28);
+
+  --cau-gutter: clamp(16px, 4vw, 48px);
+  --cau-header-h: 70px;
+  /* 672 image + 48 gap + 480 info: the width the two PDP columns actually need.
+     The grid and the breadcrumb above it both centre on this, so they share one
+     left edge. */
+  --cau-pdp-max: 1200px;
+}
+
+/* ---------- breadcrumb ---------- */
+
+.pdp-v2 .pdp-v2__crumb-back {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding-top: 10px;
+  font-size: .8125rem;
+  color: var(--cau-ink-400);
+}
+.pdp-v2 .breadcrumb { display: none; }
+
+/* ---------- gallery ---------- */
+
+/* Focal bleeds the gallery past the gutter on phones and pads each slide back
+   in, which leaves the image floating in white. The prototype draws one square
+   card that the photo fills. The frame therefore belongs on the image wrapper,
+   which is the element Focal actually sizes, not on the track. */
+.pdp-v2 .product__media-list-wrapper {
+  max-width: 100% !important;
+  width: 100%;
+}
+.pdp-v2 .product__media-list { margin-inline: 0; }
+.pdp-v2 .product__media-item { padding-inline: 0; }
+.pdp-v2 .product__media-image-wrapper {
+  /* Focal drives this from --aspect-ratio per image; redefining the variable
+     squares it off without needing !important. */
+  --aspect-ratio: 1;
+  border: 1px solid var(--cau-hairline);
+  border-radius: var(--cau-r-lg);
+  background: var(--cau-mist);
+}
+.pdp-v2 .product__media-image-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.pdp-v2__seal {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+  width: clamp(44px, 14vw, 56px);
+  height: clamp(44px, 14vw, 56px);
+  padding: 2px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .2);
+  transition: transform .15s cubic-bezier(.34, 1.56, .64, 1);
+}
+.pdp-v2__seal img { width: 100%; height: 100%; border-radius: 50%; }
+
+/* Focal's own gallery nav, not Flickity's.
+
+   flickity-controls.product__media-nav holds three things: prev/next arrows
+   and a dots-nav (both hidden-lap-and-up, so phones only), and a thumbnail
+   strip (hidden-pocket, so desktop only). Focal already gets that split right;
+   these rules only restyle them. Note the nav is a SIBLING of the image
+   wrapper, so the dots anchor to .product__media instead. */
+
+/* Shopify serves joshtheme2025.scss raw — it is never compiled — so the browser
+   reads that file's SCSS nesting as native CSS nesting. The nested rules under
+   `.shopify-section--featured-product .product, .product` (joshtheme2025.scss:453)
+   therefore resolve through :is(), which takes the specificity of its strongest
+   arm, landing them at (0,3,0). A plain `.pdp-v2 .product__media` is (0,2,0) and
+   loses to them no matter how late it is loaded — hence the extra `.product` on
+   the overrides below, which ties at (0,3,0) and wins on source order.
+
+   display: block matters too. flickity-controls is a custom element and
+   defaults to inline, so it kept an 18px line box below the image even with
+   every child hidden or absolute — which is what pushed the dots down onto
+   the frame's edge. */
+
+.pdp-v2 .product__media { position: relative; }
+.pdp-v2 .product__media-nav { display: block; }
+
+/* The image wrapper is the card. The outer frame — border, radius and the
+   1em/2em inset that made the image look double-framed — is not ours. */
+.pdp-v2 .product .product__media {
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+}
+
+/* joshtheme2025.scss:461 sets this !important, so matching (0,3,0) is not
+   enough on its own. The value there is an arbitrary 18px; this is the same
+   idea on the scale, and it sits just above the 10px that separates the
+   thumbnails from each other. */
+.pdp-v2 .product .product__media-nav {
+  margin-block-start: var(--cau-s3) !important;
+}
+
+/* The prototype uses dots on phones, not arrows. */
+.pdp-v2 .product__media-prev-next { display: none; }
+
+.pdp-v2 .dots-nav {
+  position: absolute;
+  left: 50%;
+  bottom: 22px;
+  transform: translateX(-50%);
+  z-index: 2;
+  width: auto;
+  margin: 0;
+  padding: 6px 9px;
+  gap: 6px;
+  flex-wrap: nowrap;
+  justify-content: center;
+  border-radius: var(--cau-r-pill);
+  background: rgba(10, 10, 12, .3);
+}
+.pdp-v2 .dots-nav__item {
+  width: 6px;
+  height: 6px;
+  margin: 0;
+  opacity: 1;
+  border-radius: var(--cau-r-pill);
+  background: rgba(255, 255, 255, .55);
+  transition: width .2s ease, background .2s ease;
+}
+.pdp-v2 .dots-nav__item[aria-current="true"] { width: 16px; opacity: 1; background: #fff; }
+
+/* One image is not a carousel. */
+.pdp-v2 .dots-nav:has(.dots-nav__item:only-child) { display: none; }
+
+/* Focal's zoom trigger, restyled to the prototype's circle. */
+.pdp-v2 .product__zoom-button {
+  position: absolute;
+  right: 12px;
+  bottom: 14px;
+  z-index: 2;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: var(--cau-r-pill);
+  background: rgba(255, 255, 255, .94);
+  color: var(--cau-ink-900);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .2);
+  transition: transform .1s ease;
+}
+.pdp-v2 .product__zoom-button:active { transform: scale(.94); }
+.pdp-v2 .product__zoom-button svg { width: 20px; height: 20px; }
+
+/* Thumbnails. Focal already sizes these 76px and marks the current one with a
+   ::after ring; the prototype uses a border on the tile instead, so the ring
+   is switched off rather than layered under a second indicator. */
+.pdp-v2 .product__thumbnail {
+  padding: 0;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border: 1.5px solid var(--cau-hairline);
+  border-radius: var(--cau-r-md);
+  background: var(--cau-mist);
+  transition: border-color .12s ease;
+}
+.pdp-v2 .product__thumbnail::after { display: none; }
+.pdp-v2 .product__thumbnail img { width: 100%; height: 100%; object-fit: cover; }
+.pdp-v2 .product__thumbnail-item[aria-current] .product__thumbnail { border-color: var(--cau-ink-900); }
+.pdp-v2 .product__thumbnail-list-inner { gap: 10px; }
+
+@media screen and (min-width: 901px) {
+  .pdp-v2 .pdp-v2__crumb-back { display: none; }
+  .pdp-v2 .breadcrumb { display: block; }
+
+  .pdp-v2__seal { top: 14px; right: 14px; width: 76px; height: 76px; padding: 3px; }
+  .pdp-v2__seal:hover { transform: scale(1.06); }
+
+
+
+  /* One image means nothing to choose between. */
+  .pdp-v2 .product__thumbnail-list:has(.product__thumbnail-item:only-child) { display: none; }
+}
+
+/* Sticky only once the columns sit side by side. Focal stacks .product until
+   1000px (theme.css: `.product { display: flex }`), and a sticky gallery in a
+   stacked layout pins under the header while the buy box scrolls over it —
+   that was the overlap between 901px and 999px. */
+@media screen and (min-width: 1000px) {
+  .pdp-v2 .product__media { position: sticky; align-self: start;
+    top: calc(env(safe-area-inset-top, 0px) + var(--cau-header-h) + 16px); }
+}
+
+/* PhotoSwipe renders in place: <product-image-zoom class="pswp"> is a child of
+   .product__media (snippets/product-media.liquid:245) and theme.js inits it on
+   that element without ever moving it to <body>. position: sticky creates a
+   stacking context, so the lightbox's z-index: 1500 is trapped inside the
+   gallery column and the info column — a later sibling — paints over it. That
+   is why zoom only breaks on desktop; phones never get the sticky.
+
+   Unsticking while it is open restores the arrangement phones already use:
+   relative keeps the containing block the dots and the seal are positioned
+   against, but does not open a stacking context, so 1500 competes at the root
+   and clears the header. */
+.pdp-v2 .product .product__media:has(.pswp--open) {
+  position: relative;
+  top: auto;
+}
+
+/* joshtheme2025.scss:470 lays the two columns out as `1fr 1fr`, so each track
+   is half the container — about 760px here. The image fills its track, but the
+   info column's content is capped at 480px (see the rule further down) and sits
+   flush to the start of its own, so the whole remainder piles up as dead space
+   against the right edge and the page reads as left-aligned.
+
+   Sizing the second track to the width that column is actually allowed to be
+   leaves no slack in it, and capping the grid to what the two columns need lets
+   margin-inline: auto centre the pair. 1200px is 672 + 48 + 480, which keeps the
+   image at the size it has today. Below that width the cap stops binding and the
+   image column simply takes whatever is left. */
+@media screen and (min-width: 1080px) {
+  .pdp-v2 .product {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 480px);
+    column-gap: 48px;
+    max-width: var(--cau-pdp-max);
+    margin-inline: auto;
+  }
+
+  /* The breadcrumb shares the container with the grid
+     (main-product.liquid:60-97), so without the same box it keeps the old
+     full-width left edge and sits outside where the image now starts. */
+  .pdp-v2 .breadcrumb {
+    max-width: var(--cau-pdp-max);
+    margin-inline: auto;
+  }
+}
+
+/* ---------- product header ---------- */
+
+/* Focal rules a line under the meta block and pads it out. The prototype runs
+   the buy box as one continuous column, so the rule goes. */
+.pdp-v2 .product-meta {
+  border-bottom: 0;
+  margin: 0;
+  padding-block-end: 0;
+}
+
+.pdp-v2 .product-meta__vendor {
+  font-size: .75rem;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--cau-ink-400);
+}
+.pdp-v2 .product-meta__title {
+  font-size: 1.5rem;
+  line-height: 1.16;
+  letter-spacing: -.032em;
+  margin-top: 8px;
+}
+.pdp-v2 .product-meta__price-list-container { margin-top: var(--cau-s3); }
+.pdp-v2 .price-list {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 0;
+}
+.pdp-v2 .price--large {
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -.01em;
+  line-height: 1;
+}
+/* Focal paints a reduced price in the sale accent. In the prototype the price
+   is ink and the SAVE pill alone carries the red, so the page has one red
+   thing on it rather than two competing for the eye. */
+.pdp-v2 .price--highlight { color: var(--cau-ink-900); }
+.pdp-v2 .price--compare { font-size: .9375rem; font-weight: 500; color: var(--cau-ink-400); text-decoration: line-through; }
+
+.pdp-v2__save {
+  display: inline-block;
+  line-height: 1.35;
+  padding: 4px 7px;
+  border-radius: var(--cau-r-sm);
+  background: var(--cau-sale);
+  color: #fff;
+  font-size: .6875rem;
+  font-weight: 800;
+  letter-spacing: .03em;
+}
+
+/* ---------- rating ----------
+
+   Loox's own widget, not ours. Loox fills data-rating and data-raters from
+   its API at runtime, so a Liquid row built from the metafields showed stars
+   on 1 of 14 products while Loox showed them on most — the metafields are
+   synced patchily. Styling Loox's markup keeps the coverage and gets the
+   prototype's look; the trade is that a Loox update can change the markup
+   under these rules. */
+
+.pdp-v2 .loox-rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  font-size: .875rem;
+  font-weight: 600;
+  color: var(--cau-ink-700);
+}
+/* Loox's widget stays in the DOM as the data source but is clipped out of
+   sight — display:none would risk its script skipping it. */
+.pdp-v2 a:has(> .loox-rating) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.pdp-v2__rating {
+  display: flex;
+  align-items: center;
+  gap: 4px 8px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+  font-size: .875rem;
+  color: var(--cau-ink-700);
+}
+.pdp-v2__rating[hidden] { display: none; }
+.pdp-v2__rating-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  /* 44px of target without 44px of row: the padding is given back as margin,
+     so the line sits where the design puts it. */
+  min-height: 44px;
+  margin: -4px -8px;
+  padding: 4px 8px;
+  border-radius: var(--cau-r-sm);
+  transition: background-color .15s ease;
+}
+.pdp-v2__rating-txt {
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--cau-hairline);
+}
+.pdp-v2__rating-trust { color: var(--cau-ink-400); }
+
+/* The row opens the reviews popup. Without this it reads as a line of text
+   that happens to be underlined - the chevron and the hover tint are what
+   say it does something. Both are off until pdp-reviews.js confirms there is
+   a dialog on the page to open: see snippets/product-info.liquid. */
+.pdp-v2__rating-chev { display: none; width: 15px; height: 15px; flex: 0 0 auto; }
+.pdp-reviews-has-modal .pdp-v2__rating-chev { display: block; }
+.pdp-reviews-has-modal .pdp-v2__rating-btn:hover { background: var(--cau-mist); }
+.pdp-reviews-has-modal .pdp-v2__rating-btn:hover .pdp-v2__rating-txt {
+  text-decoration-color: currentColor;
+}
+.pdp-v2__rating-btn:focus-visible {
+  outline: 2px solid var(--cau-ink-900);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pdp-v2__rating-btn { transition: none; }
+}
+
+.pdp-v2__stars {
+  --pct: 0%;
+  position: relative;
+  display: inline-block;
+  font-size: 15px;
+  line-height: 1;
+  letter-spacing: 2px;
+  font-family: system-ui, sans-serif;
+}
+.pdp-v2__stars::before { content: "\2605\2605\2605\2605\2605"; color: var(--cau-rating-empty); }
+.pdp-v2__stars::after {
+  content: "\2605\2605\2605\2605\2605";
+  position: absolute;
+  inset: 0;
+  width: var(--pct);
+  overflow: hidden;
+  color: var(--cau-rating);
+}
+/* Loox renders its stars as SVG or as glyphs depending on configuration;
+   cover both so the colour matches the prototype either way. */
+.pdp-v2 .loox-rating svg,
+.pdp-v2 .loox-rating svg path,
+.pdp-v2 .loox-rating svg polygon { fill: var(--cau-rating); }
+.pdp-v2 .loox-rating .loox-icon,
+.pdp-v2 .loox-rating [class*="star"] { color: var(--cau-rating); }
+
+@media screen and (min-width: 901px) {
+  .pdp-v2 .product-meta__title { font-size: clamp(1.5rem, 3.4vw, 2rem); }
+  .pdp-v2 .product-meta__price-list-container { margin-top: var(--cau-s4); }
+  .pdp-v2 .price--large { font-size: 1.75rem; }
+  .pdp-v2 .price--compare { font-size: 1rem; }
+  .pdp-v2__save { font-size: .75rem; padding: 4px 8px; }
+  /* Cap the content, not .product__info itself — Focal sizes that column from
+     the grid, and overriding its width narrows the whole buy box. */
+  .pdp-v2 .product-meta,
+  .pdp-v2 .product-form { max-width: 480px; }
+}
+
+
+/* ---------- BNPL explainer ---------- */
+
+/* The size picker sheet — its grab handle, rounded top, lift and scrim —
+   now lives in size-chart.css. The same sheet renders on the homepage's
+   featured product and in the quick-buy drawer, neither of which loads this
+   file, and these rules were .pdp-v2-scoped besides, so the sheet only
+   looked right on the product page. size-chart.css is loaded globally from
+   theme.liquid and already carries the sheet's header; the rest followed it
+   there, un-scoped. The drag that the handle advertises is still pdp.js,
+   which is product-page only. */
+
+
+
+/* ---------- size row ----------
+
+   Focal's size field is a <button class="select"> that names the sheet in
+   aria-controls. There is no toggle class on the sheet itself. */
+
+.pdp-v2 .product-form__option-name {
+  font-size: .75rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.pdp-v2 .select {
+  width: 100%;
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  border: 1.5px solid var(--cau-hairline);
+  border-radius: var(--cau-r-md);
+  background: var(--cau-paper);
+  color: var(--cau-ink-900);
+  font-size: 1rem;
+  font-weight: 700;
+  text-align: start;
+  transition: border-color .12s ease, transform .1s ease;
+}
+.pdp-v2 .select:hover { border-color: var(--cau-ink-400); }
+.pdp-v2 .select:active { transform: scale(.99); }
+.pdp-v2 .select[aria-expanded="true"] { border-color: var(--cau-ink-900); }
+
+@media (pointer: coarse) {
+  .pdp-v2 .select { border-width: 2px; }
+}
+
+/* ---------- signals ---------- */
+
+.pdp-v2__signals { display: grid; gap: 6px; margin-top: var(--cau-s3); }
+.pdp-v2__signal {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: .875rem;
+  font-weight: 600;
+}
+.pdp-v2__signal svg { width: 15px; height: 15px; flex: 0 0 auto; }
+.pdp-v2__signal b { font-weight: 800; }
+.pdp-v2__signal--stock { color: var(--cau-ink-900); }
+.pdp-v2__signal--ship { color: var(--cau-ink-700); }
+.pdp-v2__signal--ship b { color: var(--cau-ink-900); }
+
+/* ---------- buy buttons ---------- */
+
+.pdp-v2 [data-product-add-to-cart-button] {
+  width: 100%;
+  min-height: 54px;
+  margin-top: var(--cau-s4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: var(--cau-r-md);
+  background: var(--cau-ink-900);
+  color: #fff;
+  font-size: 1.0625rem;
+  font-weight: 700;
+  letter-spacing: .01em;
+  box-shadow: var(--cau-e-cta);
+  transition: transform .1s cubic-bezier(.4, 0, .6, 1), opacity .2s ease;
+}
+.pdp-v2 [data-product-add-to-cart-button]:active { transform: scale(.985) translateY(1px); }
+
+/* The separator is drawn here rather than sitting in the label, so Focal's
+   loader-button cannot swallow it when it restores data-button-content, and
+   so it never depends on flex gap reaching an anonymous text node. */
+.pdp-v2__cta-price::before {
+  content: "·";
+  margin: 0 .45em 0 .55em;
+  opacity: .65;
+}
+.pdp-v2 [data-product-add-to-cart-button][disabled] {
+  opacity: .35;
+  box-shadow: none;
+  transform: none;
+  cursor: default;
+}
+
+/* Focal's container is a grid with its own 10px gap; the margin added here
+   was stacking a second one on top. The gap alone now sets the distance. */
+.pdp-v2 .product-form__payment-container { position: relative; gap: 8px; }
+.pdp-v2 .shopify-payment-button { margin-top: 0; }
+.pdp-v2 .shopify-payment-button__button {
+  width: 100%;
+  min-height: 48px;
+  border-radius: var(--cau-r-md);
+}
+/* Shopify's secondary link. The prototype has one express button, not two. */
+.pdp-v2 .shopify-payment-button__more-options { display: none; }
+
+/* Transparent, so the real button shows through; it only has to catch the tap. */
+.pdp-v2__express-guard {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 48px;
+  z-index: 3;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.pdp-v2__express-guard[hidden] { display: none; }
+
+/* ---------- secure checkout ---------- */
+
+/* ---------- buy box rhythm ----------
+
+   Focal lays the form out as a grid with row-gap 16px, adds another 16px to
+   the option selector, and pads the buy-buttons area by 16px while bleeding it
+   past the gutter. Every one of those stacks on top of the margins set here,
+   so each gap was being paid for twice. The gap is handed back to the elements
+   themselves, which is what the mobile-first order already assumes. */
+
+.pdp-v2 .product-form { row-gap: 0; }
+.pdp-v2 .product-form__option-selector { margin-block-start: var(--cau-s4); }
+.pdp-v2 .product-form__buy-buttons {
+  margin-inline: 0;
+  padding: 0;
+}
+
+/* ---------- dispatch timer ----------
+
+   The ported block ships as a bordered box with a dark digit pill. The design
+   wants it to read as one more signal line, so the chrome comes off and it
+   inherits the signals' type, colour and clock. Its behaviour, settings and
+   timezone handling are untouched.
+
+   Where the timer runs, the generic dispatch line is suppressed — two
+   different dispatch claims on one page is worse than either alone. */
+
+.pdp-v2 .dispatch-timer-block { margin: var(--cau-s3) 0 0; }
+
+.pdp-v2 .dispatch-timer-container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 4px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--cau-ink-700);
+  font-size: .875rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.pdp-v2 .dispatch-icon {
+  width: 15px;
+  height: 15px;
+  flex: 0 0 auto;
+  margin-inline-end: 4px;
+}
+.pdp-v2 .dispatch-countdown {
+  display: inline;
+  min-width: 0;
+  padding: 0;
+  background: none;
+  color: var(--cau-ink-900);
+  font-size: .875rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The design reads "17h 50m 49s", not "17:50:49". The units are appended as
+   pseudo-elements and the colons hidden, so the ported script keeps writing
+   plain digits into textContent and nothing about its logic changes. */
+.pdp-v2 .timer-colon { display: none; }
+.pdp-v2 .timer-hours::after { content: "h"; }
+.pdp-v2 .timer-minutes::after { content: "m"; }
+.pdp-v2 .timer-seconds::after { content: "s"; }
+.pdp-v2 .timer-digits + .timer-digits { margin-inline-start: .3em; }
+
+/* The clock rewrites these every second, so their width has to be constant or
+   the whole line twitches as 1s give way to 8s. Tabular figures handle it
+   where the font has them; the fixed group width handles it where it does not,
+   and also stops the trailing text reflowing at the turn of each minute. */
+.pdp-v2 .dispatch-countdown,
+.pdp-v2 .timer-digits {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1, "lnum" 1;
+}
+.pdp-v2 .timer-digits {
+  /* A fixed width, not a minimum. "04h" measures about 2.7ch in this face, so
+     a 2.55ch minimum never bound and the box was still free to vary. */
+  display: inline-block;
+  width: 3.3ch;
+  text-align: start;
+}
+/* The clock itself gets a fixed box, not just its three digit groups. With a
+   constant width the wrap point cannot move, so the trailing text stays where
+   it is instead of jumping to the next line as the numbers roll. Sized for the
+   widest it ever gets, "23h 59m 59s". */
+.pdp-v2 .dispatch-countdown {
+  /* Three fixed groups plus two gaps. Fixed, so the phrase around it is always
+     the same length and the wrap point cannot move. */
+  display: inline-block;
+  width: 10.1ch;
+  white-space: nowrap;
+}
+
+/* One dispatch claim per page. */
+.pdp-v2 .product-form:has(.dispatch-timer-block) .pdp-v2__signal--ship { display: none; }
+
+/* The size field before anything is chosen: a prompt, not a value. */
+.pdp-v2 .select.pdp-v2--unchosen .select__selected-value {
+  color: var(--cau-ink-400);
+  font-weight: 600;
+}
+
+/* ---------- bundle & save ---------- */
+
+.pdp-v2__eyebrow {
+  font-size: .75rem;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--cau-ink-900);
+}
+
+.pdp-v2__bundle {
+  margin-top: var(--cau-s4);
+  padding: 14px;
+  border: 1px solid var(--cau-hairline);
+  border-radius: var(--cau-r-md);
+  background: var(--cau-panel);
+}
+.pdp-v2__bundle-head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 11px;
+}
+.pdp-v2__bundle-hint { font-size: .75rem; font-weight: 600; color: var(--cau-ink-400); }
+
+.pdp-v2__btiers {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--cau-s2);
+  margin-bottom: 12px;
+}
+.pdp-v2__btier {
+  min-width: 0;
+  width: 100%;
+  padding: 9px 4px;
+  border: 1.5px solid var(--cau-hairline);
+  border-radius: var(--cau-r-md);
+  background: var(--cau-paper);
+  text-align: center;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  transition: border-color .15s ease, transform .1s ease, background-color .15s ease;
+}
+button.pdp-v2__btier {
+  appearance: none;
+  -webkit-appearance: none;
+  margin: 0;
+  line-height: inherit;
+}
+button.pdp-v2__btier:hover {
+  border-color: var(--cau-ink-900);
+}
+button.pdp-v2__btier:active {
+  transform: scale(.98);
+}
+.pdp-v2__btier:not(button) {
+  cursor: default;
+}
+.pdp-v2__btier b {
+  display: block;
+  font-family: var(--heading-font-family, inherit);
+  font-size: .8125rem;
+  font-weight: 700;
+  color: var(--cau-ink-900);
+}
+.pdp-v2__btier span {
+  display: block;
+  margin-top: 3px;
+  font-size: .6875rem;
+  font-weight: 700;
+  color: var(--cau-sale);
+}
+
+.pdp-v2__bundle-cta {
+  width: 100%;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1.5px solid var(--cau-ink-900);
+  border-radius: var(--cau-r-md);
+  background: var(--cau-paper);
+  color: var(--cau-ink-900);
+  font-size: .9375rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform .1s ease, background .15s ease, color .15s ease;
+}
+.pdp-v2__bundle-cta:hover { background: var(--cau-ink-900); color: #fff; }
+.pdp-v2__bundle-cta:active { transform: scale(.98); }
+
+/* ---------- verified panel + trust links ---------- */
+
+.pdp-v2__verified {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  margin-top: var(--cau-s3);
+  padding: 13px 15px;
+  border-radius: var(--cau-r-md);
+  background: var(--cau-mist);
+}
+.pdp-v2__verified-seal {
+  width: 60px;
+  height: 60px;
+  flex: 0 0 auto;
+  padding: 2px;
+  border-radius: var(--cau-r-pill);
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .12);
+}
+.pdp-v2__verified p {
+  margin: 0;
+  min-width: 0;
+  font-size: .875rem;
+  line-height: 1.5;
+  color: var(--cau-ink-700);
+}
+/* Focal's reset flattens b to inherit, so the weight is set explicitly. */
+.pdp-v2__verified b {
+  color: var(--cau-ink-900);
+  font-weight: 800;
+}
+.pdp-v2__verified a {
+  color: var(--cau-ink-900);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  white-space: nowrap;
+}
+
+.pdp-v2__microtrust {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px var(--cau-s4);
+  margin-top: var(--cau-s2);
+}
+.pdp-v2__microtrust a {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 36px;
+  font-size: .8125rem;
+  font-weight: 600;
+  color: var(--cau-ink-700);
+  text-decoration: underline;
+  text-decoration-color: var(--cau-hairline);
+  text-underline-offset: 3px;
+}
+.pdp-v2__microtrust a:hover { color: var(--cau-ink-900); text-decoration-color: currentColor; }
+.pdp-v2__microtrust svg { width: 16px; height: 16px; flex: 0 0 auto; color: var(--cau-ink-400); }
+
+/* ---------- sticky add to cart ----------
+
+   Focal owns when this appears: <product-sticky-form> toggles its own hidden
+   attribute on scroll, and nothing here interferes with that. These rules set
+   how it looks once it is up, and put the product back into it on phones,
+   where Focal shows the button alone. */
+
+.pdp-v2 .product-sticky-form {
+  background: rgba(255, 255, 255, .76);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  backdrop-filter: saturate(180%) blur(20px);
+  box-shadow: var(--cau-e2);
+  padding-block-end: max(10px, env(safe-area-inset-bottom, 0px) + 10px);
+  padding-block-start: 10px;
+}
+.pdp-v2 .product-sticky-form .product-sticky-form__inner {
+  /* Focal only makes this a flex row above 1000px, so on phones the button
+     dropped below the product instead of sitting beside it. */
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 12px;
+  max-width: 900px;
+  margin-inline: auto;
+}
+.pdp-v2 .product-sticky-form__content-wrapper { min-width: 0; flex: 1; display: flex; align-items: center; gap: 12px; }
+.pdp-v2 .product-sticky-form__image-wrapper {
+  width: 44px;
+  flex: 0 0 auto;
+  margin-inline-end: 0;
+  overflow: hidden;
+  border: 1px solid var(--cau-hairline);
+  border-radius: var(--cau-r-md);
+  background: var(--cau-mist);
+}
+.pdp-v2 .product-sticky-form__info { min-width: 0; flex: 1; }
+.pdp-v2 .product-sticky-form__bottom-info {
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 6px;
+}
+.pdp-v2 .product-sticky-form__title {
+  /* One line, truncated. The bar is 46px tall with a button beside it, so a
+     long title that wrapped would push the price out of the bar. */
+  flex-basis: 100%;
+  min-width: 0;
+  max-width: 100%;
+  font-size: .8125rem;
+  font-weight: 700;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pdp-v2 .product-sticky-form__price { font-size: .8125rem; font-weight: 600; color: var(--cau-ink-400); }
+.pdp-v2__sticky-size { font-size: .8125rem; font-weight: 600; color: var(--cau-ink-900); }
+.pdp-v2__sticky-size::before { content: "·"; margin-inline-end: 6px; color: var(--cau-ink-400); }
+/* The separator Focal puts between title and price has no place in a stacked bar. */
+.pdp-v2 .product-sticky-form .square-separator { display: none; }
+
+.pdp-v2 .product-sticky-form__form { flex: 0 0 auto; margin-inline-start: auto; }
+.pdp-v2 .product-sticky-form [data-product-add-to-cart-button] {
+  width: auto;
+  min-height: 46px;
+  margin-top: 0;
+  padding: 0 20px;
+  border-radius: var(--cau-r-md);
+  background: var(--cau-ink-900);
+  color: #fff;
+  font-size: .9375rem;
+  font-weight: 700;
+  box-shadow: var(--cau-e-cta);
+}
+/* Shop Pay has no room in a 46px bar, and it would buy the default variant. */
+.pdp-v2 .product-sticky-form .shopify-payment-button { display: none; }
+
+@media (prefers-reduced-transparency: reduce) {
+  .pdp-v2 .product-sticky-form {
+    background: var(--cau-paper);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    border-top: 1px solid var(--cau-hairline);
+  }
+}
+
+/* ---------- size guide on desktop ----------
+
+   Below 741px the picker is a bottom sheet and the guide is simply another
+   view of it. Above that it is a narrow anchored dropdown, which is the wrong
+   shape for a twelve-column table — so in guide mode only, it becomes a
+   centred modal. Centring is inset + margin rather than a transform, because
+   a transform would become the containing block for the fixed scrim inside
+   it. */
+
+
+
+/* ---------- FAQ ----------
+
+   Title on top and to the left, questions full width beneath it, question
+   text on the title's left edge — the phone layout at every width. Scoped by
+   living in this file: pdp.css loads only with main-product, so the FAQ page
+   itself keeps Focal's centred header. */
+
+.shopify-section--faq .section__header {
+  text-align: start;
+  margin-inline: 0;
+  margin-block-end: var(--cau-s4);
+}
+.shopify-section--faq .section__header .heading {
+  margin: 0;
+  font-size: clamp(1.25rem, 2.6vw, 1.5rem);
+  letter-spacing: -.02em;
+}
+
+@media screen and (min-width: 741px) {
+  /* Focal insets the questions 24px from 741px; the rows run to the
+     container edge here, so the text lines up with the title. */
+  .shopify-section--faq .faq__item .collapsible-toggle,
+  .shopify-section--faq .faq__item .collapsible__content { padding-inline-start: 0; }
+}
+
+@media screen and (min-width: 1000px) {
+  /* Focal centres the list in a 668px column from 1000px. */
+  .shopify-section--faq .faq__wrapper { width: auto; max-width: none; margin-inline: 0; }
+}
+
+/* ---------- section rhythm ----------
+
+   The redesigned sections pad themselves by --cau-section-pad. Focal's own
+   sections on this page used their own margins on top of that (80px under the
+   product grid, the 64px section breather, Loox's 80px tail, 2em under the
+   FAQ), so gaps ran from 48px to 140px. These bring them onto the same
+   rhythm. Product pages only: this file loads with main-product. */
+
+@media screen and (min-width: 901px) {
+  :root { --cau-section-pad: 32px; }
+}
+
+/* Worn by the community starts flush (padding-top: 0), so the grid supplies
+   the whole gap. */
+.pdp-v2 .product:not(.product--featured) { margin-block-end: calc(var(--cau-section-pad) * 2); }
+
+/* "Customer Reviews" heading, then the Loox carousel straight under it. */
+.shopify-section--rich-text .section { margin-block: var(--cau-section-pad) 0; }
+.shopify-section--apps .loox-v2-carousel-container { margin-bottom: var(--cau-section-pad); }
+
+.shopify-section--faq .section { margin-block: var(--cau-section-pad); }
+
+/* The footer's trust row: its top margin is the 64px breather site-wide
+   (joshtheme2025.scss, same four-class selector; this file loads later). */
+.shopify-section-group-footer-group.shopify-section--multi-column.trust .section { margin-block-start: var(--cau-section-pad); }

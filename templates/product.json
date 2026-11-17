@@ -1,0 +1,335 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "slideshow_LqrTdm": {
+      "type": "slideshow",
+      "blocks": {
+        "image_XxmxJh": {
+          "type": "image",
+          "disabled": true,
+          "settings": {
+            "text_position": "middle_center",
+            "subheading": "",
+            "title": "",
+            "button_1_text": "",
+            "button_1_link": "",
+            "button_2_text": "",
+            "button_2_link": "",
+            "text_color": "#ffffff",
+            "button_background": "#ffffff",
+            "button_text_color": "#000000",
+            "overlay_color": "#000000",
+            "overlay_opacity": 0
+          }
+        }
+      },
+      "block_order": [
+        "image_XxmxJh"
+      ],
+      "name": "Slideshow",
+      "settings": {
+        "section_height": "auto",
+        "transition_type": "sweep",
+        "show_initial_transition": false,
+        "autoplay": true,
+        "cycle_speed": 5,
+        "background": "rgba(0,0,0,0)"
+      }
+    },
+    "main": {
+      "type": "main-product",
+      "blocks": {
+        "variant_picker": {
+          "type": "variant_picker",
+          "settings": {
+            "hide_sold_out_variants": false,
+            "selector_mode": "dropdown",
+            "color_mode": "dropdown",
+            "variant_image_options": "",
+            "size_chart_page": ""
+          }
+        },
+        "pdp_signals": {
+          "type": "pdp_signals",
+          "settings": {}
+        },
+        "dispatch_timer": {
+          "type": "dispatch_timer",
+          "settings": {
+            "prefix_text": "Order within",
+            "suffix_text": "to get same-day shipping",
+            "timezone": "Australia/Sydney",
+            "border_color": "#e5e5e5",
+            "text_color": "#555555",
+            "timer_bg_color": "#3d3d3d",
+            "timer_text_color": "#ffffff"
+          }
+        },
+        "buy_buttons": {
+          "type": "buy_buttons",
+          "settings": {
+            "show_payment_button": true,
+            "show_gift_card_recipient": false,
+            "atc_button_background": "#282828",
+            "atc_button_text_color": "#ffffff",
+            "buy_now_button_background": "rgba(0,0,0,0)",
+            "buy_now_button_text_color": "rgba(0,0,0,0)"
+          }
+        },
+        "pdp_bundle": {
+          "type": "pdp_bundle",
+          "settings": {
+            "bundle_title": "Bundle & save",
+            "bundle_mix_enabled": true,
+            "bundle_mix_hint": "Mix any 2+ pieces from the store",
+            "bundle_cta_label": "Build a bundle — save up to 20% ›",
+            "bundle_sheet_title": "Build your bundle",
+            "bundle_sheet_button": "Add items to your bundle",
+            "bundle_chips": [
+              "shop-all",
+              "shop-all-clothing",
+              "shop-all-sneakers",
+              "collectibles"
+            ],
+            "bundle_same_enabled": false,
+            "bundle_same_hint": "Buy more of this one and save",
+            "bundle_same_tiers": "2 items|$7.50 off each, 3 items|$13.33 off each"
+          }
+        },
+        "pdp_verified": {
+          "type": "pdp_verified",
+          "settings": {
+            "verified_lead": "Verified by the CoppedAU team before dispatch.",
+            "verified_text": "Tags, stitching and hardware checked against retail references before it ships.",
+            "verified_link_label": "How we verify ›",
+            "verified_link": "#verify",
+            "microtrust": "Free shipping over $300|#shipping|van\n14-day size exchange|/policies/refund-policy|box"
+          }
+        }
+      },
+      "block_order": [
+        "variant_picker",
+        "pdp_signals",
+        "dispatch_timer",
+        "buy_buttons",
+        "pdp_bundle",
+        "pdp_verified"
+      ],
+      "settings": {
+        "show_vendor": true,
+        "show_sku": false,
+        "show_badges": false,
+        "show_taxes_included": false,
+        "show_product_rating": false,
+        "show_sticky_add_to_cart": true,
+        "show_share_buttons": false,
+        "help_page": "",
+        "enable_video_autoplay": true,
+        "enable_video_looping": false,
+        "enable_image_zoom": true,
+        "show_thumbnails_on_mobile": false,
+        "desktop_thumbnails_position": "bottom",
+        "transition_effect": "slide"
+      }
+    },
+    "ugc_community": {
+      "type": "ugc-community",
+      "blocks": {
+        "post_1": {
+          "type": "post",
+          "settings": {
+            "caption": "",
+            "sub_line": "@copped.au",
+            "product": "",
+            "duration": ""
+          }
+        },
+        "post_2": {
+          "type": "post",
+          "settings": {
+            "caption": "",
+            "sub_line": "@copped.au",
+            "product": "",
+            "duration": ""
+          }
+        },
+        "post_3": {
+          "type": "post",
+          "settings": {
+            "caption": "",
+            "sub_line": "@copped.au",
+            "product": "",
+            "duration": ""
+          }
+        }
+      },
+      "block_order": [
+        "post_1",
+        "post_2",
+        "post_3"
+      ],
+      "settings": {
+        "heading": "Worn by the community",
+        "handle": "@copped.au",
+        "handle_url": "https://www.instagram.com/copped.au/"
+      }
+    },
+    "verified_panel": {
+      "type": "pdp-verified-panel",
+      "blocks": {
+        "step_sourced": {
+          "type": "step",
+          "settings": {
+            "icon": "box",
+            "step_label": "STEP",
+            "title": "Sourced from trusted retailers",
+            "text": "We buy through authorised retail channels only — never unknown third-party sellers."
+          }
+        },
+        "step_inspected": {
+          "type": "step",
+          "settings": {
+            "icon": "search",
+            "step_label": "STEP",
+            "title": "Inspected in-house",
+            "text": "Each item is checked by hand against retail references — tags, stitching, hardware and print."
+          }
+        },
+        "step_shipped": {
+          "type": "step",
+          "settings": {
+            "icon": "truck",
+            "step_label": "STEP",
+            "title": "Dispatched sealed from Melbourne",
+            "text": "Packed and shipped tracked from our Melbourne HQ, usually within 1–2 business days."
+          }
+        }
+      },
+      "block_order": [
+        "step_sourced",
+        "step_inspected",
+        "step_shipped"
+      ],
+      "settings": {
+        "heading": "How every piece is verified",
+        "intro": "Fakes are the one thing you shouldn't have to worry about. Here's exactly what happens before an order leaves us.",
+        "seal_alt": "",
+        "link_label": "",
+        "link_url": ""
+      }
+    },
+    "product_description": {
+      "type": "product-description",
+      "settings": {
+        "specs_heading": "The details",
+        "specs_lead": "The facts first — everything you'd want to check before you cop.",
+        "show_specs": true,
+        "description_heading": "About this piece",
+        "strip_faq": true
+      }
+    },
+    "pdp_reviews": {
+      "type": "pdp-reviews",
+      "settings": {
+        "heading": "What buyers say",
+        "layout": "slider",
+        "sort": "featured",
+        "per_page": 4,
+        "show_distribution": true
+      }
+    },
+    "complete_fit": {
+      "type": "pdp-complete-fit",
+      "settings": {
+        "heading": "Complete the fit",
+        "intro": "Pieces that pair with this one.",
+        "button_label": "+ Add to bundle",
+        "card_count": 8
+      }
+    },
+    "shipping_returns": {
+      "type": "pdp-shipping",
+      "blocks": {
+        "card_shipping": {
+          "type": "card",
+          "settings": {
+            "icon": "truck",
+            "title": "Shipping",
+            "content": "<ul><li>Ships tracked from our Melbourne warehouse</li><li>Same-day dispatch — order before 1pm AEST/AEDT</li><li>Standard 3–5 days · Express 1–3 days</li><li>Free shipping on orders over $300, Australia-wide</li></ul>"
+          }
+        },
+        "card_returns": {
+          "type": "card",
+          "settings": {
+            "icon": "exchange",
+            "title": "Size exchanges & returns",
+            "content": "<ul><li>No change-of-mind returns — store credit, 9% handling fee</li><li>Size exchanges accommodated subject to rare item availability</li><li>Item must be unworn with original tags attached</li></ul>"
+          }
+        },
+        "template--20694667132951__b6c07d54-cd78-44ca-b23a-5ef97b50e3a8-question-1": {
+          "type": "question",
+          "settings": {
+            "title": "ARE YOUR PRODUCTS AUTHENTIC?",
+            "answer": "<p>Absolutely! At Copped AU, we stand by the authenticity of every product we offer. We conduct thorough verifications to ensure 100% authenticity. Our commitment is to provide you with genuine, high-quality items every time you shop with us.</p>",
+            "open_by_default": true
+          }
+        },
+        "template--20694667132951__b6c07d54-cd78-44ca-b23a-5ef97b50e3a8-question-2": {
+          "type": "question",
+          "settings": {
+            "title": "WHAT IF I HAVE A CONCERN ABOUT THE PRODUCT I RECIEVE?",
+            "answer": "<p>We understand how important peace of mind is when shopping. If you have any concerns about your purchase, please don't hesitate to reach out to our customer service team. We are dedicated to resolving any issues to your satisfaction promptly. </p>",
+            "open_by_default": false
+          }
+        },
+        "template--20694667132951__b6c07d54-cd78-44ca-b23a-5ef97b50e3a8-question-3": {
+          "type": "question",
+          "settings": {
+            "title": "HOW QUICKLY WILL MY ORDER ARRIVE?",
+            "answer": "<p>Unless otherwise stated, we aim to ship your order out within 1-2 business days. With regular shipping, it typically arrives in 3-5 business days. Need it faster? Opt for express shipping at checkout for a 1-3 business day delivery.</p>",
+            "open_by_default": false
+          }
+        },
+        "3a9aeaa3-c6ab-4e28-8820-ed4c696edb18": {
+          "type": "question",
+          "settings": {
+            "title": "HOW DO SIZE EXCHANGES WORK?",
+            "answer": "<p>We do our best to accommodate size changes where we can. Since our items are rare and stock is limited, availability plays a big role. If you need a different size, reach out to us and we'll let you know what's possible. You can find the full details on our Size Exchange policy page.</p>",
+            "open_by_default": false
+          }
+        }
+      },
+      "block_order": [
+        "card_shipping",
+        "card_returns",
+        "template--20694667132951__b6c07d54-cd78-44ca-b23a-5ef97b50e3a8-question-1",
+        "template--20694667132951__b6c07d54-cd78-44ca-b23a-5ef97b50e3a8-question-2",
+        "template--20694667132951__b6c07d54-cd78-44ca-b23a-5ef97b50e3a8-question-3",
+        "3a9aeaa3-c6ab-4e28-8820-ed4c696edb18"
+      ],
+      "settings": {
+        "heading": "Shipping & returns",
+        "lead": "Bought unseen? Here's the plain-English version, so there are no surprises.",
+        "faq_heading": "Common questions"
+      }
+    }
+  },
+  "order": [
+    "slideshow_LqrTdm",
+    "main",
+    "ugc_community",
+    "verified_panel",
+    "product_description",
+    "pdp_reviews",
+    "complete_fit",
+    "shipping_returns"
+  ]
+}

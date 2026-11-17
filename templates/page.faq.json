@@ -1,0 +1,35 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "show_title": false,
+        "page_width": "medium"
+      }
+    },
+    "faq": {
+      "type": "faq",
+      "settings": {
+        "show_navigation": true,
+        "title": "ABOUT US",
+        "content": "<p><strong>CoppedAU</strong> was founded by a group of friends from Melbourne who forged a close bond over their love of sneaker culture. The more they discussed the latest developments in streetwear culture in their free time, they started to realise that they could use their passion and expertise in the field to source exclusive streetwear products. Initially, it was for just their friends and family, but as word spread, the project began to grow to friends of friends, to people they had never met before, until eventually CoppedAU became what it is today; a leading distributor of exclusive sneakers and apparel in Australia!</p><p>We're a community of sneaker and streetwear enthusiasts who are passionate about curating the latest and most exclusive pieces for our customers. Our team has been in the business of selling hyped items for over a decade, and we have the expertise and experience to provide the best service possible.</p><p>We believe in delivering excellent customer service, and we're committed to making your shopping experience with us as seamless and enjoyable as possible. Our team of dedicated professionals is always ready to assist you with any questions, concerns, or inquiries you may have. We're flexible, approachable, and always friendly, so don't hesitate to reach out to us.</p><p>At CoppedAU, we take authenticity seriously. We understand that purchasing exclusive items online can be risky, which is why we offer a 100% authenticity or moneyback guarantee on all products we sell. Our team of experts meticulously inspects every item before it's shipped to ensure that it meets our high standards of quality and authenticity.</p><p>We're constantly updating our inventory with the latest and most exclusive pieces in the sneaker and streetwear world. Our selection includes limited-edition drops, exclusive collaborations, and hard-to-find pieces that you won't find anywhere else. We're committed to bringing you the most sought-after items in the industry and helping you elevate your style to the next level.</p><p>Thank you for choosing Copped AU as your go-to destination for all things sneakers and streetwear. We're proud to serve our customers and provide them with the best shopping experience possible. If you have any questions or feedback, please don't hesitate to reach out to us. Our team is always happy to hear from you and help you in any way we can.</p>",
+        "background": "rgba(0,0,0,0)",
+        "text_color": "rgba(0,0,0,0)"
+      }
+    }
+  },
+  "order": [
+    "main",
+    "faq"
+  ]
+}

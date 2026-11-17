@@ -1,0 +1,128 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "show_title": false,
+        "page_width": "medium"
+      }
+    },
+    "rich_text_NgJc63": {
+      "type": "rich-text",
+      "name": "Heading",
+      "settings": {
+        "custom_class": "about-us",
+        "subheading": "",
+        "title": "Contact us",
+        "content": "<p>At CoppedAU, your satisfaction comes first.<br/><br/>We’re committed to making your shopping experience smooth, enjoyable, and hassle-free.</p><p>Our dedicated customer service team is here to help you with anything you need via email or the contact form below. We can assist with sizing and colourway options, via our website's dedicated live chat or Instagram messages.</p>",
+        "button_text": "",
+        "button_link": "",
+        "background_type": "boxed",
+        "text_width": "medium",
+        "text_position": "center",
+        "text_alignment": "left",
+        "background": "rgba(0,0,0,0)",
+        "text_color": "rgba(0,0,0,0)",
+        "button_background": "rgba(0,0,0,0)",
+        "button_text_color": "rgba(0,0,0,0)",
+        "padding_top": 8,
+        "padding_bottom": 8,
+        "mbl_padding_top": 6,
+        "mbl_padding_bottom": 6
+      }
+    },
+    "image_with_text_overlay_QGGRpU": {
+      "type": "image-with-text-overlay",
+      "name": "Image with text overlay",
+      "settings": {
+        "custom_class": "about-us",
+        "reveal_on_scroll": true,
+        "section_height": "auto",
+        "image": "shopify://shop_images/About-us-YEEZY.jpg",
+        "subheading": "",
+        "title": "",
+        "content": "",
+        "button_text": "",
+        "button_link": "",
+        "link_style": "link",
+        "background_type": "full_width",
+        "text_width": "medium",
+        "text_position": "middle_center",
+        "text_color": "#ffffff",
+        "button_background": "#ffffff",
+        "button_text_color": "#000000",
+        "overlay_color": "#000000",
+        "overlay_opacity": 0
+      }
+    },
+    "custom_liquid_9jBHgm": {
+      "type": "custom-liquid",
+      "name": "Custom Liquid",
+      "settings": {
+        "subheading": "",
+        "title": "",
+        "liquid": "<div class=\"contact-info\">\n<table>\n  <tr>\n    <td>Email</td>\n    <td><a class=\"button\" href=\"mailto:hello@coppedau.com.au\">hello@coppedau.com.au</a></td>\n  </tr>\n  <tr>\n    <td>Social</td>\n    <td><a class=\"button\" target=\"_blank\" href=\"https://www.instagram.com/copped.au/?hl=en\">@copped.au</a></td>\n  </tr>\n</table>\n</div>",
+        "background_type": "boxed",
+        "add_vertical_spacing": false,
+        "background": "rgba(0,0,0,0)",
+        "text_color": "rgba(0,0,0,0)"
+      }
+    },
+    "b2ba276e-479f-4a09-832f-914b13305015": {
+      "type": "rich-text",
+      "settings": {
+        "custom_class": "about-us",
+        "subheading": "",
+        "title": "",
+        "content": "<p>We aim to respond to all inquiries within 24 hours, though during peak periods response times may be longer. Thank you for choosing CoppedAU. We value your trust and look forward to helping you.</p>",
+        "button_text": "",
+        "button_link": "",
+        "background_type": "boxed",
+        "text_width": "medium",
+        "text_position": "center",
+        "text_alignment": "left",
+        "background": "rgba(0,0,0,0)",
+        "text_color": "rgba(0,0,0,0)",
+        "button_background": "rgba(0,0,0,0)",
+        "button_text_color": "rgba(0,0,0,0)",
+        "padding_top": 8,
+        "padding_bottom": 8,
+        "mbl_padding_top": 8,
+        "mbl_padding_bottom": 8
+      }
+    },
+    "contact-form": {
+      "type": "contact-form",
+      "settings": {
+        "title": "",
+        "content": "",
+        "text_1_heading": "",
+        "text_1_text": "",
+        "text_2_heading": "",
+        "text_2_text": "",
+        "background": "rgba(0,0,0,0)",
+        "text_color": "rgba(0,0,0,0)",
+        "button_background": "rgba(0,0,0,0)",
+        "button_text_color": "rgba(0,0,0,0)"
+      }
+    }
+  },
+  "order": [
+    "main",
+    "rich_text_NgJc63",
+    "image_with_text_overlay_QGGRpU",
+    "custom_liquid_9jBHgm",
+    "b2ba276e-479f-4a09-832f-914b13305015",
+    "contact-form"
+  ]
+}

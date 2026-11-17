@@ -1,0 +1,46 @@
+{% if section.settings.show_css_grid_section == true %}
+<hr>
+
+<div class="grid-wrapper">
+  <div class="grid-number">
+    1
+  </div>
+  <div class="grid-number">
+    2
+  </div>
+  <div class="grid-number">
+    3
+  </div>
+  <div class="grid-number">
+    4
+  </div>
+</div>
+
+{% endif %}
+
+{% schema %}
+  {
+    "name": "CSS-Grid",
+    "settings": [
+
+    {
+      "type": "checkbox",
+      "id": "show_css_grid_section",
+      "label": "Show CSS Grid",
+      "default": false
+    }
+],
+	"presets": [
+    {
+       "name": "CSS Grid",
+       "category": "CSS Grid"
+    }
+]
+  }
+{% endschema %}
+
+{% stylesheet %}
+{% endstylesheet %}
+
+{% javascript %}
+{% endjavascript %}

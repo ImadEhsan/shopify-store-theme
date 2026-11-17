@@ -1,0 +1,23 @@
+{%- layout none -%}
+{%- comment -%}
+  The bundle builder's browse list: /collections/<handle>?view=bundle-json&page=N
+
+  JSON, 24 products a page. Sold-out products are left out here rather than in
+  the browser, so a page can hold fewer than 24; "pages" still tells the sheet
+  whether there is more to load.
+{%- endcomment -%}
+{%- paginate collection.products by 24 -%}
+{
+  "page": {{ paginate.current_page }},
+  "pages": {{ paginate.pages }},
+  "products": [
+    {%- assign separator = '' -%}
+    {%- for product in collection.products -%}
+      {%- if product.available -%}
+        {{- separator -}}{%- render 'bundle-json-product', product: product -%}
+        {%- assign separator = ',' -%}
+      {%- endif -%}
+    {%- endfor -%}
+  ]
+}
+{%- endpaginate -%}

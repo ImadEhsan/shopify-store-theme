@@ -1,0 +1,154 @@
+/* BNPL row, payment marks and the BNPL explainer modal.
+
+   Split out of pdp.css because these three live in shared snippets
+   (pdp-bnpl, pdp-pay) that the homepage's featured product and the
+   collection quick-buy drawer also render - and those load no pdp.css, so
+   the logos and payment marks were rendering at their natural size. The
+   stylesheet now travels with the markup instead of with the product page.
+
+   The classes keep their pdp-v2__ prefix but none of them require a
+   .pdp-v2 ancestor, which is why they work outside the product page. */
+
+.pdp-v2__tnum { font-variant-numeric: tabular-nums; }
+
+.pdp-v2__bnpl {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+  font-size: .8125rem;
+  color: var(--cau-ink-700);
+}
+
+.pdp-v2__bnpl-logos { display: inline-flex; align-items: center; gap: 5px; }
+
+.pdp-v2__bnpl-logos svg {
+  display: block;
+  height: 22px;
+  width: auto;
+  border-radius: 3px;
+  box-shadow: 0 0 0 1px var(--cau-hairline);
+}
+
+.pdp-v2__bnpl-info {
+  width: 28px;
+  height: 28px;
+  margin-left: -2px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: var(--cau-r-pill);
+  background: none;
+  color: var(--cau-ink-400);
+  cursor: pointer;
+}
+
+.pdp-v2__bnpl-info:hover { color: var(--cau-ink-900); background: color-mix(in srgb, var(--cau-ink-900) 7%, transparent); }
+
+.pdp-v2__bnpl-info svg { width: 17px; height: 17px; }
+
+.pdp-v2__modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: 12px;
+  background: rgba(10, 10, 12, .46);
+  overscroll-behavior: contain;
+}
+
+.pdp-v2__modal[hidden] { display: none; }
+
+.pdp-v2__modal-box {
+  width: 100%;
+  max-width: 440px;
+  max-height: calc(100vh - 40px);
+  overflow: auto;
+  padding: var(--cau-s8);
+  border: 1px solid var(--cau-hairline);
+  border-radius: var(--cau-r-lg);
+  background: var(--cau-paper);
+  box-shadow: 0 1px 2px rgba(17, 17, 17, .05), 0 12px 28px -16px rgba(17, 17, 17, .16);
+}
+
+.pdp-v2__modal-box h3 { margin: 0 0 14px; font-size: 1.125rem; }
+
+.pdp-v2__bnpl-lead { margin: 0 0 var(--cau-s4); font-size: .9375rem; color: var(--cau-ink-700); }
+
+.pdp-v2__bnpl-prov {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 0;
+  border-top: 1px solid var(--cau-hairline);
+}
+
+.pdp-v2__bnpl-prov svg {
+  height: 28px;
+  width: auto;
+  flex: 0 0 auto;
+  border-radius: var(--cau-r-sm);
+  box-shadow: 0 0 0 1px var(--cau-hairline);
+}
+
+.pdp-v2__bnpl-prov b { display: block; font-size: .875rem; }
+
+.pdp-v2__bnpl-prov span { display: block; margin-top: 2px; font-size: .8125rem; line-height: 1.45; color: var(--cau-ink-700); }
+
+.pdp-v2__bnpl-fine { margin: var(--cau-s3) 0 0; font-size: .75rem; color: var(--cau-ink-400); }
+
+.pdp-v2__modal-close {
+  /* Focal's reset sets button { text-align: inherit }, so a button no longer
+     centres its own label. Centred explicitly, by the same flex approach the
+     other buttons here use. */
+  width: 100%;
+  min-height: 46px;
+  margin-top: var(--cau-s6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border: 1.5px solid var(--cau-hairline);
+  border-radius: var(--cau-r-md);
+  background: var(--cau-paper);
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color .15s ease;
+}
+
+.pdp-v2__modal-close:hover { border-color: var(--cau-ink-900); }
+
+.pdp-v2__pay {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+  font-size: .75rem;
+  font-weight: 600;
+  color: var(--cau-ink-400);
+}
+
+.pdp-v2__lock { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+
+.pdp-v2__lock svg { width: 13px; height: 13px; }
+
+.pdp-v2__paymarks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pdp-v2__paymarks li {
+  display: flex;
+  border-radius: var(--cau-r-sm);
+  box-shadow: 0 0 0 1px var(--cau-hairline);
+}
+
+.pdp-v2__paymarks svg { display: block; height: 24px; width: auto; border-radius: var(--cau-r-sm); }

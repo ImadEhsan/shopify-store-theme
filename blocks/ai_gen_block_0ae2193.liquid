@@ -1,0 +1,446 @@
+{% doc %}
+  @prompt
+    logo grid carousel with auto-scroll. Each logo should be a link to a collection page, The carousel should be a stand-alone component. treat it as a section, Revert back to previous version. This section should sit inside the page body, with the same margins as existing sections.
+
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-logo-carousel-{{ ai_gen_id }} {
+    width: 100%;
+    overflow: hidden;
+    background-color: {{ block.settings.background_color }};
+    padding: {{ block.settings.padding_top }}px 0 {{ block.settings.padding_bottom }}px;
+  }
+
+  .ai-logo-carousel__track-{{ ai_gen_id }} {
+    display: flex;
+    align-items: center;
+    gap: {{ block.settings.logo_spacing }}px;
+    animation: ai-logo-carousel-scroll-{{ ai_gen_id }} {{ block.settings.scroll_speed }}s linear infinite;
+    width: fit-content;
+  }
+
+  .ai-logo-carousel__item-{{ ai_gen_id }} {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: {{ block.settings.logo_width }}px;
+    height: {{ block.settings.logo_height }}px;
+  }
+
+  .ai-logo-carousel__link-{{ ai_gen_id }} {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    text-decoration: none;
+    border-radius: {{ block.settings.logo_border_radius }}px;
+    transition: transform0.3s ease, opacity 0.3s ease;}
+
+  .ai-logo-carousel__link-{{ ai_gen_id }}:hover {
+    transform: scale(1.05);
+    opacity: 0.8;
+  }
+
+  .ai-logo-carousel__image-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: {{ block.settings.logo_border_radius }}px;
+  }
+
+  .ai-logo-carousel__placeholder-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    background-color: #f4f4f4;
+    border-radius: {{ block.settings.logo_border_radius }}px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  .ai-logo-carousel__placeholder-{{ ai_gen_id }} svg {
+    width: 60%;
+    height: 60%;
+    opacity: 0.3;
+  }
+
+  .ai-logo-carousel__empty-state-{{ ai_gen_id }} {
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 10px;
+    color: #666;
+    text-align: center;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+
+  @keyframes ai-logo-carousel-scroll-{{ ai_gen_id }} {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(calc(-100% - {{ block.settings.logo_spacing }}px));
+    }
+  }
+
+  .ai-logo-carousel__track-{{ ai_gen_id }}:hover {
+    animation-play-state: paused;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-logo-carousel__item-{{ ai_gen_id }} {
+      width: {{ block.settings.logo_width | times: 0.8 }}px;
+      height: {{ block.settings.logo_height | times: 0.8 }}px;
+    }
+
+    .ai-logo-carousel__track-{{ ai_gen_id }} {
+      gap: {{ block.settings.logo_spacing | times: 0.8 }}px;
+    }
+  }
+{% endstyle %}
+
+<logo-carousel-{{ ai_gen_id }}
+  class="ai-logo-carousel-{{ ai_gen_id }}"
+  {{ block.shopify_attributes }}
+>
+  <div class="ai-logo-carousel__track-{{ ai_gen_id }}">
+    {% for i in (1..8) %}
+      {% liquid
+        assign collection_key = 'collection_' | append: i
+        assign logo_key = 'logo_' | append: i
+        assign collection = block.settings[collection_key]
+        assign logo = block.settings[logo_key]
+      %}
+
+      {% if collection != blank or logo != blank %}
+        <div class="ai-logo-carousel__item-{{ ai_gen_id }}">
+          {% if collection != blank %}
+            <a href="{{ collection.url }}" class="ai-logo-carousel__link-{{ ai_gen_id }}">
+          {% else %}
+            <div class="ai-logo-carousel__link-{{ ai_gen_id }}">
+          {% endif %}
+            {% if logo != blank %}
+              <img
+                src="{{ logo | image_url: width: 400 }}"
+                alt="{{ collection.title | default: 'Brand logo' | escape }}"
+                class="ai-logo-carousel__image-{{ ai_gen_id }}"loading="lazy"
+                width="{{ block.settings.logo_width }}"
+                height="{{ block.settings.logo_height }}"
+              >
+            {% else %}
+              <div class="ai-logo-carousel__placeholder-{{ ai_gen_id }}">{{ 'image' | placeholder_svg_tag }}<div class="ai-logo-carousel__empty-state-{{ ai_gen_id }}">
+                  Add logo {{ i }}
+                </div>
+              </div>
+            {% endif %}
+          {% if collection != blank %}
+            </a>
+          {% else %}
+            </div>
+          {% endif %}
+        </div>
+      {% endif %}
+    {% endfor %}
+
+    {% for i in (1..8) %}
+      {% liquid
+        assign collection_key = 'collection_' | append: i
+        assign logo_key = 'logo_' | append: i
+        assign collection = block.settings[collection_key]
+        assign logo = block.settings[logo_key]
+      %}
+
+      {% if collection != blank or logo != blank %}
+        <div class="ai-logo-carousel__item-{{ ai_gen_id }}">
+          {% if collection != blank %}
+            <a href="{{ collection.url }}" class="ai-logo-carousel__link-{{ ai_gen_id }}">
+          {% else %}
+            <div class="ai-logo-carousel__link-{{ ai_gen_id }}">
+          {% endif %}
+            {% if logo != blank %}
+              <img
+                src="{{ logo | image_url: width: 400 }}"
+                alt="{{ collection.title | default: 'Brand logo' | escape }}"
+                class="ai-logo-carousel__image-{{ ai_gen_id }}"
+                loading="lazy"
+                width="{{ block.settings.logo_width }}"
+                height="{{ block.settings.logo_height }}"
+              >
+            {% else %}
+              <div class="ai-logo-carousel__placeholder-{{ ai_gen_id }}">
+                {{ 'image' | placeholder_svg_tag }}
+                <div class="ai-logo-carousel__empty-state-{{ ai_gen_id }}">
+                  Add logo {{ i }}
+                </div>
+              </div>
+            {% endif %}
+          {% if collection != blank %}
+            </a>
+          {% else %}
+            </div>
+          {% endif %}
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+</logo-carousel-{{ ai_gen_id }}><script>
+  (function() {
+    class LogoCarousel{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+      }
+
+      connectedCallback() {
+        this.track = this.querySelector('.ai-logo-carousel__track-{{ ai_gen_id }}');
+        this.setupAccessibility();
+      }
+
+      setupAccessibility() {
+        const links = this.querySelectorAll('.ai-logo-carousel__link-{{ ai_gen_id }}[href]');
+        links.forEach(link => {
+          link.setAttribute('tabindex', '0');
+        });
+
+        this.track.addEventListener('keydown', (event) => {
+          if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+            event.preventDefault();
+            const focusableElements = Array.from(links);
+            const currentIndex = focusableElements.indexOf(document.activeElement);
+            
+            let nextIndex;
+            if (event.key === 'ArrowRight') {
+              nextIndex = (currentIndex + 1) % focusableElements.length;
+            } else {
+              nextIndex = (currentIndex - 1 + focusableElements.length) % focusableElements.length;
+            }
+            
+            focusableElements[nextIndex].focus();
+          }
+        });
+      }
+    }
+
+    customElements.define('logo-carousel-{{ ai_gen_id }}', LogoCarousel{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Logo carousel",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Appearance"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Logo settings"
+    },
+    {
+      "type": "range",
+      "id": "logo_width",
+      "min": 80,
+      "max": 300,
+      "step": 10,
+      "unit": "px",
+      "label": "Logo width",
+      "default": 150
+    },
+    {
+      "type": "range",
+      "id": "logo_height",
+      "min": 40,
+      "max": 200,
+      "step": 10,
+      "unit": "px",
+      "label": "Logo height",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "logo_spacing",
+      "min": 20,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Logo spacing",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "logo_border_radius",
+      "min": 0,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "label": "Logo border radius",
+      "default": 8
+    },
+    {
+      "type": "header",
+      "content": "Animation"
+    },
+    {
+      "type": "range",
+      "id": "scroll_speed",
+      "min": 10,
+      "max": 60,
+      "step": 5,
+      "unit": "s",
+      "label": "Scroll speed",
+      "default": 30
+    },
+    {
+      "type": "header",
+      "content": "Logo1"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_1",
+      "label": "Logo image"
+    },
+    {
+      "type": "collection",
+      "id": "collection_1",
+      "label": "Collection link"
+    },
+    {
+      "type": "header",
+      "content": "Logo 2"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_2",
+      "label": "Logo image"
+    },
+    {
+      "type": "collection",
+      "id": "collection_2",
+      "label": "Collection link"
+    },
+    {
+      "type": "header",
+      "content": "Logo 3"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_3",
+      "label": "Logo image"
+    },
+    {
+      "type": "collection",
+      "id": "collection_3",
+      "label": "Collection link"
+    },
+    {
+      "type": "header",
+      "content": "Logo 4"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_4",
+      "label": "Logo image"
+    },
+    {
+      "type": "collection",
+      "id": "collection_4",
+      "label": "Collection link"
+    },
+    {
+      "type": "header",
+      "content": "Logo 5"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_5",
+      "label": "Logo image"
+    },
+    {
+      "type": "collection",
+      "id": "collection_5",
+      "label": "Collection link"
+    },
+    {
+      "type": "header",
+      "content": "Logo 6"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_6",
+      "label": "Logo image"
+    },
+    {
+      "type": "collection",
+      "id": "collection_6",
+      "label": "Collection link"
+    },
+    {
+      "type": "header",
+      "content": "Logo 7"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_7",
+      "label": "Logo image"
+    },
+    {
+      "type": "collection",
+      "id": "collection_7",
+      "label": "Collection link"
+    },
+    {
+      "type": "header",
+      "content": "Logo 8"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_8",
+      "label": "Logo image"
+    },
+    {
+      "type": "collection",
+      "id": "collection_8",
+      "label": "Collection link"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Logo carousel"
+    }
+  ],
+  "tag": null
+}
+{% endschema %}

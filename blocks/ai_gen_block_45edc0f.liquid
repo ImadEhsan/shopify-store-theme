@@ -1,0 +1,111 @@
+{% doc %}
+  @prompt
+    Using the loox plug in to source the data, create a review carousel featuring 7 reviews. Include an image, star rating and brief summary of the review. This should scroll horizontally on desktop and mobile. This should a be a <section> within the <body>, Include a small image from the review. Add an option to only include reviews that have an image., Can you populate the reviews with data from the Loox Shopify app?
+
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-loox-container-{{ ai_gen_id }} {
+    padding: {{ block.settings.section_padding }}px20px;
+    background-color: {{ block.settings.background_color }};
+  }
+
+  .ai-loox-container__content-{{ ai_gen_id }} {
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .ai-loox-container__title-{{ ai_gen_id }} {
+    font-size: {{ block.settings.title_size }}px;
+    color: {{ block.settings.text_color }};
+    margin: 0 0 40px;
+  }
+
+  .ai-loox-container__widget-{{ ai_gen_id }} {
+    width: 100%;
+  }
+{% endstyle %}
+
+<div class="ai-loox-container-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-loox-container__content-{{ ai_gen_id }}">
+    {% if block.settings.title != blank %}
+      <h2 class="ai-loox-container__title-{{ ai_gen_id }}">{{ block.settings.title }}</h2>
+    {% endif %}
+    
+    <div class="ai-loox-container__widget-{{ ai_gen_id }}">
+      {% if block.settings.loox_widget_code != blank %}
+        {{ block.settings.loox_widget_code }}
+      {% else %}
+        <p>Please add your Loox widget code in the block settings</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Loox reviews widget",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "Customer Reviews"
+    },
+    {
+      "type": "html",
+      "id": "loox_widget_code",
+      "label": "Loox widget embed code",
+      "info": "Copy the embed code from your Loox dashboard"
+    },
+    {
+      "type": "header",
+      "content": "Style"
+    },
+    {
+      "type": "range",
+      "id": "section_padding",
+      "label": "Section padding",
+      "min": 20,
+      "max": 100,
+      "step": 10,
+      "unit": "px",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "label": "Title size",
+      "min": 20,
+      "max": 50,
+      "step": 2,
+      "unit": "px",
+      "default": 32
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#333333"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Loox reviews widget"
+    }
+  ]
+}
+{% endschema %}

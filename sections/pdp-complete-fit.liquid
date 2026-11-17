@@ -1,0 +1,146 @@
+{%- comment -%}
+  Complete the fit.
+
+  Two passes, like Focal's product-recommendations: the page renders an empty
+  shell, then pdp-complete-fit.js asks the recommendations endpoint for this
+  same section. Complementary first — that is the per-product list the
+  merchant curates in Search & Discovery — then related when a product has
+  none. recommendations.performed is only true on that second request.
+
+  Each card is Focal's own <form is="product-form">, so the add, the cart
+  count and error messages behave exactly like the main Add to cart. The
+  script only opens and closes the size chips, submits on a chip, and opens
+  the cart drawer afterwards instead of Focal's "added" message.
+{%- endcomment -%}
+
+{%- liquid
+  assign card_count = section.settings.card_count
+  assign fetch_limit = card_count | plus: 4 | at_most: 10
+-%}
+
+{%- if recommendations.performed -%}
+  {%- comment -%} The endpoint response: cards only, the shell takes them. {%- endcomment -%}
+  <div data-pdp-fit-grid>
+    {%- assign shown = 0 -%}
+    {%- for card in recommendations.products -%}
+      {%- if card.available == false or card.id == product.id -%}
+        {%- continue -%}
+      {%- endif -%}
+      {%- if shown >= card_count -%}
+        {%- break -%}
+      {%- endif -%}
+      {%- assign shown = shown | plus: 1 -%}
+
+      {%- liquid
+        assign save = 0
+        if card.compare_at_price > card.price
+          assign save = card.compare_at_price | minus: card.price
+        endif
+        assign sizes_id = 'pdp-fit-' | append: section.id | append: '-' | append: card.id
+      -%}
+
+      <article class="pdp-fit__card">
+        <a class="pdp-fit__img" href="{{ card.url }}" tabindex="-1" aria-hidden="true">
+          {%- if save > 0 -%}
+            <span class="pdp-fit__save">SAVE {{ save | money_without_trailing_zeros }}</span>
+          {%- endif -%}
+          {%- if card.featured_media != blank -%}
+            {{ card.featured_media | image_url: width: 600 | image_tag: loading: 'lazy', sizes: '(max-width: 900px) 50vw, 300px', widths: '200,300,400,500,600', alt: '' }}
+          {%- endif -%}
+        </a>
+
+        {%- if card.vendor != blank -%}
+          <span class="pdp-fit__vendor">{{ card.vendor | escape }}</span>
+        {%- endif -%}
+        <h3 class="pdp-fit__name"><a href="{{ card.url }}">{{ card.title | escape }}</a></h3>
+
+        <div class="pdp-fit__price pdp-v2__tnum">
+          <span class="pdp-fit__now">
+            {%- if card.price_varies -%}From {% endif -%}
+            {{- card.price | money -}}
+          </span>
+          {%- if save > 0 -%}
+            <s class="pdp-fit__was">{{ card.compare_at_price | money }}</s>
+          {%- endif -%}
+        </div>
+
+        <form is="product-form" method="post" action="{{ routes.cart_add_url }}" class="pdp-fit__add" data-pdp-fit-form>
+          {%- if card.has_only_default_variant or card.variants.size == 1 -%}
+            <input type="hidden" name="id" value="{{ card.first_available_variant.id }}">
+            <button type="submit" class="pdp-fit__btn">{{ section.settings.button_label | escape }}</button>
+          {%- else -%}
+            <button type="button" class="pdp-fit__btn" aria-expanded="false" aria-controls="{{ sizes_id }}" data-pdp-fit-toggle>
+              {{- section.settings.button_label | escape -}}
+            </button>
+            <fieldset class="pdp-fit__sizes" id="{{ sizes_id }}" hidden>
+              <legend class="pdp-fit__hint">Select size</legend>
+              <div class="pdp-fit__chips">
+                {%- for variant in card.variants -%}
+                  <label class="pdp-fit__chip">
+                    <input class="visually-hidden" type="radio" name="id" value="{{ variant.id }}" {% unless variant.available %}disabled{% endunless %}>
+                    <span>{{ variant.title | escape }}</span>
+                  </label>
+                {%- endfor -%}
+              </div>
+            </fieldset>
+          {%- endif -%}
+        </form>
+      </article>
+    {%- endfor -%}
+  </div>
+{%- else -%}
+  {{ 'pdp-complete-fit.css' | asset_url | stylesheet_tag }}
+  <script src="{{ 'cau-drag-scroll.js' | asset_url }}" defer></script>
+  <script src="{{ 'pdp-complete-fit.js' | asset_url }}" defer></script>
+
+  <pdp-complete-fit
+    class="pdp-fit"
+    id="fit"
+    section-id="{{ section.id }}"
+    product-id="{{ product.id }}"
+    limit="{{ fetch_limit }}"
+    hidden>
+    <div class="container">
+      <header class="pdp-fit__head">
+        <div>
+          {%- if section.settings.heading != blank -%}
+            <h2 class="pdp-fit__title">{{ section.settings.heading | escape }}</h2>
+          {%- endif -%}
+          {%- if section.settings.intro != blank -%}
+            <p class="pdp-fit__lead">{{ section.settings.intro | escape }}</p>
+          {%- endif -%}
+        </div>
+        <div class="pdp-fit__arrows" data-pdp-fit-arrows hidden>
+          <button type="button" class="pdp-fit__arrow" data-pdp-fit-prev aria-label="Previous">
+            {%- render 'icon', icon: 'chevron-back', width: 8, height: 12 -%}
+          </button>
+          <button type="button" class="pdp-fit__arrow pdp-fit__arrow--next" data-pdp-fit-next aria-label="Next">
+            {%- render 'icon', icon: 'chevron-back', width: 8, height: 12 -%}
+          </button>
+        </div>
+      </header>
+      <div class="pdp-fit__grid" data-pdp-fit-slot data-cau-drag-scroll tabindex="0" role="group" aria-label="{{ section.settings.heading | default: 'Complete the fit' | escape }}"></div>
+      <div class="pdp-fit__progress" data-pdp-fit-progress hidden><span data-pdp-fit-thumb></span></div>
+    </div>
+  </pdp-complete-fit>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Complete the fit",
+  "tag": "section",
+  "class": "shopify-section--pdp-complete-fit",
+  "enabled_on": { "templates": ["product"] },
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Shows the product's complementary products from the Search & Discovery app, or related products when it has none. Sold-out products are skipped."
+    },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Complete the fit" },
+    { "type": "text", "id": "intro", "label": "Intro", "default": "Pieces that pair with this one." },
+    { "type": "text", "id": "button_label", "label": "Button label", "default": "+ Add to bundle" },
+    { "type": "range", "id": "card_count", "label": "Cards", "min": 2, "max": 8, "step": 1, "default": 4 }
+  ],
+  "presets": [ { "name": "Complete the fit" } ]
+}
+{% endschema %}

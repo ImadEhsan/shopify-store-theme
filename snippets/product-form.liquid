@@ -1,0 +1,766 @@
+{%- assign color_label_list = 'general.label.color' | t | replace: ', ', ',' | downcase | split: ',' -%}
+{%- assign color_white_label = 'general.label.white' | t | downcase -%}
+{%- assign size_label_list = 'general.label.size' | t | replace: ', ', ',' | downcase | split: ',' -%}
+
+<div class="product-form">
+  {%- for block in section.blocks -%}
+    {%- case block.type -%}
+      {%- comment -%}
+      ----------------------------------------------------------------------------------------------------------------
+      APP BLOCK TYPE
+      ----------------------------------------------------------------------------------------------------------------
+      {%- endcomment -%}
+      {%- when '@app' -%}
+        {%- render block -%}
+
+      {%- comment -%}
+      ----------------------------------------------------------------------------------------------------------------
+      VARIANT PICKER BLOCK TYPE
+      ----------------------------------------------------------------------------------------------------------------
+      {%- endcomment -%}
+      {%- when 'variant_picker' -%}
+        {%- unless product.has_only_default_variant -%}
+          {%- assign size_chart_page = block.settings.size_chart_page -%}
+          {%- assign found_size_option = false -%}
+
+          <variant-picker data-block-type="variant-picker" data-block-id="{{ section.id }}" handle="{{ product.handle }}" section-id="{{ section.id }}" form-id="{{ product_form_id }}" {% if update_url %}update-url{% endif %} {% if block.settings.hide_sold_out_variants %}hide-sold-out-variants{% endif %} class="product-form__variants" {{ block.shopify_attributes }}>
+            {%- comment -%}
+            The variant data is outputted as a JSON, which allows the theme to emit an event with the data when the variant changes. This must not be removed.
+            {%- endcomment -%}
+            <script data-variant type="application/json">
+              {{- product.selected_or_first_available_variant | json -}}
+            </script>
+
+            {%- for option in product.options_with_values -%}
+              {%- assign option_downcase = option.name | downcase -%}
+              {%- capture option_id -%}option-{{ section.id }}-{{ template.suffix }}-{{ product.id }}-{{ forloop.index }}-{{ context }}{%- endcapture -%}
+
+              {%- assign selector_type = block.settings.selector_mode -%}
+              {%- assign variant_image_options = block.settings.variant_image_options | replace: ', ', ',' | downcase | split: ',' -%}
+
+              {%- assign swatch_count = option.values | map: 'swatch' | compact | size -%}
+
+              {%- if swatch_count > 0 and block.settings.color_mode == 'swatch' %}
+                {%- assign selector_type = 'swatch' -%}
+              {%- endif -%}
+
+              {% if swatch_count == 0 and color_label_list contains option_downcase and block.settings.color_mode != 'none' %}
+                {%- assign selector_type = 'swatch' -%}
+              {%- endif -%}
+
+              {%- if variant_image_options contains option_downcase -%}
+                {%- assign selector_type = 'variant_image' -%}
+              {%- endif -%}
+
+              <div class="product-form__option-selector" data-selector-type="{{ selector_type | replace: '_', '-' | escape }}">
+                <div class="product-form__option-info">
+                  <span class="product-form__option-name">{{ option.name }}</span>
+
+                  {%- if selector_type != 'dropdown' -%}
+                    <span id="{{ option_id }}-value" class="product-form__option-value">{{ option.selected_value }}</span>
+                  {%- endif -%}
+
+                  {%- comment -%}
+                    Any option whose name contains "size" counts. Focal required
+                    the name to equal "Size" exactly, which left 22 products
+                    (Hoodie Size, T-shirt Size, Short Size, Sweatpant Size)
+                    with no size chart at all.
+                  {%- endcomment -%}
+                  {%- assign option_name_lower = option.name | downcase -%}
+                  {%- comment -%}
+                    Main buy box only. product-form also renders twice for
+                    quick-buy, and three panels on one page means duplicate
+                    DOM ids; a 12-column grid inside a quick-buy popover is
+                    also the wrong place for it.
+                  {%- endcomment -%}
+                  {%- if option_name_lower contains 'size' and context != 'quick-buy' -%}
+                    {%- render 'size-chart-panel', product: product, section_id: section.id -%}
+                  {%- endif -%}
+                </div>
+
+                {%- case selector_type -%}
+                  {%- when 'variant_image' -%}
+                    <div class="variant-swatch-list">
+                      {%- for value in option.values -%}
+                        {%- assign image = value.variant.featured_media | default: value.variant.product.featured_media | default: product.featured_media -%}
+
+                        <div class="variant-swatch {% unless value.available %}is-disabled{% endunless %}">
+                          {%- if value.product_url != blank -%}
+                            {%- if value == option.selected_value -%}
+                              <input type="hidden" form="{{ product_form_id }}" data-option-position="{{ option.position }}" name="option{{ option.position }}" value="{{ value.id }}">
+                            {%- endif -%}
+
+                            <a href="{{ value.product_url }}" class="variant-swatch__item {% if value == option.selected_value %}is-selected{% endif %}">
+                              <span class="visually-hidden">{{ value }}</span>
+
+                              {{- image | image_url: width: image.width | image_tag: loading: 'lazy', sizes: '(max-width: 740px) 64px, 72px', sizes: '64,72,128,144,192,216', class: 'variant-swatch__image' -}}
+                            </a>
+                          {%- else -%}
+                            <input class="variant-swatch__radio visually-hidden" type="radio" data-option-position="{{ option.position }}" name="option{{ option.position }}" form="{{ product_form_id }}" id="{{ option_id }}-{{ forloop.index }}" value="{{ value.id }}" {% if value == option.selected_value %}checked="checked"{% endif %} aria-label="{{ value | escape }}">
+                            <label class="variant-swatch__item" for="{{ option_id }}-{{ forloop.index }}">
+                              <span class="visually-hidden">{{ value }}</span>
+
+                              {{- image | image_url: width: image.width | image_tag: loading: 'lazy', sizes: '(max-width: 740px) 64px, 72px', sizes: '64,72,128,144,192,216', class: 'variant-swatch__image' -}}
+                            </label>
+                          {%- endif -%}
+                        </div>
+                      {%- endfor -%}
+                    </div>
+
+                  {%- when 'swatch' -%}
+                    <div class="color-swatch-list">
+                      {%- assign color_swatch_config = settings.color_swatch_config | newline_to_br | split: '<br />' -%}
+
+                      {%- for value in option.values -%}
+                        {%- assign color_value_downcase = value | downcase -%}
+
+                        <div class="color-swatch {% if color_white_label == color_value_downcase %}color-swatch--white{% endif %} {% unless value.available %}is-disabled{% endunless %}">
+                          {%- if value.product_url != blank -%}
+                            {%- if value == option.selected_value -%}
+                              <input type="hidden" form="{{ product_form_id }}" data-option-position="{{ option.position }}" name="option{{ option.position }}" value="{{ value.id }}">
+                            {%- endif -%}
+
+                            <a href="{{ value.product_url }}" class="color-swatch__item {% if value == option.selected_value %}is-selected{% endif %}" style="{% render 'color-swatch-style', swatch: value.swatch, color_swatch_config: color_swatch_config, value: value %}">
+                              <span class="visually-hidden">{{ value }}</span>
+                            </a>
+                          {%- else -%}
+                            <input class="color-swatch__radio visually-hidden" type="radio" data-option-position="{{ option.position }}" name="option{{ option.position }}" form="{{ product_form_id }}" id="{{ option_id }}-{{ forloop.index }}" value="{{ value.id }}" {% if value == option.selected_value %}checked="checked"{% endif %}>
+                            <label class="color-swatch__item" for="{{ option_id }}-{{ forloop.index }}" style="{% render 'color-swatch-style', swatch: value.swatch, color_swatch_config: color_swatch_config, value: value %}">
+                              <span class="visually-hidden">{{ value }}</span>
+                            </label>
+                          {%- endif -%}
+                        </div>
+                      {%- endfor -%}
+                    </div>
+
+                  {%- when 'block' -%}
+                    <div class="block-swatch-list">
+                      {%- for value in option.values -%}
+                        <div class="block-swatch {% unless value.available %}is-disabled{% endunless %}">
+                          {%- if value.product_url != blank -%}
+                            {%- if value == option.selected_value -%}
+                              <input type="hidden" form="{{ product_form_id }}" data-option-position="{{ option.position }}" name="option{{ option.position }}" value="{{ value.id }}">
+                            {%- endif -%}
+
+                            <a href="{{ value.product_url }}" class="block-swatch__item {% if value == option.selected_value %}is-selected{% endif %}">
+                              {{- value -}}
+                            </a>
+                          {%- else -%}
+                            <input class="block-swatch__radio visually-hidden" type="radio" data-option-position="{{ option.position }}" name="option{{ option.position }}" form="{{ product_form_id }}" id="{{ option_id }}-{{ forloop.index }}" value="{{ value.id }}" {% if value == option.selected_value %}checked="checked"{% endif %}>
+                            <label class="block-swatch__item" for="{{ option_id }}-{{ forloop.index }}">{{ value }}</label>
+                          {%- endif -%}
+                        </div>
+                      {%- endfor -%}
+                    </div>
+
+                  {%- when 'dropdown' -%}
+                    <div class="select-wrapper">
+                      <combo-box initial-focus-selector="[aria-selected='true']" id="{{ option_id }}-combo-box" class="combo-box">
+                        <span class="combo-box__overlay"></span>
+
+                        {%- comment -%}
+                          The grab handle. Decorative — it advertises the drag
+                          rather than implementing it — so it is hidden from
+                          assistive technology, and from desktop where this is
+                          a dropdown and nothing drags.
+                        {%- endcomment -%}
+                        <div class="pdp-v2__grab" aria-hidden="true"></div>
+
+                        <header class="combo-box__header">
+                          {%- comment -%}
+                            A way into the size chart from inside the picker —
+                            the moment someone is unsure is while they are
+                            looking at the sizes. Hidden by script when the
+                            product has no chart.
+                          {%- endcomment -%}
+                          {%- assign combo_name_lower = option.name | downcase -%}
+                          {%- if combo_name_lower contains 'size' -%}
+                            <button type="button" class="combo-box__size-guide link" data-open-size-chart hidden>{{ 'product.general.size_chart' | t }}</button>
+                          {%- endif -%}
+
+                          <p class="combo-box__title heading h6">{%- if combo_name_lower contains 'size' -%}Select {{ combo_name_lower }}{%- else -%}{{ option.name }}{%- endif -%}</p>
+
+                          <button type="button" class="combo-box__close-button tap-area" data-action="close" title="{{ 'general.accessibility.close' | t | escape }}">
+                            {%- render 'icon' with 'close' -%}
+                          </button>
+                        </header>
+
+                        {%- comment -%}
+                          The size guide, as a second view of this sheet. The
+                          script swaps which of the two is hidden; nothing
+                          closes and nothing reopens.
+                        {%- endcomment -%}
+                        {%- assign combo_name_lower = option.name | downcase -%}
+                        {%- if combo_name_lower contains 'size' and context != 'quick-buy' -%}
+                          {%- render 'size-chart-panel', product: product, section_id: section.id, embedded: true -%}
+                        {%- endif -%}
+
+                        <div class="combo-box__option-list" role="listbox">
+                          {%- for value in option.values -%}
+                            {%- if value.product_url != blank -%}
+                              {%- if value == option.selected_value -%}
+                                <input type="hidden" form="{{ product_form_id }}" data-option-position="{{ option.position }}" name="option{{ option.position }}" value="{{ value.id }}">
+                              {%- endif -%}
+
+                              <a href="{{ value.product_url }}" aria-selected="{% if value == option.selected_value %}true{% else %}false{% endif %}" class="combo-box__option-item {% if value.available == false %}is-disabled{% endif %}">
+                                {{- value -}}
+                              </a>
+                            {%- else -%}
+                              {%- comment -%}
+                                Stock for this size. option.values carries
+                                availability but not quantity, so find the
+                                variant whose option at this position matches.
+                                Single-option products match exactly; on
+                                multi-option products we take the first match,
+                                which is the right one for the size axis.
+                              {%- endcomment -%}
+                              {%- assign opt_index = option.position | minus: 1 -%}
+                              {%- assign value_qty = nil -%}
+                              {%- assign value_tracked = false -%}
+                              {%- for pv in product.variants -%}
+                                {%- if pv.options[opt_index] == value -%}
+                                  {%- if pv.inventory_management != blank -%}
+                                    {%- assign value_tracked = true -%}
+                                    {%- assign value_qty = pv.inventory_quantity -%}
+                                  {%- endif -%}
+                                  {%- break -%}
+                                {%- endif -%}
+                              {%- endfor -%}
+
+                              <button type="button" role="option" class="combo-box__option-item size-option {% if value.available == false %}is-disabled{% endif %}" value="{{ value.id }}" aria-selected="{% if value == option.selected_value %}true{% else %}false{% endif %}">
+                                <span class="size-option__name">{{ value }}</span>
+                                {%- if value.available == false -%}
+                                  <span class="size-option__stock size-option__stock--out">{{ 'product.form.sold_out' | t }}</span>
+                                {%- elsif value_tracked and value_qty > 0 and settings.pdp_low_stock_threshold > 0 and value_qty <= settings.pdp_low_stock_threshold -%}
+                                  {%- comment -%} Only the low end is called out; a healthy size says nothing. {%- endcomment -%}
+                                  <span class="size-option__stock size-option__stock--low">Low stock</span>
+                                {%- endif -%}
+                              </button>
+                            {%- endif -%}
+                          {%- endfor -%}
+                        </div>
+
+                        <input type="hidden" data-option-position="{{ option.position }}" name="option{{ option.position }}" form="{{ product_form_id }}" value="{{ option.selected_value.id }}" aria-label="{{ option.name | escape }}">
+                      </combo-box>
+
+                      <button type="button" is="toggle-button" class="select" aria-expanded="false" aria-haspopup="listbox" aria-controls="{{ option_id }}-combo-box">
+                        <span id="{{ option_id }}-value" class="select__selected-value">{{ option.selected_value }}</span>
+                        {%- render 'icon' with 'chevron' -%}
+                      </button>
+                    </div>
+                {%- endcase -%}
+              </div>
+            {%- endfor -%}
+          </variant-picker>
+        {%- endunless -%}
+
+      {%- comment -%}
+      ----------------------------------------------------------------------------------------------------------------
+      LINE ITEM PROPERTY
+      ----------------------------------------------------------------------------------------------------------------
+      {%- endcomment -%}
+      {%- when 'line_item_property' -%}
+        {%- if block.settings.label != blank -%}
+          {%- case block.settings.type -%}
+            {%- when 'text' -%}
+              {%- if block.settings.allow_long_text -%}
+                <div class="product-form__line-item-property" {{ block.shopify_attributes }}>
+                  <label class="input__block-label" for="line-item-{{ section.id }}-{{ block.id }}">{{ block.settings.label | escape }}:</label>
+                  <textarea {% if block.settings.required %}required{% endif %} id="line-item-{{ section.id }}-{{ block.id }}" form="{{ product_form_id }}" class="input__field input__field--textarea" name="properties[{{ block.settings.label | escape }}]"></textarea>
+                </div>
+              {% else %}
+                <div class="product-form__line-item-property" {{ block.shopify_attributes }}>
+                  <label class="input__block-label" for="line-item-{{ section.id }}-{{ block.id }}">{{ block.settings.label | escape }}:</label>
+                  <input {% if block.settings.required %}required{% endif %} id="line-item-{{ section.id }}-{{ block.id }}" form="{{ product_form_id }}" type="text" class="input__field" name="properties[{{ block.settings.label | escape }}]">
+                </div>
+              {%- endif -%}
+
+            {%- when 'checkbox' -%}
+              <div class="product-form__line-item-property" {{ block.shopify_attributes }}>
+                <div class="checkbox-container">
+                  <input type="hidden" form="{{ product_form_id }}" class="checkbox" name="properties[{{ block.settings.label | escape }}]" value="{{ block.settings.unchecked_value | escape }}">
+                  <input type="checkbox" form="{{ product_form_id }}" class="checkbox" name="properties[{{ block.settings.label | escape }}]" id="line-item-{{ section.id }}-{{ block.id }}" value="{{ block.settings.checked_value | escape }}">
+                  <label for="line-item-{{ section.id }}-{{ block.id }}">{{ block.settings.label | escape }}</label>
+                </div>
+              </div>
+          {%- endcase -%}
+        {%- endif -%}
+
+      {%- comment -%}
+      ----------------------------------------------------------------------------------------------------------------
+      TEXT
+      ----------------------------------------------------------------------------------------------------------------
+      {%- endcomment -%}
+      {%- when 'text' -%}
+        {% if block.settings.text != blank %}
+          <div class="product-form__text" {{ block.shopify_attributes }}>
+            {{- block.settings.text -}}
+          </div>
+        {%- endif -%}
+
+      {%- comment -%}
+      ----------------------------------------------------------------------------------------------------------------
+      IMAGE
+      ----------------------------------------------------------------------------------------------------------------
+      {%- endcomment -%}
+      {%- when 'image' -%}
+        {% if block.settings.image != blank and context != 'quick-buy' %}
+          <div class="product-form__image product-form__image--{{ block.settings.image_alignment }}" {{ block.shopify_attributes }}>
+            {%- capture image_sizes -%}{{ block.settings.image_width }}, {{ block.settings.image_width | times: 2 }}, {{ block.settings.image_width | times: 3 }}{%- endcapture -%}
+            {%- capture sizes_attribute -%}{{ block.settings.image_width }}px{%- endcapture -%}
+            {%- capture style_attribute -%}max-width: {{ block.settings.image_width }}px{%- endcapture -%}
+            {{- block.settings.image | image_url: width: block.settings.image.width | image_tag: loading: 'lazy', sizes: sizes_attribute, widths: image_sizes, style: style_attribute -}}
+          </div>
+        {%- endif -%}
+
+      {%- comment -%}
+      ----------------------------------------------------------------------------------------------------------------
+      BUTTON
+      ----------------------------------------------------------------------------------------------------------------
+      {%- endcomment -%}
+      {%- when 'button' -%}
+        {% if block.settings.link != blank and block.settings.text != blank and context != 'quick-buy' %}
+          <div class="product-form__button" {{ block.shopify_attributes }}>
+            {%- if block.settings.background == 'rgba(0,0,0,0)' -%}
+              {%- assign button_background = settings.primary_button_background -%}
+            {%- else -%}
+              {%- assign button_background = block.settings.background -%}
+            {%- endif -%}
+
+            {%- if block.settings.text_color == 'rgba(0,0,0,0)' -%}
+              {%- assign button_text_color = settings.primary_button_text_color -%}
+            {%- else -%}
+              {%- assign button_text_color = block.settings.text_color -%}
+            {%- endif -%}
+
+            {%- capture button_background_rgb -%}{{ button_background.red }}, {{ button_background.green }}, {{ button_background.blue }}{%- endcapture -%}
+            {%- capture button_text_color_rgb -%}{{ button_text_color.red }}, {{ button_text_color.green }}, {{ button_text_color.blue }}{%- endcapture -%}
+
+            <a href="{{ block.settings.link }}" class="button button--primary {% if block.settings.stretch %}button--full{% endif %}" style="--primary-button-background: {{ button_background_rgb }}; --primary-button-text-color: {{ button_text_color_rgb }}">{{ block.settings.text | escape }}</a>
+          </div>
+        {%- endif -%}
+
+      {%- comment -%}
+      ----------------------------------------------------------------------------------------------------------------
+      CUSTOM LIQUID
+      ----------------------------------------------------------------------------------------------------------------
+      {%- endcomment -%}
+      {%- when 'liquid' -%}
+        <div data-block-type="liquid" data-block-id="{{ block.id }}" {{ block.shopify_attributes }}>
+          {% if block.settings.liquid != blank %}
+            <div class="product-form__custom-liquid">
+              {{- block.settings.liquid -}}
+            </div>
+          {%- endif -%}
+        </div>
+
+      {%- comment -%}
+      ----------------------------------------------------------------------------------------------------------------
+      QUANTITY SELECTOR
+      ----------------------------------------------------------------------------------------------------------------
+      {%- endcomment -%}
+      {%- when 'quantity_selector' -%}
+        {%- if request.page_type != 'password' and product.available -%}
+          <div data-block-type="quantity-selector" data-block-id="{{ block.id }}" class="product-form__quantity" {{ block.shopify_attributes }}>
+            <span class="product-form__quantity-label">{{ 'product.form.quantity' | t }}:</span>
+
+            <quantity-selector class="quantity-selector">
+              <button type="button" class="quantity-selector__button">
+                <span class="visually-hidden">{{ 'cart.general.decrease_quantity' | t }}</span>
+                {%- render 'icon' with 'minus-big' -%}
+              </button>
+
+              <input type="number" form="{{ product_form_id }}" is="input-number" class="quantity-selector__input" inputmode="numeric" name="quantity" autocomplete="off" value="{{ product.selected_or_first_available_variant.quantity_rule.min | default: 1 }}" step="{{ product.selected_or_first_available_variant.quantity_rule.increment }}" min="{{ product.selected_or_first_available_variant.quantity_rule.min }}" {% if product.selected_or_first_available_variant.quantity_rule.max != nil %}max="{{ product.selected_or_first_available_variant.quantity_rule.max }}"{% endif %} aria-label="{{ 'product.form.quantity' | t | escape }}">
+
+              <button type="button" class="quantity-selector__button">
+                <span class="visually-hidden">{{ 'cart.general.increase_quantity' | t }}</span>
+                {%- render 'icon' with 'plus-big' -%}
+              </button>
+            </quantity-selector>
+
+            {%- liquid
+              assign variant = product.selected_or_first_available_variant
+              assign quantity_rules = ''
+
+              if variant.quantity_rule.min > 1
+                assign rule = 'product.quantity.minimum_of' | t: min: variant.quantity_rule.min
+                assign quantity_rules = quantity_rules | append: ' / ' | append: rule
+              endif
+
+              if variant.quantity_rule.max != nil
+                assign rule = 'product.quantity.maximum_of' | t: max: variant.quantity_rule.max
+                assign quantity_rules = quantity_rules | append: ' / ' | append: rule
+              endif
+
+              if variant.quantity_rule.increment > 1
+                assign rule = 'product.quantity.increment_of' | t: step: variant.quantity_rule.increment
+                assign quantity_rules = quantity_rules | append: ' / ' | append: rule
+              endif
+            -%}
+
+            {%- if quantity_rules != blank -%}
+              <p class="product-form__quantity-rules text--subdued text--small">{{ quantity_rules | remove_first: ' / ' | capitalize }}</p>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+
+      {%- comment -%}
+      ----------------------------------------------------------------------------------------------------------------
+      VOLUME PRICING TABLE
+      ----------------------------------------------------------------------------------------------------------------
+      {%- endcomment -%}
+      
+      {%- when 'volume_pricing' -%}
+        <div data-block-type="volume-pricing" data-block-id="{{ block.id }}" {{ block.shopify_attributes }}>
+          {%- render 'volume-pricing-table', variant: product.selected_or_first_available_variant -%}
+        </div>
+
+      {%- comment -%}
+      ----------------------------------------------------------------------------------------------------------------
+      PRODUCT DESCRIPTION
+      ----------------------------------------------------------------------------------------------------------------
+      {%- endcomment -%}
+      {%- when 'description' -%}
+        {%- if product.description != blank and context != 'quick-buy' -%}
+          <div class="product-form__description rte" {{ block.shopify_attributes }}>
+            {{- product.description -}}
+          </div>
+        {%- endif -%}
+
+      {%- comment -%}
+      ----------------------------------------------------------------------------------------------------------------
+      INVENTORY
+      ----------------------------------------------------------------------------------------------------------------
+      {%- endcomment -%}
+      {%- when 'inventory' -%}
+        {%- if product.template_suffix != 'pre-order' -%}
+          <div data-block-type="inventory" data-block-id="{{ block.id }}" {{ block.shopify_attributes }}>
+            {%- if product.selected_or_first_available_variant.available or product.selected_or_first_available_variant.incoming -%}
+              <product-inventory class="product-form__inventory-wrapper">
+                {%- if product.selected_or_first_available_variant.available -%}
+                  {%- if product.selected_or_first_available_variant.inventory_management and product.selected_or_first_available_variant.inventory_policy == 'deny' and product.selected_or_first_available_variant.inventory_quantity <= block.settings.low_inventory_threshold and block.settings.low_inventory_threshold > 0 -%}
+                    <span class="inventory inventory--low">{{ 'product.form.low_stock_with_quantity_count' | t: count: product.selected_or_first_available_variant.inventory_quantity }}</span>
+                  {%- else -%}
+                    {%- if product.selected_or_first_available_variant.inventory_policy == 'continue' and product.selected_or_first_available_variant.inventory_quantity <= 0 and product.selected_or_first_available_variant.requires_shipping -%}
+                      {%- if product.selected_or_first_available_variant.incoming and product.selected_or_first_available_variant.next_incoming_date -%}
+                        {%- capture next_incoming_date -%}{{ product.selected_or_first_available_variant.next_incoming_date | date: format: 'date' }}{%- endcapture -%}
+                        <span class="inventory inventory--low">{{ 'product.form.incoming_stock' | t: next_incoming_date: next_incoming_date }}</span>
+                      {%- else -%}
+                        <span class="inventory inventory--low">{{ 'product.form.oversell_stock' | t }}</span>
+                      {%- endif -%}
+                    {%- else -%}
+                      <span class="inventory inventory--high">{{ 'product.form.in_stock' | t }}</span>
+                    {%- endif -%}
+                  {%- endif -%}
+                {%- elsif product.selected_or_first_available_variant.incoming -%}
+                  {%- if product.selected_or_first_available_variant.next_incoming_date -%}
+                    {%- capture next_incoming_date -%}{{ product.selected_or_first_available_variant.next_incoming_date | date: format: 'date' }}{%- endcapture -%}
+                    <span class="inventory inventory--low">{{ 'product.form.incoming_stock' | t: next_incoming_date: next_incoming_date }}</span>
+                  {%- else -%}
+                    <span class="inventory inventory--low">{{ 'product.form.oversell_stock' | t }}</span>
+                  {%- endif -%}
+                {%- endif -%}
+              </product-inventory>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+
+      {%- comment -%}
+      ----------------------------------------------------------------------------------------------------------------
+      BUY BUTTONS
+      ----------------------------------------------------------------------------------------------------------------
+      {%- endcomment -%}
+{%- when 'dispatch_timer' -%}
+      {%- comment -%}
+        DISPATCH TIMER — ported verbatim from the "Arslan Working Copy" theme
+        (id 173297139735) so the behaviour, the settings and the look are the
+        ones already approved on this store.
+
+        Two things it gets right that a fresh build here did not: it resolves
+        the cutoff with Intl.DateTimeFormat against a named Australian
+        timezone, so it is correct for a shopper anywhere, and it is gated on
+        the per-product metafield custom.show_dispatch_timer, so only products
+        the merchant has flagged make the claim.
+      {%- endcomment -%}
+        {% if product.metafields.custom.show_dispatch_timer.value == true %}
+          {%- comment -%} DISPATCH TIMER BLOCK {%- endcomment -%}
+          <div class="dispatch-timer-block" {{ block.shopify_attributes }} 
+              style="
+                --border-color: {{ block.settings.border_color }};
+                --text-color: {{ block.settings.text_color }};
+                --timer-bg: {{ block.settings.timer_bg_color }};
+                --timer-text: {{ block.settings.timer_text_color }};
+              ">
+            
+            <div class="dispatch-timer-container">
+              {%- comment -%} Same clock as the other signals, so the two read as one family. {%- endcomment -%}
+              <svg class="dispatch-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+              <span class="dispatch-text">{{ block.settings.prefix_text }}</span>
+              
+              <div class="dispatch-countdown" data-timezone="{{ block.settings.timezone }}">
+                <span class="timer-digits timer-hours">00</span>
+                <span class="timer-colon">:</span>
+                <span class="timer-digits timer-minutes">00</span>
+                <span class="timer-colon">:</span>
+                <span class="timer-digits timer-seconds">00</span>
+              </div>
+              
+              <span class="dispatch-text">{{ block.settings.suffix_text }}</span>
+            </div>
+
+          </div>
+
+          <style>
+            .dispatch-timer-block {
+              margin: 15px 0;
+              width: 100%;
+            }
+            .dispatch-timer-container {
+              display: inline-flex;
+              width: 100%;
+              align-items: center;
+              justify-content: center;
+              flex-wrap: wrap;
+              gap: 12px;
+              padding: 9px;
+              border: 1px solid var(--border-color);
+              background: transparent;
+              color: var(--text-color);
+              font-family: inherit;
+              font-size: 11.5px;
+              letter-spacing: 0.5px;
+            }
+            .dispatch-countdown {
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              background-color: var(--timer-bg);
+              color: var(--timer-text);
+              padding: 3px 5px;
+              font-size: 12px;
+              font-weight: 600;
+              letter-spacing: 1px;
+              line-height: normal;
+              min-width: 77px;
+            }
+            .timer-colon {
+              margin: 0 2px;
+              position: relative;
+              top: -1px;
+            }
+          </style>
+
+          <script>
+            document.addEventListener('DOMContentLoaded', function() {
+              const timerElements = document.querySelectorAll('.dispatch-countdown');
+
+              function updateTimers() {
+                const now = new Date();
+
+                timerElements.forEach(timer => {
+                  const timeZone = timer.getAttribute('data-timezone');
+                  
+                  // Format the current time in the selected Australian timezone
+                  const formatter = new Intl.DateTimeFormat('en-US', {
+                    timeZone: timeZone,
+                    hour: '2-digit', 
+                    minute: '2-digit', 
+                    second: '2-digit',
+                    hour12: false
+                  });
+
+                  // Extract the local hour, minute, and second in that timezone
+                  const parts = formatter.formatToParts(now);
+                  const timeMap = {};
+                  parts.forEach(p => timeMap[p.type] = p.value);
+
+                  // Calculate time remaining until 23:59:59 (Midnight)
+                  let hoursLeft = 23 - parseInt(timeMap.hour, 10);
+                  let minutesLeft = 59 - parseInt(timeMap.minute, 10);
+                  let secondsLeft = 59 - parseInt(timeMap.second, 10);
+
+                  // Handle edge case where hour might be '24' instead of '00' in some browsers
+                  if (hoursLeft < 0) hoursLeft = 0;
+
+                  // Pad with leading zeros
+                  const h = String(hoursLeft).padStart(2, '0');
+                  const m = String(minutesLeft).padStart(2, '0');
+                  const s = String(secondsLeft).padStart(2, '0');
+
+                  // Update DOM
+                  timer.querySelector('.timer-hours').textContent = h;
+                  timer.querySelector('.timer-minutes').textContent = m;
+                  timer.querySelector('.timer-seconds').textContent = s;
+                });
+              }
+
+              // Run immediately, then update every second
+              if (timerElements.length > 0) {
+                updateTimers();
+                setInterval(updateTimers, 1000);
+              }
+            });
+          </script>
+        {% endif %}
+
+      {%- when 'pdp_verified' -%}
+        {%- if context != 'quick-buy' -%}
+          {%- render 'pdp-verified', block: block -%}
+        {%- endif -%}
+
+      {%- when 'pdp_bundle' -%}
+        {%- if context != 'quick-buy' -%}
+          {%- render 'pdp-bundle', block: block, product: product -%}
+        {%- endif -%}
+
+      {%- when 'pdp_signals' -%}
+        {%- comment -%}
+          A block rather than a tail on the variant picker: Focal skips the
+          picker entirely on single-variant products, and 70 of 250 products
+          here have no size. Shipping is not size-specific, so it must still
+          appear on those. Being a block also lets the merchant move it.
+        {%- endcomment -%}
+        {%- if context != 'quick-buy' -%}
+          {%- render 'pdp-signals', product: product -%}
+        {%- endif -%}
+
+      {%- when 'buy_buttons' -%}
+        {%- if request.page_type != 'password' -%}
+          {%- assign recipient_feature_active = false -%}
+
+          {%- if product.gift_card? and block.settings.show_gift_card_recipient -%}
+            {%- assign recipient_feature_active = true -%}
+          {%- endif -%}
+
+          <div data-block-type="buy-buttons" data-block-id="{{ block.id }}" class="product-form__buy-buttons" {{ block.shopify_attributes }}>
+            {%- form 'product', product, is: 'product-form', id: product_form_id -%}
+              {%- if recipient_feature_active -%}
+                <gift-card-recipient class="gift-card-recipient">
+                  <div class="input input--checkbox">
+                    <div class="checkbox-container">
+                      <input type="checkbox" class="checkbox" name="properties[__shopify_send_gift_card_to_recipient]" id="product-{{ section.id }}-{{ product.id }}-send-gift-card-to-recipient">
+                      <label for="product-{{ section.id }}-{{ product.id }}-send-gift-card-to-recipient" class="text--subdued">{{ 'gift_card.recipient.checkbox' | t }}</label>
+                    </div>
+                  </div>
+
+                  <div class="gift-card-recipient__fields js:hidden">
+                    <div class="input">
+                      <input id="product-{{ section.id }}-{{ product.id }}-recipient-email" type="email" class="input__field input__field--text" name="properties[Recipient email]" maxlength="138" required value="{{ form.email }}">
+                      <label for="product-{{ section.id }}-{{ product.id }}-recipient-email" class="input__label">{{ 'gift_card.recipient.email_label' | t }}</label>
+                    </div>
+
+                    <div class="input">
+                      <input id="product-{{ section.id }}-{{ product.id }}-recipient-name" type="text" class="input__field input__field--text" name="properties[Recipient name]" value="{{ form.name }}">
+                      <label for="product-{{ section.id }}-{{ product.id }}-recipient-name" class="input__label">{{ 'gift_card.recipient.name_label' | t }}</label>
+                    </div>
+
+                    <div class="input">
+                      <input type="hidden" name="properties[__shopify_offset]" value="" disabled>
+                      <input id="product-{{ section.id }}-{{ product.id }}-send-on" type="date" class="input__field input__field--text" pattern="\d{4}-\d{2}-\d{2}" name="properties[Send on]" value="{{ form.send_on }}">
+                      <label for="product-{{ section.id }}-{{ product.id }}-send-on" class="input__label">{{ 'gift_card.recipient.send_on_label' | t }}</label>
+                    </div>
+
+                    <div class="input">
+                      <textarea id="product-{{ section.id }}-{{ product.id }}-recipient-message" rows="4" maxlength="200"class="input__field input__field--textarea" name="properties[Message]">{{ form.message }}</textarea>
+                      <label for="product-{{ section.id }}-{{ product.id }}-recipient-message" class="input__label">{{ 'gift_card.recipient.message_label' | t }}</label>
+                    </div>
+                  </div>
+                </gift-card-recipient>
+              {%- endif -%}
+
+              <input type="hidden" disabled name="id" value="{{ product.selected_or_first_available_variant.id }}">
+
+              <product-payment-container {% if update_url %}id="MainPaymentContainer"{% endif %} class="product-form__payment-container" {{ block.shopify_attributes }}>
+                <button id="AddToCart" type="submit" is="loader-button" {% unless block.settings.show_payment_button and template.suffix != 'quick-buy-popover' %}data-use-primary{% endunless %} data-product-add-to-cart-button data-button-content="{% if product.template_suffix == 'pre-order' %}{{ 'product.form.pre_order' | t | escape }}{% else %}{{ 'product.form.add_to_cart' | t | escape }}{% endif %}" class="product-form__add-button button {% unless product.selected_or_first_available_variant.available %}button--ternary{% else %}{% if block.settings.show_payment_button and template.suffix != 'quick-buy-popover' %}button--secondary{% else %}button--primary{% endif %}{% endunless %} button--full" {% unless product.selected_or_first_available_variant.available %}disabled{% endunless %}>
+                  {%- if product.selected_or_first_available_variant == nil -%}
+                    {{- 'product.form.unavailable' | t -}}
+                  {%- elsif product.selected_or_first_available_variant.available -%}
+                    {%- if product.template_suffix == 'pre-order' -%}
+                      {{- 'product.form.pre_order' | t -}}
+                    {%- else -%}
+                      {{- 'product.form.add_to_cart' | t -}}
+                    {%- endif -%}
+                  {%- else -%}
+                    {{- 'product.form.sold_out' | t -}}
+                  {%- endif -%}
+
+                  {%- comment -%}
+                    The price in the button. Focal re-renders this whole element
+                    on a variant change, so putting it in Liquid means it stays
+                    correct for free.
+                  {%- endcomment -%}
+                  {%- if product.selected_or_first_available_variant.available -%}
+                    <span class="pdp-v2__cta-price pdp-v2__tnum">{{ product.selected_or_first_available_variant.price | money }}</span>
+                  {%- endif -%}
+                </button>
+
+                {%- if block.settings.show_payment_button and recipient_feature_active == false and template.suffix != 'quick-buy-popover' -%}
+                  {{ form | payment_button }}
+
+                  {%- comment -%}
+                    Shop Pay is Shopify's own button and it checks out with
+                    whatever variant is pre-selected — XX-Small on this store.
+                    Products that have a size therefore get a transparent
+                    catcher over it until a size is chosen; tapping the catcher
+                    opens the size sheet, exactly as Add to cart does.
+
+                    A product with no size has nothing to choose, so it never
+                    gets a guard. Without that condition the guard would block
+                    Shop Pay forever on the 70 of 250 products that are
+                    single-variant.
+                  {%- endcomment -%}
+                  {%- assign has_size_option = false -%}
+                  {%- for opt in product.options_with_values -%}
+                    {%- assign opt_lower = opt.name | downcase -%}
+                    {%- if opt_lower contains 'size' -%}
+                      {%- assign has_size_option = true -%}
+                    {%- endif -%}
+                  {%- endfor -%}
+
+                  {%- if has_size_option -%}
+                    <button type="button"
+                            class="pdp-v2__express-guard"
+                            data-pdp-express-guard
+                            aria-label="{{ 'product.form.add_to_cart' | t | escape }}"></button>
+                  {%- endif -%}
+
+                  {%- unless product.selected_or_first_available_variant.available -%}
+                    <style>
+                      #shopify-section-{{ section.id }} .shopify-payment-button {
+                        display: none;
+                      }
+                    </style>
+                  {%- endunless -%}
+                {%- endif -%}
+              </product-payment-container>
+
+              {%- if context != 'quick-buy' -%}
+                {%- render 'pdp-pay' -%}
+              {%- endif -%}
+            {%- endform -%}
+          </div>
+        {%- endif -%}
+
+        {%- if context != 'quick-buy' -%}
+          <store-pickup data-block-type="pickup-availability" data-block-id="{{ block.id }}" class="product-form__store-availability-container">
+            {%- render 'store-availability', product_variant: product.selected_or_first_available_variant -%}
+          </store-pickup>
+        {%- endif -%}
+    {%- endcase -%}
+  {%- endfor -%}
+
+  {%- comment -%}
+  IMPLEMENTATION NOTE: under rare circumstances, merchant may want to show selectors but hide the add to cart button. This
+  is however problematic as elements changed based on this. So if we detect there is no buy buttons block, we add an empty one
+  {%- endcomment -%}
+
+  {%- assign buy_buttons_block = section.blocks | where: 'type', 'buy_buttons' | first -%}
+
+  {%- if buy_buttons_block == blank -%}
+    {%- form 'product', product, is: 'product-form', id: product_form_id -%}
+      <input type="hidden" disabled name="id" value="{{ product.selected_or_first_available_variant.id }}">
+    {%- endform -%}
+  {%- endif -%}
+</div>
+
+

@@ -1,0 +1,55 @@
+{%- comment -%}
+  The stylesheet loads here, not in the product section: the homepage's
+  featured product and the quick-buy drawer render this snippet too, and
+  neither of them loads pdp.css.
+{%- endcomment -%}
+{{ 'pdp-paylines.css' | asset_url | stylesheet_tag }}
+
+{%- comment -%}
+  The instalment row.
+
+  In: product (required)
+
+  Afterpay and Zip are live payment methods at this checkout. They are
+  third-party gateways, and shop.enabled_payment_types returns only card brands
+  and accelerated wallets, so Liquid cannot detect them — the logos are fixed
+  for that reason, not for want of checking. The setting exists so the row can
+  be switched off in one click if either is ever removed.
+
+  The amount is the product price divided by the instalment count, which is how
+  both providers present it.
+{%- endcomment -%}
+
+{%- if settings.pdp_show_bnpl -%}
+  {%- assign parts = settings.pdp_bnpl_count | default: 4 -%}
+  {%- assign each = product.selected_or_first_available_variant.price | divided_by: parts -%}
+
+  <div class="pdp-v2__bnpl">
+    <span>or {{ parts }} &times; <b class="pdp-v2__tnum">{{ each | money }}</b> interest-free with</span>
+    <span class="pdp-v2__bnpl-logos">
+      <svg xmlns="http://www.w3.org/2000/svg" role="img" viewBox="0 0 38 24" aria-label="Afterpay"><path fill="#b2fce4" d="M35 0H3C1.3 0 0 1.3 0 3v18c0 1.7 1.4 3 3 3h32c1.7 0 3-1.3 3-3V3c0-1.7-1.4-3-3-3z"/><path d="m27.4 6.8-2.7-1.6-2.7-1.6c-1.8-1-4.1.3-4.1 2.4v.4c0 .2.1.4.3.5l1.3.7c.4.2.8-.1.8-.5v-.8c0-.4.4-.7.8-.5l2.5 1.4 2.4 1.5c.4.2.4.7 0 .9l-2.5 1.4-2.5 1.6c-.4.2-.8-.1-.8-.5v-.4c0-2.1-2.3-3.4-4.1-2.4l-2.7 1.6-2.7 1.6c-1.8 1-1.8 3.7 0 4.7l2.7 1.6 2.7 1.6c1.8 1 4.1-.3 4.1-2.4v-.4c0-.2-.1-.4-.3-.5l-1.3-.7c-.4-.2-.8.1-.8.5v.8c0 .4-.4.7-.8.5l-2.5-1.4-2.5-1.5c-.4-.2-.4-.7 0-.9l2.5-1.4 2.5-1.4c.4-.2.8.1.8.5v.4c0 2.1 2.3 3.4 4.1 2.4l2.7-1.6 2.7-1.6c1.9-1.2 1.9-3.8.1-4.9z"/></svg>
+      <svg xmlns="http://www.w3.org/2000/svg" role="img" viewBox="0 0 38 24" aria-label="Zip"><path d="M34.9 23H3.1c-1.1 0-2-.9-2-2V3c0-1.1.9-2 2-2h31.8c1.1 0 2 .9 2 2v18c0 1.1-.9 2-2 2z" fill="#fff"/><path fill="#1a0826" d="M6.5 14.7l.2 1.9h8l-.2-2.2h-3.8v-.2l3.4-2.4-.2-1.9h-8l.3 2.1h3.7v.3z"/><path fill="#aa8fff" d="M14.8 9.9l.9 6.7h8l-.8-6.7z"/><path d="M32.1 12.3c-.2-1.5-1.4-2.4-3-2.4h-5.3l.8 6.7H27l-.2-1.3h2.5c2.1-.1 3-1.3 2.8-3zm-3 1.1h-2.5l-.2-1.6h2.5c.6 0 .9.3.9.8.1.2 0 .8-.7.8z" fill="#1a0826"/><ellipse transform="rotate(-46.771 16.352 8.156)" cx="16.4" cy="8.2" rx="1.1" ry="1.3" fill="#1a0826"/><path d="M34.9 1c1.1 0 2 .9 2 2v18c0 1.1-.9 2-2 2H3.1c-1.1 0-2-.9-2-2V3c0-1.1.9-2 2-2h31.8m0-1H3.1c-1.7 0-3 1.3-3 3v18c0 1.7 1.3 3 3 3h31.8c1.7 0 3-1.3 3-3V3c0-1.6-1.3-3-3-3z" opacity=".07"/></svg>
+    </span>
+
+    {%- comment -%}
+      The explainer. Both providers have terms a shopper is entitled to see
+      before they commit, and "interest-free" on its own is not the whole story.
+    {%- endcomment -%}
+    <button class="pdp-v2__bnpl-info" type="button" data-pdp-bnpl-open aria-haspopup="dialog" aria-label="How Afterpay and Zip work">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
+    </button>
+  </div>
+
+  <div class="pdp-v2__modal" data-pdp-bnpl-modal hidden>
+    <div class="pdp-v2__modal-box" role="dialog" aria-modal="true" aria-labelledby="pdp-bnpl-title">
+      <h3 id="pdp-bnpl-title">Pay in {{ parts }}, interest-free</h3>
+      <p class="pdp-v2__bnpl-lead">Split this order into {{ parts }} payments of <b class="pdp-v2__tnum">{{ each | money }}</b>. Choose your provider at checkout.</p>
+
+      <div class="pdp-v2__bnpl-prov"><svg xmlns="http://www.w3.org/2000/svg" role="img" viewBox="0 0 38 24" aria-label="Afterpay"><path fill="#b2fce4" d="M35 0H3C1.3 0 0 1.3 0 3v18c0 1.7 1.4 3 3 3h32c1.7 0 3-1.3 3-3V3c0-1.7-1.4-3-3-3z"/><path d="m27.4 6.8-2.7-1.6-2.7-1.6c-1.8-1-4.1.3-4.1 2.4v.4c0 .2.1.4.3.5l1.3.7c.4.2.8-.1.8-.5v-.8c0-.4.4-.7.8-.5l2.5 1.4 2.4 1.5c.4.2.4.7 0 .9l-2.5 1.4-2.5 1.6c-.4.2-.8-.1-.8-.5v-.4c0-2.1-2.3-3.4-4.1-2.4l-2.7 1.6-2.7 1.6c-1.8 1-1.8 3.7 0 4.7l2.7 1.6 2.7 1.6c1.8 1 4.1-.3 4.1-2.4v-.4c0-.2-.1-.4-.3-.5l-1.3-.7c-.4-.2-.8.1-.8.5v.8c0 .4-.4.7-.8.5l-2.5-1.4-2.5-1.5c-.4-.2-.4-.7 0-.9l2.5-1.4 2.5-1.4c.4-.2.8.1.8.5v.4c0 2.1 2.3 3.4 4.1 2.4l2.7-1.6 2.7-1.6c1.9-1.2 1.9-3.8.1-4.9z"/></svg><div><b>Afterpay</b><span>Four fortnightly payments, the first at purchase.</span></div></div>
+      <div class="pdp-v2__bnpl-prov"><svg xmlns="http://www.w3.org/2000/svg" role="img" viewBox="0 0 38 24" aria-label="Zip"><path d="M34.9 23H3.1c-1.1 0-2-.9-2-2V3c0-1.1.9-2 2-2h31.8c1.1 0 2 .9 2 2v18c0 1.1-.9 2-2 2z" fill="#fff"/><path fill="#1a0826" d="M6.5 14.7l.2 1.9h8l-.2-2.2h-3.8v-.2l3.4-2.4-.2-1.9h-8l.3 2.1h3.7v.3z"/><path fill="#aa8fff" d="M14.8 9.9l.9 6.7h8l-.8-6.7z"/><path d="M32.1 12.3c-.2-1.5-1.4-2.4-3-2.4h-5.3l.8 6.7H27l-.2-1.3h2.5c2.1-.1 3-1.3 2.8-3zm-3 1.1h-2.5l-.2-1.6h2.5c.6 0 .9.3.9.8.1.2 0 .8-.7.8z" fill="#1a0826"/><ellipse transform="rotate(-46.771 16.352 8.156)" cx="16.4" cy="8.2" rx="1.1" ry="1.3" fill="#1a0826"/><path d="M34.9 1c1.1 0 2 .9 2 2v18c0 1.1-.9 2-2 2H3.1c-1.1 0-2-.9-2-2V3c0-1.1.9-2 2-2h31.8m0-1H3.1c-1.7 0-3 1.3-3 3v18c0 1.7 1.3 3 3 3h31.8c1.7 0 3-1.3 3-3V3c0-1.6-1.3-3-3-3z" opacity=".07"/></svg><div><b>Zip</b><span>Pay in {{ parts }}, or use your Zip account.</span></div></div>
+
+      <p class="pdp-v2__bnpl-fine">Subject to provider approval. Provider terms and late fees may apply.</p>
+      <button class="pdp-v2__modal-close" type="button" data-pdp-bnpl-close>Got it</button>
+    </div>
+  </div>
+{%- endif -%}

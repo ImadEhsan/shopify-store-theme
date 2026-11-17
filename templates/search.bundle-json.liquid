@@ -1,0 +1,23 @@
+{%- layout none -%}
+{%- comment -%}
+  The bundle builder's search: /search?q=<terms>&type=product&options[prefix]=last&view=bundle-json&page=N
+
+  Shopify's own search, so every match is reachable (predictive search stops at
+  ten). JSON, 24 results a page. Non-products and sold-out products are left
+  out, so a page can hold fewer than 24; "pages" says whether there is more.
+{%- endcomment -%}
+{%- paginate search.results by 24 -%}
+{
+  "page": {{ paginate.current_page }},
+  "pages": {{ paginate.pages }},
+  "products": [
+    {%- assign separator = '' -%}
+    {%- for item in search.results -%}
+      {%- if item.object_type == 'product' and item.available -%}
+        {{- separator -}}{%- render 'bundle-json-product', product: item -%}
+        {%- assign separator = ',' -%}
+      {%- endif -%}
+    {%- endfor -%}
+  ]
+}
+{%- endpaginate -%}

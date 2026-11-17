@@ -1,0 +1,84 @@
+{%- comment -%}
+  Turns tab-separated text into a normalised row string and OUTPUTS it.
+
+  In:  raw    the pasted text
+  Out: prints rows joined by "~~", cells joined by "||"
+
+  Callers capture the output and derive their own counts:
+
+    {%- capture sc_rows -%}{%- render 'size-chart-parse', raw: raw -%}{%- endcapture -%}
+    {%- assign sc_row_list = sc_rows | strip | split: '~~' -%}
+
+  This prints rather than assigning because Shopify forbids {% include %}
+  inside a snippet rendered with {% render %}, and {% render %} cannot
+  assign back to its caller. Printing plus capture is the only shape that
+  keeps one parser and keeps every consumer isolated.
+
+  Rows shorter than the widest row are padded, so a ragged paste cannot
+  shift cells into the wrong column.
+
+  Carriage returns from Windows Excel are removed by the per-cell `strip`:
+  a CR only ever lands at the end of a cell.
+
+  The blob is deliberately NOT stripped before splitting. A grid pasted from a
+  spreadsheet starts with an empty corner cell, so its first line begins with a
+  tab — and stripping the blob ate that tab, which shifted every column heading
+  one place left and put each one over the wrong column.
+
+  Rows whose cells are all empty except the first are dropped. A spreadsheet
+  carries an axis caption ("Height (cm)") and a title on their own rows, and
+  rendering those as data put empty rows through the middle of the table.
+{%- endcomment -%}
+
+{%- assign sc_tab = '	' -%}
+{%- assign sc_lines = raw | split: '
+' -%}
+
+{%- assign sc_cols_count = 0 -%}
+{%- for line in sc_lines -%}
+  {%- assign cells = line | split: sc_tab -%}
+  {%- if cells.size > sc_cols_count -%}
+    {%- assign sc_cols_count = cells.size -%}
+  {%- endif -%}
+{%- endfor -%}
+
+{%- assign sc_rows = '' -%}
+{%- assign sc_rows_count = 0 -%}
+{%- for line in sc_lines -%}
+  {%- assign trimmed = line | strip -%}
+  {%- if trimmed == blank -%}
+    {%- continue -%}
+  {%- endif -%}
+  {%- assign cells = line | split: sc_tab -%}
+
+  {%- comment -%} A caption or title row: a label and nothing beside it. {%- endcomment -%}
+  {%- assign has_data = false -%}
+  {%- for cell in cells offset: 1 -%}
+    {%- assign c = cell | strip -%}
+    {%- if c != '' -%}
+      {%- assign has_data = true -%}
+      {%- break -%}
+    {%- endif -%}
+  {%- endfor -%}
+  {%- unless has_data -%}
+    {%- continue -%}
+  {%- endunless -%}
+
+  {%- assign row = '' -%}
+  {%- for i in (1..sc_cols_count) -%}
+    {%- assign idx = forloop.index0 -%}
+    {%- assign cell = cells[idx] | default: '' | strip -%}
+    {%- if forloop.first -%}
+      {%- assign row = cell -%}
+    {%- else -%}
+      {%- assign row = row | append: '||' | append: cell -%}
+    {%- endif -%}
+  {%- endfor -%}
+  {%- if sc_rows_count == 0 -%}
+    {%- assign sc_rows = row -%}
+  {%- else -%}
+    {%- assign sc_rows = sc_rows | append: '~~' | append: row -%}
+  {%- endif -%}
+  {%- assign sc_rows_count = sc_rows_count | plus: 1 -%}
+{%- endfor -%}
+{{- sc_rows -}}

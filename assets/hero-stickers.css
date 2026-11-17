@@ -1,0 +1,124 @@
+/* ---------------------------------------------------------------------------
+   Hero stickers
+
+   The two stickers — FREE SHIPPING and 100% AUTHENTIC — are an image each in a
+   custom-html section that sits directly under the slideshow. They are pulled
+   up out of that section and over the hero with negative offsets.
+
+   Moved here out of joshtheme2025.scss, for two reasons.
+
+   One: the rule that made the rows a positioning context was keyed to a
+   hardcoded live-theme section id —
+   [id="shopify-section-template--22783304204311__custom_html_mFQm67"] — so it
+   matched on one theme and silently did nothing on every copy of it. The rows
+   are addressed by their own class here instead.
+
+   Two, and the reason mobile was wrong: the offsets were fixed pixels while
+   the hero's height is a vw value. theme.css gives .slideshow--medium a
+   --slideshow-min-height of 133vw on a phone, 90vw, 48vw and 40vw as the
+   viewport widens — so the hero is roughly 520px tall on a 390px phone and
+   roughly 580px on a 1440px desktop. One pixel offset cannot land in both.
+
+   The two stickers need different treatment, because they are anchored to
+   different things:
+
+   - SHIPPING sits on the hero's bottom edge, overhanging it by about a fifth
+     of its own height. The rows have no height of their own, so their top edge
+     IS the hero's bottom edge — a negative top here is measured from exactly
+     the right place and needs no knowledge of how tall the hero is. Pixels are
+     correct for this one.
+
+   - AUTHENTIC sits about an eighth of the way down the hero. That offset is a
+     fraction of the hero's height, so it is expressed as one: --hero-height is
+     mirrored from theme.css per breakpoint and the sticker is placed off it.
+     Change the slideshow's height setting and these follow.
+   --------------------------------------------------------------------------- */
+
+.sticker-row-1,
+.sticker-row-2,
+.sticker-row-3,
+.sticker-row-4 {
+  position: relative;
+  /* .slideshow--medium in theme.css. Kept in step with it by hand. */
+  --hero-height: 133vw;
+}
+
+img.sticker-shipping,
+img.sticker-exchange {
+  transform: rotate(-10deg);
+}
+
+/* Bottom-left of the hero, overhanging its edge. */
+.sticker-row-1 img.sticker-shipping,
+.sticker-row-3 img.sticker-exchange {
+  position: absolute;
+  z-index: 3;
+  width: 36vw;
+  max-width: 150px;
+  inset-inline-start: 6px;
+  top: -62px;
+}
+
+/* Upper right of the hero. */
+.sticker-row-2 img.sticker-authentic,
+.sticker-row-4 img.sticker-payment {
+  position: absolute;
+  z-index: 3;
+  width: 34vw;
+  max-width: 150px;
+  inset-inline-end: -2vw;
+  top: calc(var(--hero-height) * -0.87);
+}
+
+@media screen and (min-width: 741px) {
+  .sticker-row-1,
+  .sticker-row-2,
+  .sticker-row-3,
+  .sticker-row-4 {
+    --hero-height: 90vw;
+  }
+
+  .sticker-row-1 img.sticker-shipping,
+  .sticker-row-3 img.sticker-exchange {
+    width: auto;
+    max-width: 200px;
+    inset-inline-start: 20px;
+    top: -80px;
+  }
+
+  .sticker-row-2 img.sticker-authentic,
+  .sticker-row-4 img.sticker-payment {
+    width: auto;
+    max-width: 200px;
+    inset-inline-end: -40px;
+  }
+}
+
+@media screen and (min-width: 1000px) {
+  .sticker-row-1,
+  .sticker-row-2,
+  .sticker-row-3,
+  .sticker-row-4 {
+    --hero-height: 48vw;
+  }
+}
+
+@media screen and (min-width: 1200px) {
+  .sticker-row-1,
+  .sticker-row-2,
+  .sticker-row-3,
+  .sticker-row-4 {
+    --hero-height: 40vw;
+  }
+
+  .sticker-row-1 img.sticker-shipping,
+  .sticker-row-3 img.sticker-exchange {
+    max-width: 230px;
+    top: -90px;
+  }
+
+  .sticker-row-2 img.sticker-authentic,
+  .sticker-row-4 img.sticker-payment {
+    max-width: 230px;
+  }
+}

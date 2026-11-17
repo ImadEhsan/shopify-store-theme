@@ -1,0 +1,233 @@
+{%- comment -%}
+  Reviews, rendered by us from Loox's Storefront API.
+
+  Loox's own section draws its reviews inside a cross-origin iframe, so neither
+  its markup nor its review text is reachable from the theme - not by CSS and
+  not by Liquid. The Storefront API lifts that ceiling: it returns the review
+  bodies, media, replies and the rating distribution as JSON, keyed by Shopify
+  product id, with no key in the page (it authenticates by CORS origin, so only
+  calls from the store's own domain are accepted). The cards below are therefore
+  ours to design.
+
+  The section renders BOTH of these, and they work independently:
+
+  - Inline, as a band in the page, under the "What buyers say" heading. Its
+    list is fetched when the band nears the viewport.
+  - As a popup, opened from the rating row in the buy box
+    (snippets/product-info.liquid). The dialog is fixed and hidden until the
+    row is clicked, and its list is fetched on the first open.
+
+  Each is its own instance of the panel (snippets/pdp-reviews-panel), its own
+  lightbox (snippets/pdp-reviews-lightbox) and its own [data-pdp-reviews]
+  root, so pdp-reviews.js runs once per instance and neither knows about the
+  other. The bottomline call (average, count, distribution) is cached in the
+  script, so the two instances share one request for it.
+
+  Two things stay deliberate:
+
+  - The whole list is client-rendered, so review text is not in the server HTML
+    and earns no rich-snippet value. The rating row is what Google reads from
+    this page, and it comes from product.metafields.loox via Loox's own JSON-LD.
+  - Nothing renders until the store's Loox public store ID is set. Loox's own
+    app section has been removed from templates/product.json, so without the
+    id this page has no review list at all - hence the notice below, which
+    shows in the theme editor only. The buy box's rating row is unaffected
+    either way: it still falls back to scraping Loox's loox-rating block
+    (which stays in the main-product section) when the API has not answered.
+{%- endcomment -%}
+
+{%- liquid
+  comment
+    One ID for the whole store, held in a metaobject rather than a theme
+    setting so it belongs to the store, not to whichever theme is published,
+    and so it is editable in the admin under Content -> Metaobjects. The
+    definition is type "loox" with a single-line text field "public_store_id";
+    the store keeps one entry of it, and that entry is what is read here. Every
+    product page reads it from here; there is no per-section override.
+  endcomment
+  assign loox_entry = shop.metaobjects.loox.values | first
+  assign store_id = loox_entry.public_store_id.value | strip
+  if store_id == blank
+    assign store_id = settings.loox_public_store_id | strip
+  endif
+  if store_id == blank
+    assign store_id = section.settings.public_store_id | strip
+  endif
+  assign live = false
+  if store_id != blank and product != blank
+    assign live = true
+  endif
+  assign slider = true
+  if section.settings.layout == 'grid'
+    assign slider = false
+  endif
+-%}
+
+{{ 'pdp-reviews.css' | asset_url | stylesheet_tag }}
+{%- if live -%}
+  {%- if slider -%}
+    <script src="{{ 'cau-drag-scroll.js' | asset_url }}" defer></script>
+  {%- endif -%}
+  <script src="{{ 'pdp-reviews.js' | asset_url }}" defer></script>
+{%- endif -%}
+
+<section class="pdp-reviews{% if live %} pdp-reviews--live{% endif %}" id="reviews">
+  <div class="container">
+    <div class="pdp-reviews__head">
+      {%- if section.settings.heading != blank -%}
+        <h2 class="pdp-reviews__title">{{ section.settings.heading | escape }}</h2>
+      {%- endif -%}
+
+      {%- comment -%}
+        No rating row here. It would restate the score block immediately below
+        it, which carries the same average, the same stars and a fuller count.
+        The buy box keeps its own row (product-info.liquid) - that one is far
+        from this panel and still earns its place, and CAU.setRating fills it.
+      {%- endcomment -%}
+    </div>
+
+    {%- if live == false and request.design_mode -%}
+      {%- comment -%}
+        Editor only. On the storefront an unconfigured section stays quiet -
+        a heading with nothing under it - rather than showing shoppers a
+        message meant for whoever is setting the section up.
+      {%- endcomment -%}
+      <p class="pdp-reviews__setup">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>
+        <span>Add an entry to the <b>loox</b> metaobject under <b>Content &rarr; Metaobjects</b> with your Loox <b>public store ID</b> in its <b>public_store_id</b> field to show reviews here. Find the ID in the Loox admin under Settings &rarr; API Keys.</span>
+      </p>
+    {%- endif -%}
+
+    {%- if live -%}
+      {%- comment -%}
+        The inline instance. Everything inside is filled by pdp-reviews.js. It
+        ships empty, and the placeholder cards appear only once a request is
+        actually in flight - never from page load. The list is fetched when
+        this wrapper nears the viewport, which on a page this long is usually
+        well after paint, and a skeleton sitting there through all of that
+        reads as a page that never loaded. Once a request is out, though, the
+        placeholders are what stop the rail collapsing and springing back as
+        the answer lands.
+
+        The slider class sits on this wrapper, not the section, so the rail
+        styling reaches the inline list and not the popup's grid.
+      {%- endcomment -%}
+      <div
+        class="pdp-reviews__inline{% if slider %} pdp-reviews--slider{% endif %}"
+        data-pdp-reviews
+        data-store="{{ store_id | escape }}"
+        data-product="{{ product.id }}"
+        data-per-page="{{ section.settings.per_page | default: 4 }}"
+        data-sort="{{ section.settings.sort | default: 'featured' }}"
+        data-layout="{% if slider %}slider{% else %}grid{% endif %}"
+      >
+        {%- render 'pdp-reviews-panel', section: section, slider: slider, is_modal: false -%}
+        {%- render 'pdp-reviews-lightbox' -%}
+      </div>
+    {%- endif -%}
+  </div>
+
+  {%- if live -%}
+    {%- comment -%}
+      The popup instance. Fixed, hidden, and outside the .container - it is
+      not part of the page's flow at all. The trigger is the rating row in the
+      buy box (snippets/product-info.liquid), which the JS upgrades from its
+      anchor fallback once this dialog is on the page.
+
+      Opening is what loads the list: the IntersectionObserver that defers the
+      inline fetch has nothing to watch here, so the script fetches on the
+      first open instead. Always a grid - the dialog scrolls vertically and a
+      rail inside it would fight that.
+
+      The wrapper is the JS root; the dialog and the lightbox are siblings in
+      it rather than nested, because the dialog's backdrop blur would otherwise
+      trap the fixed lightbox inside its own stacking context.
+    {%- endcomment -%}
+    <div
+      class="pdp-reviews__popup"
+      data-pdp-reviews
+      data-store="{{ store_id | escape }}"
+      data-product="{{ product.id }}"
+      data-per-page="{{ section.settings.per_page | default: 6 }}"
+      data-sort="{{ section.settings.sort | default: 'featured' }}"
+      data-layout="grid"
+    >
+      <div class="revmodal" data-pdp-reviews-modal hidden>
+        <div class="revmodal__panel" role="dialog" aria-modal="true"
+             aria-labelledby="revmodal-title-{{ section.id }}">
+          <div class="revmodal__head">
+            <h2 class="revmodal__title" id="revmodal-title-{{ section.id }}">
+              {{- section.settings.heading | default: 'Reviews' | escape -}}
+            </h2>
+            <button type="button" class="revmodal__close" data-pdp-reviews-modal-close aria-label="Close reviews">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+            </button>
+          </div>
+
+          <div class="revmodal__body">
+            {%- render 'pdp-reviews-panel', section: section, slider: false, is_modal: true -%}
+          </div>
+        </div>
+      </div>
+      {%- render 'pdp-reviews-lightbox' -%}
+    </div>
+  {%- endif -%}
+</section>
+
+{% schema %}
+{
+  "name": "Reviews",
+  "tag": "section",
+  "class": "shopify-section--pdp-reviews",
+  "enabled_on": { "templates": ["product"] },
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "What buyers say" },
+    {
+      "type": "header",
+      "content": "Loox Storefront API"
+    },
+    {
+      "type": "paragraph",
+      "content": "Reviews are rendered here from the Loox Storefront API, in the theme's own design, both as this inline section and as a popup opened from the rating row in the buy box. The store ID is read from the loox metaobject entry under Content → Metaobjects, or Theme settings → Product page (CoppedAU) → Reviews."
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Layout",
+      "default": "slider",
+      "options": [
+        { "value": "slider", "label": "Slider" },
+        { "value": "grid", "label": "Grid (Prototype)" }
+      ],
+      "info": "The slider is a horizontal rail that pulls in the next page as you reach the end; the grid is a 2-column layout with a Load more button."
+    },
+    {
+      "type": "select",
+      "id": "sort",
+      "label": "Default sort",
+      "default": "featured",
+      "options": [
+        { "value": "featured", "label": "Featured (pinned, then photo and video)" },
+        { "value": "date", "label": "Most recent" },
+        { "value": "rating", "label": "Highest rated" }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "per_page",
+      "label": "Reviews per page",
+      "min": 2,
+      "max": 24,
+      "step": 2,
+      "default": 4
+    },
+    {
+      "type": "checkbox",
+      "id": "show_distribution",
+      "label": "Show rating breakdown in popup",
+      "default": true
+    }
+  ],
+  "presets": [ { "name": "Reviews" } ]
+}
+{% endschema %}

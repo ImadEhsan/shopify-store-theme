@@ -1,0 +1,157 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "type": "footer",
+  "name": "Footer group",
+  "sections": {
+    "multi_column_trust_Ry9AV4": {
+      "type": "multi-column-trust",
+      "blocks": {
+        "item_whNx8r": {
+          "type": "item",
+          "settings": {
+            "image": "shopify://shop_images/icon-shipping-white.png",
+            "image_width": 100,
+            "image_border": "rgba(0,0,0,0)",
+            "title": "Free shipping",
+            "content": "<p>Free shipping on all orders over $300, Australia wide.</p>",
+            "link_text": "",
+            "link_url": "",
+            "link_style": "link",
+            "text_alignment": "center",
+            "vertical_alignment": "center"
+          }
+        },
+        "item_ijxQCN": {
+          "type": "item",
+          "settings": {
+            "image": "shopify://shop_images/icon-authentic-white.png",
+            "image_width": 100,
+            "image_border": "rgba(0,0,0,0)",
+            "title": "Authenticity",
+            "content": "<p>All items are verified by us with 100% Authenticity guarantee.</p>",
+            "link_text": "",
+            "link_url": "",
+            "link_style": "link",
+            "text_alignment": "center",
+            "vertical_alignment": "center"
+          }
+        },
+        "item_cmLe4w": {
+          "type": "item",
+          "settings": {
+            "image": "shopify://shop_images/icon-returns-white.png",
+            "image_width": 100,
+            "image_border": "rgba(0,0,0,0)",
+            "title": "Friendly Support",
+            "content": "<p>Got a question? Our team is here to help.</p>",
+            "link_text": "",
+            "link_url": "",
+            "link_style": "link",
+            "text_alignment": "center",
+            "vertical_alignment": "center"
+          }
+        },
+        "item_fyfUPP": {
+          "type": "item",
+          "settings": {
+            "image": "shopify://shop_images/icon-secure-payment-white.png",
+            "image_width": 100,
+            "image_border": "rgba(0,0,0,0)",
+            "title": "Secure payments",
+            "content": "<p>Shop confidently knowing your payment is secure.</p>",
+            "link_text": "",
+            "link_url": "",
+            "link_style": "link",
+            "text_alignment": "center",
+            "vertical_alignment": "start"
+          }
+        }
+      },
+      "block_order": [
+        "item_whNx8r",
+        "item_ijxQCN",
+        "item_cmLe4w",
+        "item_fyfUPP"
+      ],
+      "name": "Multi-column-trust",
+      "settings": {
+        "reveal_on_scroll": true,
+        "stack_items": true,
+        "subheading": "",
+        "title": "",
+        "content": "",
+        "column_alignment": "center",
+        "mobile_item_size": "small",
+        "desktop_item_size": "large",
+        "spacing": "tight",
+        "background": "#282828",
+        "text_color": "#ffffff"
+      }
+    },
+    "4c476e8b-4e3f-448e-8ec9-ac9b13b3fc76": {
+      "type": "newsletter",
+      "disabled": true,
+      "settings": {
+        "reveal_on_scroll": true,
+        "subheading": "Subscribe to our newsletter",
+        "content": "<p>Promotions, new products and sales. Directly to your inbox.</p>",
+        "text_position": "right",
+        "text_alignment": "left",
+        "text_background": "rgba(0,0,0,0)",
+        "text_color": "rgba(0,0,0,0)",
+        "button_background": "rgba(0,0,0,0)",
+        "button_text_color": "rgba(0,0,0,0)"
+      }
+    },
+    "footer": {
+      "type": "footer",
+      "blocks": {
+        "links": {
+          "type": "links",
+          "settings": {
+            "menu": "footer"
+          }
+        },
+        "6b6e5358-accf-4be3-a475-088da89b3712": {
+          "type": "social_media",
+          "settings": {
+            "title": "ABOUT US",
+            "content": "<p><strong>Office</strong><br/>27 Therry St, Melbourne, VIC, 3000</p><p><br/></p><p>CoppedAU is dedicated to bringing you the ultimate shopping experience. Confidently cop the hottest items in streetwear with us. We promise 100% authenticity or your money back, guaranteed.</p><p><br/></p>"
+          }
+        },
+        "newsletter": {
+          "type": "newsletter",
+          "settings": {
+            "title": "Newsletter",
+            "content": "<p>Get promotions, new products, and sales delivered directly to your inbox. Sign up now.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "links",
+        "6b6e5358-accf-4be3-a475-088da89b3712",
+        "newsletter"
+      ],
+      "settings": {
+        "show_payment_icons": true,
+        "show_powered_by_shopify": true,
+        "enable_follow_on_shop": true,
+        "show_country_selector": true,
+        "show_locale_selector": true
+      }
+    }
+  },
+  "order": [
+    "multi_column_trust_Ry9AV4",
+    "4c476e8b-4e3f-448e-8ec9-ac9b13b3fc76",
+    "footer"
+  ]
+}

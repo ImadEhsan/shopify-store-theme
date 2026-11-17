@@ -1,0 +1,13 @@
+# Shopify & CLI cache
+.shopify/
+*.log
+.DS_Store
+
+# Node / Dependencies (if any build tools added later)
+node_modules/
+npm-debug.log*
+
+# Environment variables & secrets
+.env
+.env.*
+

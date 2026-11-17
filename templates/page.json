@@ -1,0 +1,65 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "show_title": false,
+        "page_width": "medium"
+      }
+    },
+    "fea985a6-a81d-4fba-8979-97b32d9f54f1": {
+      "type": "rich-text",
+      "settings": {
+        "custom_class": "about-us bottom",
+        "subheading": "",
+        "title": "Purchases & Returns",
+        "content": "<h2>Policy</h2><p>At CoppedAU, we take great care to ensure that all products we offer are authentic and of the highest quality. This is particularly important for rare and hard-to-find items that we specialise in. Due to the rarity of our products and the amount of work that goes into the authentication process, we have a strict no cancellation policy in place. However, wherever possible we will always attempt to accommodate the customer for sizing changes provided the item is in a brand new condition.</p><p>Each item that we offer has been carefully authenticated by our team of experts, who have spent countless hours researching and verifying the authenticity of the product. We take pride in the quality of our products and want to ensure that our customers receive only the best.</p><p>We appreciate your understanding and are always available to answer any questions or concerns you may have about our products or policies.</p><h2>Refunds</h2><p>We <strong>do not offer</strong> refunds for change of mind, incorrect sizing, or unwanted items.</p><p>Refunds or replacements will only be provided if:</p><ul><li>The item received is faulty or defective, or<br/></li><li>You have received an incorrect item.</li></ul><p>Please contact our support team within a reasonable timeframe of receiving your order if you believe your item is eligible for a refund or replacement.</p><h2>Returns</h2><p>All products listed on CoppedAU have a strict no return/refund policy. Once an item has been processed, the order is final and cannot be altered. However, we allow returns for a change in size at our discretion, provided the item is in a brand new and unused condition. Please reach out if you need assistance with the sizing.</p><h2>Size Exchanges</h2><p>We get it - sometimes the fit just isn't right. If you need a different size, we're happy to help where we can. Here's how it works:</p><ul><li>Reach out to us within 7 days of receiving your order.</li><li>The item must be brand new, unworn, and in its original condition with all tags attached.</li><li>Once we receive and inspect the item, we'll do our best to arrange the right size for you.</li><li>If the requested size isn't available, we'll issue a store credit for the value of your order.</li><li>Return shipping is the responsibility of the customer.</li><li>A restocking fee of 9% of the order value will apply to all size exchanges.<br/></li></ul><p>Just send us a message and we'll walk you through the process.</p><h2>Other Exchange</h2><p>If you have received an item from CoppedAU that differs from what is advertised on our website, it may be eligible for an exchange under strict conditions. The conditions for exchange are:</p><ul><li>The item received has significant flaws and is not as advertised on CoppedAU.</li><li>The item received is of incorrect sizing and is not as stated on the order fulfilled.</li><li>The item can be deemed unauthentic and is illegitimate with valid proof.</li></ul><p>If an item you have received follows under any of the conditions for exchange, please message the CoppedAU team. Any enquiry for an exchange must have a detailed description and validated proof as to why the order follows the conditions for exchange. It is up to the CoppedAU team to decide whether an item satisfies the conditions for exchange. If an item from CoppedAU can be deemed for exchange, we will be in direct contact with the customer and promptly find a resolution to your order.</p><h2>Enquiries for Exchange & Return</h2><p>For any enquiries regarding exchange or return, please <a href=\"/pages/contact\" title=\"Contact\">contact us</a>. Our team will be happy to assist you with any concerns you may have.</p>",
+        "button_text": "",
+        "button_link": "",
+        "background_type": "boxed",
+        "text_width": "medium",
+        "text_position": "center",
+        "text_alignment": "left",
+        "background": "rgba(0,0,0,0)",
+        "text_color": "rgba(0,0,0,0)",
+        "button_background": "rgba(0,0,0,0)",
+        "button_text_color": "rgba(0,0,0,0)",
+        "padding_top": 36,
+        "padding_bottom": 36,
+        "mbl_padding_top": 20,
+        "mbl_padding_bottom": 20
+      }
+    },
+    "e89c345f-763c-4444-b1c3-cc58ff68c4f9": {
+      "type": "contact-form",
+      "disabled": true,
+      "settings": {
+        "title": "Contact Us",
+        "content": "",
+        "text_1_heading": "",
+        "text_1_text": "",
+        "text_2_heading": "",
+        "text_2_text": "",
+        "background": "rgba(0,0,0,0)",
+        "text_color": "rgba(0,0,0,0)",
+        "button_background": "rgba(0,0,0,0)",
+        "button_text_color": "rgba(0,0,0,0)"
+      }
+    }
+  },
+  "order": [
+    "main",
+    "fea985a6-a81d-4fba-8979-97b32d9f54f1",
+    "e89c345f-763c-4444-b1c3-cc58ff68c4f9"
+  ]
+}

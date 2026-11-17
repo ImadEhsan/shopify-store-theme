@@ -1,0 +1,90 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "e233ce86-6a11-4915-869a-a723f2219d74": {
+      "type": "image-with-text-overlay",
+      "settings": {
+        "reveal_on_scroll": true,
+        "section_height": "auto",
+        "image": "shopify://shop_images/SYNA_COLLECTION_2000_x_980_px.png",
+        "subheading": "",
+        "title": "",
+        "content": "",
+        "button_text": "",
+        "button_link": "",
+        "link_style": "link",
+        "background_type": "full_width",
+        "text_width": "medium",
+        "text_position": "middle_center",
+        "text_color": "#ffffff",
+        "button_background": "#ffffff",
+        "button_text_color": "#000000",
+        "overlay_color": "#ffffff",
+        "overlay_opacity": 0
+      }
+    },
+    "rich_text_rhp4hn": {
+      "type": "rich-text",
+      "settings": {
+        "subheading": "",
+        "title": "SYNA WORLD",
+        "content": "<p>Launched by UK rap sensation Central Cee, Syna World is quickly becoming a must-have in the world of streetwear. Featuring daring graphic prints and carefully matched color ensembles, the brand is primarily dedicated to crafting staples such as tracksuits, T-shirts and shorts. Syna World reflects the spirit of London's street culture.</p>",
+        "button_text": "",
+        "button_link": "",
+        "background_type": "full_width",
+        "text_width": "fill",
+        "text_position": "center",
+        "text_alignment": "left",
+        "background": "rgba(0,0,0,0)",
+        "text_color": "rgba(0,0,0,0)",
+        "button_background": "rgba(0,0,0,0)",
+        "button_text_color": "rgba(0,0,0,0)"
+      }
+    },
+    "collection-banner": {
+      "type": "collection-banner",
+      "disabled": true,
+      "settings": {
+        "show_collection_image": true,
+        "show_collection_title": true,
+        "show_collection_description": true,
+        "text_width": "medium",
+        "section_height": "small",
+        "image_text_color": "#ffffff",
+        "image_overlay_color": "#000000",
+        "image_overlay_opacity": 30,
+        "quick_links": ""
+      }
+    },
+    "main": {
+      "type": "main-collection",
+      "settings": {
+        "show_sort_by": true,
+        "products_per_page": 24,
+        "mobile_products_per_row": "2",
+        "desktop_products_per_row": 4,
+        "show_filters": true,
+        "show_filter_group_name": false,
+        "show_color_swatch": true,
+        "open_first_filter_group": false,
+        "filter_position": "drawer",
+        "promotion_position": "top",
+        "promotion_height": "small"
+      }
+    }
+  },
+  "order": [
+    "e233ce86-6a11-4915-869a-a723f2219d74",
+    "rich_text_rhp4hn",
+    "collection-banner",
+    "main"
+  ]
+}

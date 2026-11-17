@@ -1,0 +1,263 @@
+{%- comment -%}
+  Shipping & returns + Common questions (paired layout matching PDP prototype).
+  id="shipping" is what buy box microtrust / shipping triggers link to.
+{%- endcomment -%}
+
+{%- assign card_blocks = section.blocks | where: 'type', 'card' -%}
+{%- assign question_blocks = section.blocks | where: 'type', 'question' -%}
+{%- assign row_blocks = section.blocks | where: 'type', 'row' -%}
+
+{%- if section.blocks.size > 0 or request.design_mode -%}
+  {{ 'pdp-shipping.css' | asset_url | stylesheet_tag }}
+
+  <section class="pdp-ship" id="shipping">
+    <div class="container">
+      <div class="pdp-ship__pair">
+        <div class="pdp-ship__col pdp-ship__col--shipping">
+          {%- if section.settings.heading != blank -%}
+            <h2 class="pdp-ship__title">{{ section.settings.heading | escape }}</h2>
+          {%- endif -%}
+
+          {%- if section.settings.lead != blank -%}
+            <p class="pdp-ship__lead">{{ section.settings.lead | escape }}</p>
+          {%- endif -%}
+
+          {%- if card_blocks.size > 0 -%}
+            <div class="pdp-ship__cards">
+              {%- for block in card_blocks -%}
+                <div class="pdp-ship__card" {{ block.shopify_attributes }}>
+                  <h3 class="pdp-ship__card-title">
+                    <span class="pdp-ship__card-icon" aria-hidden="true">
+                      {%- if block.settings.icon_image != blank -%}
+                        {{ block.settings.icon_image | image_url: width: 48 | image_tag: loading: 'lazy', width: 18, height: 18, alt: '' }}
+                      {%- elsif block.settings.icon == 'truck' or block.settings.icon == 'picto-delivery-truck' -%}
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7h13v8H3z"/><path d="M16 10h3l2 3v2h-5z"/><circle cx="7" cy="18" r="1.6"/><circle cx="17" cy="18" r="1.6"/></svg>
+                      {%- elsif block.settings.icon == 'exchange' or block.settings.icon == 'picto-return-box' -%}
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7"/><path d="M3 7l3-4h12l3 4"/><path d="M9 11a3 3 0 0 0 6 0"/></svg>
+                      {%- elsif block.settings.icon == 'clock' or block.settings.icon == 'picto-fast-delivery' -%}
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                      {%- elsif block.settings.icon == 'shield' or block.settings.icon == 'picto-warranty' -%}
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                      {%- else -%}
+                        {%- render 'icon', icon: block.settings.icon, width: 18, height: 18 -%}
+                      {%- endif -%}
+                    </span>
+                    {{ block.settings.title | escape }}
+                  </h3>
+
+                  {%- if block.settings.content != blank -%}
+                    <div class="pdp-ship__card-content rte">
+                      {{ block.settings.content }}
+                    </div>
+                  {%- endif -%}
+                </div>
+              {%- endfor -%}
+            </div>
+          {%- elsif row_blocks.size > 0 -%}
+            <ul class="pdp-ship__rows" role="list">
+              {%- for block in row_blocks -%}
+                <li class="pdp-ship__row" {{ block.shopify_attributes }}>
+                  <span class="pdp-ship__icon" aria-hidden="true">
+                    {%- if block.settings.icon_image != blank -%}
+                      {{ block.settings.icon_image | image_url: width: 80 | image_tag: loading: 'lazy', width: 20, height: 20, alt: '' }}
+                    {%- else -%}
+                      {%- render 'icon', icon: block.settings.icon, width: 20, height: 20 -%}
+                    {%- endif -%}
+                  </span>
+                  <span>
+                    <b class="pdp-ship__row-title">{{ block.settings.title | escape }}</b>
+                    {%- if block.settings.text != blank -%}
+                      <span class="pdp-ship__row-text">{{ block.settings.text | escape }}</span>
+                    {%- endif -%}
+                  </span>
+                </li>
+              {%- endfor -%}
+            </ul>
+          {%- endif -%}
+        </div>
+
+        {%- if question_blocks.size > 0 or request.design_mode -%}
+          <div class="pdp-ship__col pdp-ship__col--faq">
+            {%- if section.settings.faq_heading != blank -%}
+              <h2 class="pdp-ship__title">{{ section.settings.faq_heading | escape }}</h2>
+            {%- endif -%}
+
+            <div class="pdp-ship__faq" itemscope itemtype="https://schema.org/FAQPage">
+              {%- for block in question_blocks -%}
+                <details class="pdp-ship__faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question" {% if block.settings.open_by_default %}open{% endif %} {{ block.shopify_attributes }}>
+                  <summary class="pdp-ship__faq-summary">
+                    <span itemprop="name">{{ block.settings.title | escape }}</span>
+                    <span class="pdp-ship__plus" aria-hidden="true"></span>
+                  </summary>
+                  <div class="pdp-ship__faq-ans rte" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+                    <div itemprop="text">{{ block.settings.answer }}</div>
+                  </div>
+                </details>
+              {%- endfor -%}
+            </div>
+          </div>
+        {%- endif -%}
+      </div>
+    </div>
+  </section>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Shipping & FAQ",
+  "tag": "section",
+  "class": "shopify-section--pdp-shipping",
+  "enabled_on": { "templates": ["product"] },
+  "settings": [
+    {
+      "type": "header",
+      "content": "Shipping & returns"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Shipping & returns"
+    },
+    {
+      "type": "text",
+      "id": "lead",
+      "label": "Lead text",
+      "default": "Bought unseen? Here's the plain-English version, so there are no surprises."
+    },
+    {
+      "type": "header",
+      "content": "Common questions"
+    },
+    {
+      "type": "text",
+      "id": "faq_heading",
+      "label": "FAQ heading",
+      "default": "Common questions"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "card",
+      "name": "Shipping card",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "default": "truck",
+          "options": [
+            { "value": "truck", "label": "Delivery truck" },
+            { "value": "exchange", "label": "Size exchanges / Returns" },
+            { "value": "clock", "label": "Fast dispatch" },
+            { "value": "shield", "label": "Shield / Authenticity" },
+            { "value": "picto-delivery-truck", "label": "Theme Delivery truck" },
+            { "value": "picto-return-box", "label": "Theme Return box" },
+            { "value": "picto-box", "label": "Theme Box" },
+            { "value": "picto-worldwide", "label": "Theme Worldwide" }
+          ]
+        },
+        {
+          "type": "image_picker",
+          "id": "icon_image",
+          "label": "Custom icon image",
+          "info": "Optional. Replaces the SVG icon above."
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Shipping"
+        },
+        {
+          "type": "richtext",
+          "id": "content",
+          "label": "Content",
+          "default": "<ul><li>Ships tracked from our Melbourne warehouse</li><li>Dispatch within 1–2 business days</li><li>Standard 3–5 days · Express 1–3 days</li><li>Free shipping on orders over $300, Australia-wide</li></ul>"
+        }
+      ]
+    },
+    {
+      "type": "question",
+      "name": "Question",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Question",
+          "default": "Is this piece authentic?"
+        },
+        {
+          "type": "richtext",
+          "id": "answer",
+          "label": "Answer",
+          "default": "<p>Yes — every item is sourced through authorised retail channels and verified by hand by the CoppedAU team before it ships.</p>"
+        },
+        {
+          "type": "checkbox",
+          "id": "open_by_default",
+          "label": "Open by default",
+          "default": false
+        }
+      ]
+    },
+    {
+      "type": "row",
+      "name": "Legacy row",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "default": "picto-delivery-truck",
+          "options": [
+            { "value": "picto-delivery-truck", "label": "Delivery truck" },
+            { "value": "picto-fast-delivery", "label": "Fast delivery" },
+            { "value": "picto-box", "label": "Box" },
+            { "value": "picto-return-box", "label": "Return box" },
+            { "value": "picto-plane", "label": "Plane" },
+            { "value": "picto-worldwide", "label": "Worldwide" },
+            { "value": "picto-store-pickup", "label": "Store pickup" },
+            { "value": "picto-warranty", "label": "Warranty" },
+            { "value": "picto-customer-support", "label": "Support" }
+          ]
+        },
+        { "type": "image_picker", "id": "icon_image", "label": "Custom icon" },
+        { "type": "text", "id": "title", "label": "Title", "default": "Row title" },
+        { "type": "text", "id": "text", "label": "Text" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Shipping & FAQ",
+      "blocks": [
+        {
+          "type": "card",
+          "settings": {
+            "icon": "truck",
+            "title": "Shipping",
+            "content": "<ul><li>Ships tracked from our Melbourne warehouse</li><li>Dispatch within 1–2 business days</li><li>Standard 3–5 days · Express 1–3 days</li><li>Free shipping on orders over $300, Australia-wide</li></ul>"
+          }
+        },
+        {
+          "type": "card",
+          "settings": {
+            "icon": "exchange",
+            "title": "Size exchanges",
+            "content": "<ul><li>Size exchange within 14 days of delivery</li><li>Item must be unworn with tags attached</li><li>Return postage covered by the buyer</li><li>Subject to stock in your new size</li></ul>"
+          }
+        },
+        {
+          "type": "question",
+          "settings": {
+            "title": "Is this piece authentic?",
+            "answer": "<p>Yes — every item is sourced through authorised retail channels and verified by hand by the CoppedAU team before it ships. Original tags may show USD pricing because they come from an authorised US retailer. See <a href=\"#verify\">How we verify</a>.</p>",
+            "open_by_default": true
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

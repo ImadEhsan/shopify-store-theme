@@ -1,0 +1,124 @@
+{%- comment -%}
+  Bundle builder sheet.
+
+  In: block (required) — the pdp_bundle block
+      product (required) — the product being viewed
+
+  Everything sits in a <template>: this snippet renders inside the product's
+  add-to-cart <form>, and a live search box there would submit that form on
+  Enter. pdp-bundle-sheet.js moves the sheet to <body> the first time it opens.
+
+  The config carries the tiers as numbers, the free-shipping threshold in
+  cents, the shipping protection product (never counted), the chip
+  collections and this product in the same JSON shape the ?view=bundle-json
+  templates return.
+{%- endcomment -%}
+
+{{ 'pdp-bundle-sheet.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'cau-drag-scroll.js' | asset_url }}" defer></script>
+<script src="{{ 'pdp-bundle-sheet.js' | asset_url }}" defer></script>
+
+{%- capture ship_cents -%}{%- render 'cart-free-shipping-threshold' -%}{%- endcapture -%}
+{%- assign ship_cents = ship_cents | plus: 0 -%}
+
+<script type="application/json" data-pdp-bundle-config>
+  {
+    "tiers": [
+      {%- assign tier_rows = settings.bundle_tiers | split: ',' -%}
+      {%- assign separator = '' -%}
+      {%- for row in tier_rows -%}
+        {%- assign cell = row | strip | split: '|' -%}
+        {%- if cell.size >= 2 -%}
+          {%- assign items = cell[0] | strip | plus: 0 -%}
+          {%- assign value = cell[1] | strip | plus: 0 -%}
+          {%- if items > 0 and value > 0 -%}
+            {%- comment -%}
+              amt is cents so the sheet never does currency arithmetic on a
+              float it parsed out of a settings string.
+            {%- endcomment -%}
+            {%- assign cents = cell[1] | strip | times: 100 | round -%}
+            {{- separator -}}{"items": {{ items }}, "pct": {{ value }}, "amt": {{ cents }}}
+            {%- assign separator = ',' -%}
+          {%- endif -%}
+        {%- endif -%}
+      {%- endfor -%}
+    ],
+    "discountType": {% if settings.bundle_discount_type == 'amount' %}"amount"{% else %}"percent"{% endif %},
+    "ship": {{ ship_cents }},
+    "protectionProductId": {% if settings.cart_protection_enabled and settings.cart_protection_product != blank %}{{ settings.cart_protection_product.id }}{% else %}null{% endif %},
+    "chips": [
+      {%- comment -%}
+        One chip per collection the merchant picked, in the order they dragged
+        them, each named after its collection. A collection that has since been
+        deleted comes back blank and is skipped; with none picked the array is
+        empty and the chip row hides itself.
+      {%- endcomment -%}
+      {%- assign separator = '' -%}
+      {%- for chip_collection in block.settings.bundle_chips -%}
+        {%- if chip_collection != blank -%}
+          {{- separator -}}{"label": {{ chip_collection.title | json }}, "url": {{ chip_collection.url | json }}}
+          {%- assign separator = ',' -%}
+        {%- endif -%}
+      {%- endfor -%}
+    ],
+    "searchUrl": {{ routes.search_url | json }},
+    "product": {%- render 'bundle-json-product', product: product -%}
+  }
+</script>
+
+<template data-pdp-bundle-template>
+  <div class="pdp-bb" data-pdp-bb hidden>
+    <div class="pdp-bb__scrim" data-pdp-bb-close></div>
+    <div class="pdp-bb__sheet" role="dialog" aria-modal="true" aria-labelledby="pdp-bb-title">
+      <div class="pdp-bb__grab" aria-hidden="true"></div>
+      <div class="pdp-bb__bar">
+        <h2 class="pdp-bb__title" id="pdp-bb-title" tabindex="-1">{{ block.settings.bundle_sheet_title | default: 'Build your bundle' | escape }}</h2>
+        <button type="button" class="pdp-bb__close" data-pdp-bb-close aria-label="Close bundle builder">
+          {%- render 'icon', icon: 'close', width: 14, height: 14 -%}
+        </button>
+      </div>
+
+      <div class="pdp-bb__progress">
+        <p class="pdp-bb__msg" data-pdp-bb-msg aria-live="polite"></p>
+        <div class="pdp-bb__meter" data-pdp-bb-meter role="img" aria-label="Bundle rewards progress">
+          <div class="pdp-bb__track"><i data-pdp-bb-fill></i></div>
+          <ol class="pdp-bb__nodes" data-pdp-bb-nodes></ol>
+        </div>
+      </div>
+
+      <div class="pdp-bb__body" data-pdp-bb-body>
+        <section class="pdp-bb__sec">
+          <h3 class="pdp-bb__label"><span>Your bundle</span><span class="pdp-v2__tnum" data-pdp-bb-count></span></h3>
+          <ul class="pdp-bb__picked" data-pdp-bb-picked role="list"></ul>
+        </section>
+
+        <section class="pdp-bb__sec">
+          <h3 class="pdp-bb__label"><span>Add from the store</span></h3>
+          <div class="pdp-bb__search">
+            {%- render 'icon', icon: 'header-search', width: 16, height: 16 -%}
+            <input type="search" data-pdp-bb-search placeholder="Search brands and products" autocomplete="off" enterkeyhint="search" aria-label="Search products to add">
+            <button type="button" class="pdp-bb__clear" data-pdp-bb-clear aria-label="Clear search" hidden>
+              {%- render 'icon', icon: 'close', width: 10, height: 10 -%}
+            </button>
+          </div>
+          <div class="pdp-bb__chips" data-pdp-bb-chips data-cau-drag-scroll role="group" aria-label="Filter by category"></div>
+          <ul class="pdp-bb__results" data-pdp-bb-results role="list"></ul>
+          <p class="pdp-bb__empty" data-pdp-bb-empty hidden></p>
+          <div class="pdp-bb__more" data-pdp-bb-more aria-hidden="true"></div>
+        </section>
+      </div>
+
+      <div class="pdp-bb__foot">
+        <div class="pdp-bb__tot">
+          <span data-pdp-bb-items>0 items in this bundle</span>
+          <span><s class="pdp-v2__tnum" data-pdp-bb-was></s> <b class="pdp-v2__tnum" data-pdp-bb-total></b></span>
+        </div>
+        <p class="pdp-bb__save" data-pdp-bb-save aria-live="polite"></p>
+        <p class="pdp-bb__error" data-pdp-bb-error role="alert" hidden></p>
+        <button type="button" class="pdp-bb__add" data-pdp-bb-add disabled>
+          {{- block.settings.bundle_sheet_button | default: 'Add items to your bundle' | escape -}}
+        </button>
+      </div>
+    </div>
+  </div>
+</template>

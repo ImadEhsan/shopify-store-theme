@@ -1,0 +1,100 @@
+{%- comment -%}
+  Bundle & save.
+
+  In: block (required) — the section block carrying the tier settings
+
+  Two independent offers, because the merchant runs both: a mix-and-match tier
+  set across any items, and a same-product quantity break. Either can be
+  switched off on its own.
+
+  Mix-and-match tiers are numbers ("2|10, 3|15, 4|20": items|value) in
+  Theme settings > Bundle & rewards, so the tiles here, the bundle builder and
+  the cart drawer's rewards bar read the same values and cannot disagree. The
+  discount itself is Shopify's automatic discount at checkout; whoever changes
+  a tier there must change it in Shopify.
+
+  Same-product tiers stay display text (label|saving): nothing calculates
+  from them.
+
+  Renders nothing when neither set is enabled or neither has tiers.
+{%- endcomment -%}
+
+{%- assign show_mix = block.settings.bundle_mix_enabled -%}
+{%- assign show_same = block.settings.bundle_same_enabled -%}
+
+{%- if show_mix or show_same -%}
+  {%- comment -%} Tiles as "label|saving" pairs, whichever offer is showing. {%- endcomment -%}
+  {%- capture tiles -%}
+    {%- if show_mix -%}
+      {%- assign mix_rows = settings.bundle_tiers | split: ',' -%}
+      {%- for row in mix_rows -%}
+        {%- assign cell = row | strip | split: '|' -%}
+        {%- if cell.size >= 2 -%}
+          {%- assign items = cell[0] | strip | plus: 0 -%}
+          {%- assign value = cell[1] | strip | plus: 0 -%}
+          {%- if items > 0 and value > 0 -%}
+            {%- comment -%}
+              The same number reads as a percentage or as an amount off each
+              item, per settings.bundle_discount_type. Amounts are entered in
+              dollars and the money filter wants cents.
+            {%- endcomment -%}
+            {%- if settings.bundle_discount_type == 'amount' -%}
+              {%- assign cents = cell[1] | strip | times: 100 | round -%}
+              {%- capture saving_label -%}{{ cents | money }} off each{%- endcapture -%}
+            {%- else -%}
+              {%- capture saving_label -%}{{ value }}% off{%- endcapture -%}
+            {%- endif -%}
+            {{- items -}}{%- if forloop.last -%}+{%- endif %} items|{{ saving_label }};;
+          {%- endif -%}
+        {%- endif -%}
+      {%- endfor -%}
+    {%- else -%}
+      {%- assign same_rows = block.settings.bundle_same_tiers | split: ',' -%}
+      {%- for row in same_rows -%}{{ row | strip }};;{%- endfor -%}
+    {%- endif -%}
+  {%- endcapture -%}
+
+  {%- if show_mix -%}
+    {%- assign hint = block.settings.bundle_mix_hint -%}
+  {%- else -%}
+    {%- assign hint = block.settings.bundle_same_hint -%}
+  {%- endif -%}
+
+  {%- assign rows = tiles | split: ';;' -%}
+  {%- if rows.size > 0 -%}
+    <div class="pdp-v2__bundle" {{ block.shopify_attributes }}>
+      <div class="pdp-v2__bundle-head">
+        <span class="pdp-v2__eyebrow">{{ block.settings.bundle_title | default: 'Bundle & save' | escape }}</span>
+        {%- if hint != blank -%}
+          <span class="pdp-v2__bundle-hint">{{ hint | escape }}</span>
+        {%- endif -%}
+      </div>
+
+      <div class="pdp-v2__btiers">
+        {%- for row in rows -%}
+          {%- assign cell = row | strip | split: '|' -%}
+          {%- if cell.size >= 2 -%}
+            {%- if show_mix -%}
+              <button type="button" class="pdp-v2__btier" data-pdp-bundle-open aria-haspopup="dialog" aria-label="{{ cell[0] | strip | escape }}: {{ cell[1] | strip | escape }}">
+                <b>{{ cell[0] | strip | escape }}</b>
+                <span>{{ cell[1] | strip | escape }}</span>
+              </button>
+            {%- else -%}
+              <div class="pdp-v2__btier">
+                <b>{{ cell[0] | strip | escape }}</b>
+                <span>{{ cell[1] | strip | escape }}</span>
+              </div>
+            {%- endif -%}
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+
+      {%- if show_mix and block.settings.bundle_cta_label != blank -%}
+        <button type="button" class="pdp-v2__bundle-cta" data-pdp-bundle-open aria-haspopup="dialog">
+          {{ block.settings.bundle_cta_label | escape }}
+        </button>
+        {%- render 'pdp-bundle-sheet', block: block, product: product -%}
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+{%- endif -%}

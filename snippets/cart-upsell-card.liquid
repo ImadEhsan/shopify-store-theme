@@ -1,0 +1,53 @@
+{%- comment -%}
+  One "Complete your bundle" card in the cart drawer.
+
+  In: product (required)
+
+  A product with one variant adds straight from the round button. One with
+  several shows its sizes inside the card first; a sold-out size stays visible
+  but disabled. cart-drawer.js handles both clicks.
+{%- endcomment -%}
+
+{%- liquid
+  assign single = product.has_only_default_variant
+  if product.variants.size == 1
+    assign single = true
+  endif
+  assign sizes_id = 'cau-ucard-sizes-' | append: product.id
+-%}
+
+<div class="cau-ucard" data-cau-card="{{ product.id }}">
+  {%- if product.featured_image != blank -%}
+    {{- product.featured_image | image_url: width: 104 | image_tag: loading: 'lazy', width: 52, height: 52, alt: '', class: 'cau-ucard__img' -}}
+  {%- else -%}
+    <span class="cau-ucard__img"></span>
+  {%- endif -%}
+
+  <div>
+    <a href="{{ product.url }}" class="cau-ucard__name">{{ product.title | escape }}</a>
+    <div class="cau-ucard__price">{{ product.price | money }}</div>
+  </div>
+
+  {%- if single -%}
+    <button type="button" class="cau-ucard__add" data-cau-add="{{ product.selected_or_first_available_variant.id }}" aria-label="Add {{ product.title | escape }} to bag">
+      {%- render 'icon' with 'plus', width: 12, height: 12 -%}
+    </button>
+  {%- else -%}
+    <button type="button" class="cau-ucard__add" data-cau-sizes aria-expanded="false" aria-controls="{{ sizes_id }}" aria-label="Choose a size for {{ product.title | escape }}">
+      {%- render 'icon' with 'plus', width: 12, height: 12 -%}
+    </button>
+
+    <div class="cau-ucard__sizes" id="{{ sizes_id }}" hidden>
+      {%- for variant in product.variants -%}
+        {%- liquid
+          if product.options.size == 1
+            assign label = variant.option1
+          else
+            assign label = variant.title
+          endif
+        -%}
+        <button type="button" class="cau-szchip" data-cau-add="{{ variant.id }}" {% unless variant.available %}disabled{% endunless %} aria-label="Add {{ product.title | escape }}, {{ label | escape }}">{{ label | escape }}</button>
+      {%- endfor -%}
+    </div>
+  {%- endif -%}
+</div>

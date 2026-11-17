@@ -1,0 +1,252 @@
+/* Complete the fit.
+   Mobile first: two cards across, one query takes it to four. */
+
+.pdp-fit { display: block; padding-block: var(--cau-section-pad); }
+.pdp-fit[hidden] { display: none; }
+
+.pdp-fit__head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--cau-s4);
+  margin-bottom: var(--cau-s4);
+}
+.pdp-fit__title {
+  margin: 0 0 6px;
+  font-size: clamp(1.25rem, 2.6vw, 1.5rem);
+  letter-spacing: -.02em;
+  color: var(--cau-ink-900);
+}
+.pdp-fit__lead { margin: 0; max-width: 60ch; font-size: .9375rem; color: var(--cau-ink-400); }
+
+/* A slider, the same as Worn by the community: snap per card, the next card
+   peeking on phones, the track bled to the page gutter there. */
+.pdp-fit__grid {
+  --pdp-fit-gap: var(--cau-s3);
+  --pdp-fit-col: calc((100% - 1.2 * var(--pdp-fit-gap)) / 2.2);
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: var(--pdp-fit-col);
+  gap: var(--pdp-fit-gap);
+  /* overflow-y explicit: left alone it computes to auto as well, and a touch
+     drag then has two directions to pick from (see ugc-community.css). */
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  margin-inline: calc(-1 * var(--container-gutter));
+  padding-inline: var(--container-gutter);
+  scroll-padding-inline: var(--container-gutter);
+}
+.pdp-fit__grid::-webkit-scrollbar { display: none; }
+
+/* Grab-and-pull on pointer devices. Snapping is suspended mid-drag so it does
+   not fight the pointer, and comes back on release so the rail still settles. */
+@media (hover: hover) and (pointer: fine) {
+  .pdp-fit__grid { cursor: grab; }
+  .pdp-fit__grid.is-dragging { cursor: grabbing; scroll-snap-type: none; scroll-behavior: auto; user-select: none; }
+}
+.pdp-fit__grid:focus-visible { outline: 2px solid var(--cau-ink-900); outline-offset: 4px; }
+.pdp-fit__grid > .pdp-fit__card { scroll-snap-align: start; }
+
+.pdp-fit__arrows { display: inline-flex; flex: 0 0 auto; gap: 8px; }
+.pdp-fit__arrows[hidden] { display: none; }
+.pdp-fit__arrow {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1.5px solid var(--cau-hairline);
+  border-radius: var(--cau-r-pill);
+  background: var(--cau-paper);
+  color: var(--cau-ink-900);
+  cursor: pointer;
+  transition: border-color .15s;
+}
+.pdp-fit__arrow:hover { border-color: var(--cau-ink-900); }
+.pdp-fit__arrow--next svg { transform: rotate(180deg); }
+
+.pdp-fit__progress {
+  height: 3px;
+  margin-top: var(--cau-s3);
+  overflow: hidden;
+  border-radius: var(--cau-r-pill);
+  background: var(--cau-hairline);
+}
+.pdp-fit__progress[hidden] { display: none; }
+.pdp-fit__progress span { display: block; height: 100%; border-radius: inherit; background: var(--cau-ink-900); }
+
+/* ---------- card ---------- */
+
+.pdp-fit__card { display: flex; flex-direction: column; min-width: 0; }
+
+.pdp-fit__img {
+  position: relative;
+  display: block;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border: 1px solid var(--cau-hairline);
+  border-radius: var(--cau-r-lg);
+  background: var(--cau-mist);
+}
+.pdp-fit__img img { width: 100%; height: 100%; object-fit: cover; }
+
+.pdp-fit__save {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 1;
+  padding: 3px 7px;
+  border-radius: var(--cau-r-sm);
+  background: var(--cau-sale);
+  color: var(--cau-paper);
+  font-size: .6875rem;
+  font-weight: 800;
+}
+
+.pdp-fit__vendor {
+  display: block;
+  margin-top: 12px;
+  font-size: .75rem;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--cau-ink-400);
+}
+.pdp-fit__name {
+  margin: 5px 0 0;
+  font-size: .875rem;
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--cau-ink-900);
+}
+.pdp-fit__name a { color: inherit; }
+
+.pdp-fit__price {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 8px;
+  margin-top: 7px;
+}
+.pdp-fit__now { font-size: 1rem; font-weight: 800; color: var(--cau-ink-900); }
+.pdp-fit__was { font-size: .8125rem; color: var(--cau-ink-400); }
+
+/* ---------- add to bundle ---------- */
+
+.pdp-fit__add {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 12px;
+}
+
+.pdp-fit__btn {
+  width: 100%;
+  min-height: 44px;
+  border: 1.5px solid var(--cau-ink-900);
+  border-radius: var(--cau-r-md);
+  background: var(--cau-paper);
+  color: var(--cau-ink-900);
+  font-size: .8125rem;
+  font-weight: 700;
+  text-align: center;
+  cursor: pointer;
+  transition: background .15s, color .15s, transform .1s;
+}
+.pdp-fit__btn:hover,
+.pdp-fit__btn[aria-expanded="true"] { background: var(--cau-ink-900); color: var(--cau-paper); }
+.pdp-fit__btn:active { transform: scale(.98); }
+.pdp-fit__btn[aria-busy="true"] { opacity: .6; cursor: progress; }
+
+/* Floats rather than sitting in the flow: in the flow it stretched the row,
+   and every neighbour's button (pinned with margin-top: auto) dropped with
+   it. Opens upward, over the card's own image: the slider track scrolls, so
+   anything hanging below the cards would be clipped. */
+.pdp-fit__add { position: relative; }
+.pdp-fit__sizes {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 3;
+  min-width: 0;
+  margin: 0;
+  padding: var(--cau-s3);
+  border: 1px solid var(--cau-hairline);
+  border-radius: var(--cau-r-md);
+  background: var(--cau-paper);
+  box-shadow: 0 12px 28px -12px rgba(10, 10, 12, .28);
+}
+.pdp-fit__sizes[hidden] { display: none; }
+/* Floated so the legend sits inside the panel, not on its border. */
+.pdp-fit__hint {
+  float: left;
+  width: 100%;
+  display: block;
+  margin-bottom: 6px;
+  padding: 0;
+  font-size: .75rem;
+  font-weight: 700;
+  color: var(--cau-ink-500);
+}
+/* Sneakers carry 20+ sizes with long labels ("Men's US8 / Women's 9.5").
+   Capped so an open card cannot stretch the row down the page; the list
+   scrolls inside instead. */
+.pdp-fit__chips {
+  clear: both;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-height: 188px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 2px;
+  margin: -2px;
+}
+
+.pdp-fit__chip { position: relative; }
+.pdp-fit__chip span {
+  display: grid;
+  place-items: center;
+  min-width: 44px;
+  min-height: 36px;
+  padding: 4px 10px;
+  line-height: 1.25;
+  text-align: center;
+  border: 1.5px solid var(--cau-hairline);
+  border-radius: var(--cau-r-md);
+  background: var(--cau-paper);
+  font-size: .8125rem;
+  font-weight: 600;
+  color: var(--cau-ink-900);
+  cursor: pointer;
+}
+.pdp-fit__chip:hover span { border-color: var(--cau-ink-900); }
+.pdp-fit__chip input:focus-visible + span { outline: 2px solid var(--cau-ink-900); outline-offset: 2px; }
+.pdp-fit__chip input:checked + span { border-color: var(--cau-ink-900); background: var(--cau-ink-900); color: var(--cau-paper); }
+.pdp-fit__chip input:disabled + span {
+  color: var(--cau-ink-300);
+  text-decoration: line-through;
+  cursor: not-allowed;
+}
+.pdp-fit__chip:has(input:disabled):hover span { border-color: var(--cau-hairline); }
+
+@media screen and (min-width: 561px) {
+  .pdp-fit__grid { --pdp-fit-col: calc((100% - 2.2 * var(--pdp-fit-gap)) / 3.2); }
+}
+
+@media screen and (min-width: 901px) {
+  .pdp-fit__head { margin-bottom: var(--cau-s6); }
+  .pdp-fit__grid {
+    --pdp-fit-gap: var(--cau-s4);
+    --pdp-fit-col: calc((100% - 3 * var(--pdp-fit-gap)) / 4);
+    margin-inline: 0;
+    padding-inline: 0;
+    scroll-padding-inline: 0;
+  }
+}

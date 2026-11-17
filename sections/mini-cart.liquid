@@ -1,0 +1,531 @@
+{%- comment -%}
+  Cart drawer, rebuilt to the CoppedAU prototype.
+
+  Focal's <cart-drawer> element still owns opening, closing, focus and the
+  re-render on cart:refresh; only the markup and styling are ours.
+  cart-drawer.js adds shipping protection, the upsell buttons and the
+  recommendations fetch.
+
+  Every amount shown comes from the cart Shopify returns. The rewards bar
+  shows progress against Theme settings > Bundle & rewards; the saving, the
+  discount rows and the total are what Shopify actually applied.
+
+  The shipping protection line is a real cart line but never an item: it is
+  left out of the lines, the item count, the tiers and free shipping.
+{%- endcomment -%}
+
+{{ 'cart-drawer.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'cart-drawer.js' | asset_url }}" defer></script>
+
+{%- liquid
+  assign protection_product = blank
+  assign protection_variant = blank
+  if settings.cart_protection_enabled and settings.cart_protection_product != blank
+    assign protection_product = settings.cart_protection_product
+    assign protection_variant = protection_product.selected_or_first_available_variant
+  endif
+
+  assign protection_line = blank
+  assign item_count = 0
+  assign subtotal = 0
+  assign ship_value = 0
+  assign newest_product_id = blank
+  assign cart_product_ids = ''
+
+  for line_item in cart.items
+    if protection_product != blank and line_item.product_id == protection_product.id
+      assign protection_line = line_item
+      continue
+    endif
+
+    assign item_count = item_count | plus: line_item.quantity
+    assign subtotal = subtotal | plus: line_item.original_line_price
+    assign cart_product_ids = cart_product_ids | append: line_item.product_id | append: ','
+
+    if line_item.requires_shipping
+      assign ship_value = ship_value | plus: line_item.final_line_price
+    endif
+
+    comment
+      Shopify lists the most recently added line first.
+    endcomment
+    if newest_product_id == blank
+      assign newest_product_id = line_item.product_id
+    endif
+  endfor
+
+  comment
+    Cart-level discounts are not inside final_line_price; take them off, as
+    Focal's own free shipping bar does.
+  endcomment
+  for discount_application in cart.cart_level_discount_applications
+    assign ship_value = ship_value | minus: discount_application.total_allocated_amount
+  endfor
+
+  capture ship_threshold
+    render 'cart-free-shipping-threshold'
+  endcapture
+  assign ship_threshold = ship_threshold | plus: 0
+  assign ship_done = false
+  if item_count > 0 and ship_threshold > 0 and ship_value >= ship_threshold
+    assign ship_done = true
+  endif
+
+  comment
+    Tiers as two parallel lists, lowest first: items needed and percent off.
+  endcomment
+  # The second number is a percentage or an amount off each item, per
+  # settings.bundle_discount_type. The wording is built once here so the
+  # fifteen places below that name a saving never spell the unit themselves.
+  assign is_amount = false
+  if settings.bundle_discount_type == 'amount'
+    assign is_amount = true
+  endif
+
+  assign tier_items = ''
+  assign tier_labels = ''
+  assign tier_rows = settings.bundle_tiers | split: ','
+  for row in tier_rows
+    assign cell = row | strip | split: '|'
+    if cell.size >= 2
+      assign t_items = cell[0] | strip | plus: 0
+      assign t_value = cell[1] | strip | plus: 0
+      if t_items > 0 and t_value > 0
+        if is_amount
+          assign t_cents = cell[1] | strip | times: 100 | round
+          capture t_label
+            echo t_cents | money
+            echo ' off each'
+          endcapture
+        else
+          capture t_label
+            echo t_value
+            echo '% off'
+          endcapture
+        endif
+        assign tier_items = tier_items | append: t_items | append: ','
+        assign tier_labels = tier_labels | append: t_label | append: ';;'
+      endif
+    endif
+  endfor
+  assign tier_items = tier_items | split: ','
+  assign tier_labels = tier_labels | split: ';;'
+  assign tier_count = tier_items.size
+
+  assign next_tier_items = 0
+  assign next_label = ''
+  assign max_label = ''
+  for n in tier_items
+    assign n_num = n | plus: 0
+    assign max_label = tier_labels[forloop.index0]
+    if next_tier_items == 0 and item_count < n_num
+      assign next_tier_items = n_num
+      assign next_label = max_label
+    endif
+  endfor
+
+  assign milestone_count = tier_count
+  if ship_threshold > 0
+    assign milestone_count = milestone_count | plus: 1
+  endif
+
+  assign protection_on = false
+  if protection_line != blank or cart.attributes['_protection_off'] != '1'
+    assign protection_on = true
+  endif
+-%}
+
+<cart-drawer section="{{ section.id }}" id="mini-cart" class="mini-cart drawer cau-cart">
+  {%- comment -%}
+    Cart state for cart-drawer.js. It sits inside the drawer because Focal's
+    re-render replaces the drawer's contents, never its own attributes.
+  {%- endcomment -%}
+  <div
+    hidden
+    data-cau-state
+    data-item-count="{{ item_count }}"
+    data-product-ids="{{ cart_product_ids }}"
+    {%- if protection_variant != blank %}
+      data-protection-variant="{{ protection_variant.id }}"
+      data-protection-product="{{ protection_product.id }}"
+      data-protection-qty="{% if protection_line != blank %}{{ protection_line.quantity }}{% else %}0{% endif %}"
+      data-protection-off="{% if cart.attributes['_protection_off'] == '1' %}true{% else %}false{% endif %}"
+    {%- endif %}
+  ></div>
+
+  <span class="drawer__overlay"></span>
+
+  <header class="cau-cart__head">
+    <h2 class="cau-cart__title">
+      {%- if item_count > 0 -%}Your bag ({{ item_count }}){%- else -%}Your bag{%- endif -%}
+    </h2>
+
+    <button type="button" class="cau-cart__close" data-action="close" aria-label="{{ 'general.accessibility.close' | t | escape }}">
+      {%- render 'icon' with 'close' -%}
+    </button>
+  </header>
+
+  {%- if milestone_count > 0 -%}
+    <div class="cau-rewards">
+      <div class="cau-rewards__top">
+        <p class="cau-rewards__msg" aria-live="polite">
+          {%- liquid
+            assign parts = ''
+            if item_count == 0
+              if ship_threshold > 0 and tier_count > 0
+                echo 'Add items to unlock <b>free shipping</b> and up to <b>' | append: max_label | append: '</b>.'
+              elsif ship_threshold > 0
+                echo 'Add items to unlock <b>free shipping</b>.'
+              else
+                echo 'Add items to unlock up to <b>' | append: max_label | append: '</b>.'
+              endif
+            elsif ship_done and next_tier_items == 0 and tier_count > 0
+              echo '<b>Free shipping + ' | append: max_label | append: ' unlocked.</b> Best price in the store.'
+            elsif ship_threshold == 0 and next_tier_items == 0
+              echo '<b>' | append: max_label | append: ' unlocked.</b> Best price in the store.'
+            elsif ship_done and tier_count == 0
+              echo '<b>Free shipping unlocked.</b>'
+            else
+              if ship_threshold > 0 and ship_done == false
+                assign remaining = ship_threshold | minus: ship_value | money
+                assign parts = '<b>' | append: remaining | append: '</b> from free shipping'
+              elsif ship_done and next_tier_items > 0
+                assign parts = 'Free shipping ✓'
+              endif
+
+              if next_tier_items > 0
+                assign need = next_tier_items | minus: item_count
+                assign need_word = 'more items'
+                if need == 1
+                  assign need_word = 'more item'
+                endif
+                if parts != ''
+                  assign parts = parts | append: ' · '
+                endif
+                assign parts = parts | append: '<b>' | append: need | append: ' ' | append: need_word | append: '</b> for ' | append: next_label
+              elsif tier_count > 0
+                assign parts = parts | append: ' · ' | append: max_label | append: ' ✓'
+              endif
+
+              echo parts
+            endif
+          -%}
+        </p>
+
+        {%- if cart.total_discount > 0 -%}
+          <span class="cau-rewards__save">Saving {{ cart.total_discount | money }}</span>
+        {%- endif -%}
+      </div>
+
+      {%- capture meter_label -%}
+        {%- assign reached = '' -%}
+        {%- if ship_done -%}{%- assign reached = 'Free shipping' -%}{%- endif -%}
+        {%- for n in tier_items -%}
+          {%- assign n_num = n | plus: 0 -%}
+          {%- if item_count >= n_num -%}
+            {%- if reached != '' -%}{%- assign reached = reached | append: ', ' -%}{%- endif -%}
+            {%- assign reached = reached | append: tier_labels[forloop.index0] -%}
+          {%- endif -%}
+        {%- endfor -%}
+        Rewards: {% if reached != '' %}{{ reached }} unlocked{% else %}none unlocked yet{% endif %}
+      {%- endcapture -%}
+
+      <div class="cau-meter" role="img" aria-label="{{ meter_label | strip | escape }}">
+        <div class="cau-meter__track">
+          {%- if ship_threshold > 0 -%}
+            {%- assign part = ship_value | times: 100 | divided_by: ship_threshold | at_least: 0 | at_most: 100 -%}
+            {%- if ship_done -%}{%- assign part = 100 -%}{%- endif -%}
+            <span class="cau-meter__seg"><i style="width: {{ part }}%"></i></span>
+          {%- endif -%}
+
+          {%- assign prev = 0 -%}
+          {%- for n in tier_items -%}
+            {%- assign n_num = n | plus: 0 -%}
+            {%- assign span = n_num | minus: prev -%}
+            {%- assign part = item_count | minus: prev | times: 100 | divided_by: span | at_least: 0 | at_most: 100 -%}
+            <span class="cau-meter__seg"><i style="width: {{ part }}%"></i></span>
+            {%- assign prev = n_num -%}
+          {%- endfor -%}
+        </div>
+
+        <ol class="cau-meter__nodes" role="list">
+          {%- assign node_index = 0 -%}
+          {%- if ship_threshold > 0 -%}
+            {%- assign node_index = 1 -%}
+            {%- assign left = 100.0 | divided_by: milestone_count -%}
+            <li class="cau-meter__node{% if ship_done %} is-done{% endif %}" style="left: {{ left }}%">
+              <span class="cau-meter__dot">{%- render 'icon' with 'tick' -%}</span>
+              <b>Free shipping</b>
+              <small>{{ ship_threshold | money_without_trailing_zeros }}+</small>
+            </li>
+          {%- endif -%}
+
+          {%- for n in tier_items -%}
+            {%- assign n_num = n | plus: 0 -%}
+            {%- assign position = node_index | plus: forloop.index -%}
+            {%- assign left = position | times: 100.0 | divided_by: milestone_count -%}
+            <li class="cau-meter__node{% if item_count >= n_num %} is-done{% endif %}" style="left: {{ left }}%">
+              <span class="cau-meter__dot">{%- render 'icon' with 'tick' -%}</span>
+              <b>{{ tier_labels[forloop.index0] }}</b>
+              <small>{{ n_num }}{% if forloop.last %}+{% endif %} items</small>
+            </li>
+          {%- endfor -%}
+        </ol>
+      </div>
+    </div>
+  {%- endif -%}
+
+  <div class="drawer__content cau-cart__body">
+    <p class="cau-cart__error" role="alert" data-cau-error hidden></p>
+
+    <ul class="cau-cart__lines" role="list">
+      {%- if item_count == 0 -%}
+        <li class="cau-cart__empty">
+          {%- if tier_count > 0 -%}
+            Your bag is empty — mix any {{ tier_items.first }}+ pieces to start saving.
+          {%- else -%}
+            Your bag is empty.
+          {%- endif -%}
+        </li>
+      {%- endif -%}
+
+      {%- for line_item in cart.items -%}
+        {%- if protection_product != blank and line_item.product_id == protection_product.id -%}
+          {%- continue -%}
+        {%- endif -%}
+
+        {%- capture meta -%}
+          {%- assign meta_parts = '' -%}
+          {%- if line_item.vendor != blank -%}{%- assign meta_parts = line_item.vendor | escape -%}{%- endif -%}
+          {%- unless line_item.product.has_only_default_variant -%}
+            {%- for option in line_item.options_with_values -%}
+              {%- assign option_name = option.name | downcase -%}
+              {%- if meta_parts != '' -%}{%- assign meta_parts = meta_parts | append: ' · ' -%}{%- endif -%}
+              {%- if option_name contains 'size' -%}
+                {%- assign meta_parts = meta_parts | append: 'Size ' | append: option.value | escape -%}
+              {%- else -%}
+                {%- assign meta_parts = meta_parts | append: option.value | escape -%}
+              {%- endif -%}
+            {%- endfor -%}
+          {%- endunless -%}
+          {%- if line_item.quantity > 1 -%}
+            {%- if meta_parts != '' -%}{%- assign meta_parts = meta_parts | append: ' · ' -%}{%- endif -%}
+            {%- assign meta_parts = meta_parts | append: '× ' | append: line_item.quantity -%}
+          {%- endif -%}
+          {{- meta_parts -}}
+        {%- endcapture -%}
+
+        <li>
+          <line-item class="cau-line">
+            <a href="{{ line_item.url }}" class="cau-line__img" tabindex="-1" aria-hidden="true">
+              {%- if line_item.image != blank -%}
+                {{- line_item.image | image_url: width: 128 | image_tag: loading: 'lazy', width: 64, height: 64, alt: '' -}}
+              {%- endif -%}
+            </a>
+
+            <div class="cau-line__info">
+              <a href="{{ line_item.url }}" class="cau-line__name">{{ line_item.product.title | escape }}</a>
+
+              {%- if meta != blank -%}
+                <div class="cau-line__meta">{{ meta }}</div>
+              {%- endif -%}
+
+              {%- if line_item.selling_plan_allocation -%}
+                <div class="cau-line__meta">{{ line_item.selling_plan_allocation.selling_plan.name | escape }}</div>
+              {%- endif -%}
+
+              {%- for property in line_item.properties -%}
+                {%- assign first_character_in_key = property.first | truncate: 1, '' -%}
+                {%- if property.last == blank or first_character_in_key == '_' -%}
+                  {%- continue -%}
+                {%- endif -%}
+                <div class="cau-line__meta">{{ property.first | escape }}: {{ property.last | escape }}</div>
+              {%- endfor -%}
+            </div>
+
+            <div class="cau-line__end">
+              {%- comment -%}
+                The undiscounted line price, so the lines add up to the
+                Subtotal; Shopify's discounts are listed under it.
+              {%- endcomment -%}
+              <span class="cau-line__price">
+                {%- if line_item.original_line_price == 0 -%}{{ 'cart.general.free' | t }}{%- else -%}{{ line_item.original_line_price | money }}{%- endif -%}
+              </span>
+
+              <line-item-quantity>
+                <a href="{{ routes.cart_change_url }}?quantity=0&line={{ forloop.index }}" class="cau-line__rm" aria-label="Remove {{ line_item.product.title | escape }}" data-no-instant>
+                  {%- render 'icon' with 'bin' -%}
+                </a>
+              </line-item-quantity>
+            </div>
+          </line-item>
+        </li>
+      {%- endfor -%}
+    </ul>
+
+    {%- if section.settings.show_upsell -%}
+      {%- capture upsell_hint -%}
+        {%- if next_tier_items > 0 -%}
+          {%- assign need = next_tier_items | minus: item_count -%}
+          Add {{ need }} more for {{ next_label }}
+        {%- elsif tier_count > 0 -%}
+          {{ max_label }} unlocked on every item
+        {%- endif -%}
+      {%- endcapture -%}
+
+      <div class="cau-upsell" data-cau-upsell hidden>
+        <div class="cau-upsell__head">
+          <span class="cau-upsell__title">
+            {{- section.settings.upsell_title | escape -}}
+            {%- if upsell_hint != blank -%}<small>{{ upsell_hint | strip }}</small>{%- endif -%}
+          </span>
+
+          {%- if section.settings.browse_collection != blank -%}
+            <a href="{{ section.settings.browse_collection.url }}" class="cau-upsell__more" data-cau-browse>Browse all ›</a>
+          {%- else -%}
+            <button type="button" class="cau-upsell__more" data-cau-browse hidden>Browse all ›</button>
+          {%- endif -%}
+        </div>
+
+        {%- if section.settings.upsell_collection != blank -%}
+          <div class="cau-upsell__row" data-cau-upsell-row>
+            {%- assign shown = 0 -%}
+            {%- for product in section.settings.upsell_collection.products limit: 24 -%}
+              {%- if shown >= 8 -%}{%- break -%}{%- endif -%}
+              {%- if product.available == false -%}{%- continue -%}{%- endif -%}
+              {%- if protection_product != blank and product.id == protection_product.id -%}{%- continue -%}{%- endif -%}
+              {%- assign in_cart = cart.items | where: 'product_id', product.id | first -%}
+              {%- if in_cart -%}{%- continue -%}{%- endif -%}
+              {%- assign shown = shown | plus: 1 -%}
+              {%- render 'cart-upsell-card', product: product -%}
+            {%- endfor -%}
+          </div>
+        {%- elsif newest_product_id != blank -%}
+          {%- comment -%}
+            Filled by cart-drawer.js from Shopify's recommendations for the
+            newest item: complementary first, then related. When the section is
+            rendered through /recommendations/products, the cards are here.
+          {%- endcomment -%}
+          <cau-cart-recommendations class="cau-upsell__row" data-cau-upsell-row product-id="{{ newest_product_id }}" section-id="{{ section.id }}">
+            {%- if recommendations.performed -%}
+              {%- assign shown = 0 -%}
+              {%- for product in recommendations.products -%}
+                {%- if shown >= 8 -%}{%- break -%}{%- endif -%}
+                {%- if product.available == false -%}{%- continue -%}{%- endif -%}
+                {%- if protection_product != blank and product.id == protection_product.id -%}{%- continue -%}{%- endif -%}
+                {%- assign shown = shown | plus: 1 -%}
+                {%- render 'cart-upsell-card', product: product -%}
+              {%- endfor -%}
+            {%- endif -%}
+          </cau-cart-recommendations>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+  </div>
+
+  <footer class="cau-cart__foot">
+    <div class="cau-sum">
+      <div class="cau-sum__row">
+        <span>Subtotal ({{ item_count }} item{% if item_count != 1 %}s{% endif %})</span>
+        <span>{{ subtotal | money }}</span>
+      </div>
+
+      {%- for discount_application in cart.discount_applications -%}
+        {%- if discount_application.total_allocated_amount > 0 -%}
+          <div class="cau-sum__row cau-sum__row--disc">
+            <span>{{ discount_application.title | escape }}</span>
+            <span>−{{ discount_application.total_allocated_amount | money }}</span>
+          </div>
+        {%- endif -%}
+      {%- endfor -%}
+
+      {%- if item_count > 0 -%}
+        <div class="cau-sum__row">
+          <span>Shipping</span>
+          <span>{% if ship_done %}Free{% else %}Calculated at checkout{% endif %}</span>
+        </div>
+      {%- endif -%}
+    </div>
+
+    {%- if protection_variant != blank and item_count > 0 -%}
+      <label class="cau-protect{% unless protection_on %} is-off{% endunless %}" for="cau-protect">
+        {%- render 'icon' with 'shield-check' -%}
+        <span class="cau-protect__txt">
+          <b>Shipping protection</b>
+          {%- if settings.cart_protection_text != blank -%}<small id="cau-protect-desc">{{ settings.cart_protection_text | escape }}</small>{%- endif -%}
+        </span>
+        <span class="cau-protect__amt" id="cau-protect-amt">{{ protection_variant.price | money }}</span>
+        <input class="cau-switch" type="checkbox" id="cau-protect" role="switch" data-cau-protect {% if protection_on %}checked{% endif %} aria-describedby="cau-protect-amt{% if settings.cart_protection_text != blank %} cau-protect-desc{% endif %}">
+      </label>
+    {%- endif -%}
+
+    <div class="cau-sum cau-sum--total">
+      <div class="cau-sum__row cau-sum__row--total">
+        <span>Total</span>
+        <span>{{ cart.total_price | money }}</span>
+      </div>
+    </div>
+
+    <form id="mini-cart-form" action="{{ routes.cart_url }}" method="post" novalidate>
+      <button type="submit" name="checkout" class="cau-checkout" {% if item_count == 0 %}disabled{% endif %}>
+        {{- 'cart.general.checkout' | t }} · {{ cart.total_price | money -}}
+      </button>
+    </form>
+
+    <div class="cau-cart__fine">
+      <button type="button" class="cau-cart__cont" data-action="close">Continue shopping</button>
+
+      {%- if section.settings.fine_print != blank -%}
+        <span>{%- render 'icon' with 'lock', width: 13, height: 13 -%}{{ section.settings.fine_print | escape }}</span>
+      {%- endif -%}
+    </div>
+  </footer>
+</cart-drawer>
+
+{% schema %}
+{
+  "name": "Cart drawer",
+  "class": "shopify-section--mini-cart",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Bundle tiers and shipping protection are set in Theme settings > Bundle & rewards. Free shipping is set in Theme settings > Cart."
+    },
+    {
+      "type": "text",
+      "id": "fine_print",
+      "label": "Fine print beside Continue shopping",
+      "default": "Secure · Afterpay & Zip"
+    },
+    {
+      "type": "header",
+      "content": "Complete your bundle"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_upsell",
+      "label": "Show product suggestions",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "upsell_title",
+      "label": "Heading",
+      "default": "Complete your bundle",
+      "visible_if": "{{ section.settings.show_upsell }}"
+    },
+    {
+      "type": "collection",
+      "id": "upsell_collection",
+      "label": "Curated collection",
+      "info": "Leave empty to suggest automatically: Shopify's complementary products for the newest item in the bag (set in the Search & Discovery app), otherwise related products."
+    },
+    {
+      "type": "collection",
+      "id": "browse_collection",
+      "label": "Browse all collection",
+      "info": "On product pages \"Browse all\" opens the bundle builder. Elsewhere it links here; leave empty to hide it there."
+    }
+  ]
+}
+{% endschema %}

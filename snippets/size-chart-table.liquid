@@ -1,0 +1,49 @@
+{%- comment -%}
+  Renders tab-separated text as a table.
+  In: raw (required), caption (optional)
+  Renders nothing at all when raw is blank.
+
+  Cells are escaped: Liquid does NOT escape {{ }} by default, and a pasted
+  cell may legitimately contain "<160" or "S & M".
+
+  Row cells are addressed by index up to the header's width rather than by
+  iterating the split result, because Liquid's `split` discards trailing
+  empty strings — a short row would otherwise lose its padding and shift
+  the remaining cells left.
+{%- endcomment -%}
+
+{%- capture sc_rows -%}{%- render 'size-chart-parse', raw: raw -%}{%- endcapture -%}
+{%- assign sc_row_list = sc_rows | strip | split: '~~' -%}
+
+{%- if sc_row_list.size > 1 -%}
+  {%- assign head = sc_row_list[0] | split: '||' -%}
+  {%- assign col_count = head.size -%}
+  <table class="size-chart__table">
+    {%- if caption != blank -%}
+      <caption class="size-chart__caption">{{ caption | escape }}</caption>
+    {%- endif -%}
+    <thead>
+      <tr>
+        {%- for cell in head -%}
+          <th scope="col" class="size-chart__th{% if forloop.first %} size-chart__th--row{% endif %}">{{ cell | escape }}</th>
+        {%- endfor -%}
+      </tr>
+    </thead>
+    <tbody>
+      {%- for row in sc_row_list offset: 1 -%}
+        {%- assign cells = row | split: '||' -%}
+        <tr>
+          {%- for i in (1..col_count) -%}
+            {%- assign idx = forloop.index0 -%}
+            {%- assign cell = cells[idx] | default: '' -%}
+            {%- if forloop.first -%}
+              <th scope="row" class="size-chart__rowhead">{{ cell | escape }}</th>
+            {%- else -%}
+              <td class="size-chart__td">{{ cell | escape }}</td>
+            {%- endif -%}
+          {%- endfor -%}
+        </tr>
+      {%- endfor -%}
+    </tbody>
+  </table>
+{%- endif -%}

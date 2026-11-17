@@ -1,0 +1,76 @@
+{%- comment -%}
+  Dev-only harness for the size chart renderer. Deleted in Task 8.
+  Visit /pages/contact?view=size-chart-test
+{%- endcomment -%}
+{%- capture measurements -%}Size	Length	Chest
+XXS	71.12	109.22
+XS	72.39	114.30{%- endcapture -%}
+
+{%- comment -%}Review Focus 1: a ragged row{%- endcomment -%}
+{%- capture ragged -%}Size	Length	Chest
+XXS	71.12
+XS	72.39	114.30{%- endcapture -%}
+
+{%- comment -%}Review Focus 3: markup characters in cells{%- endcomment -%}
+{%- capture risky -%}Size	Height
+XXS	<160 & up
+XS	"tall"{%- endcapture -%}
+
+{%- comment -%}Review Focus 2: a single data column{%- endcomment -%}
+{%- capture narrow -%}Size
+XXS
+XS{%- endcapture -%}
+
+<div data-test="measurements">{% render 'size-chart-table', raw: measurements, caption: 'Measured flat, cm' %}</div>
+<div data-test="ragged">{% render 'size-chart-table', raw: ragged %}</div>
+<div data-test="risky">{% render 'size-chart-table', raw: risky %}</div>
+<div data-test="narrow">{% render 'size-chart-table', raw: narrow %}</div>
+<div data-test="empty">{% render 'size-chart-table', raw: '' %}</div>
+
+{%- capture grid -%}cm / kg	≤45	45–50	50–55
+≤160	XXS	XXS	XXS
+160–165	XXS	XXS	XS
+165–170	XXS	XS	XS{%- endcapture -%}
+<div data-test="grid">{% render 'size-chart-grid', raw: grid, caption: 'Height down, weight across' %}</div>
+<div data-test="grid-empty">{% render 'size-chart-grid', raw: '' %}</div>
+
+{%- comment -%}
+  Resolution moved inside size-chart-panel (Task 6 ruling); it is exercised
+  on the product page, not here.
+{%- endcomment -%}
+
+{%- comment -%}
+  Full-panel preview using the client's real Essentials chart.
+  Local only — deleted with the rest of the harness in Task 8.
+{%- endcomment -%}
+{%- capture real_grid -%}cm / kg	≤45	45–50	50–55	55–60	60–65	65–70	70–75	75–80	80–85	85–90	≥90
+≤160	XXS	XXS	XXS	XXS	XXS	XXS	XXS	XS	XS	S	M
+160–165	XXS	XXS	XXS	XXS	XXS	XXS	XS	XS	S	M	L
+165–170	XXS	XXS	XXS	XXS	XXS	XS	XS	S	M	L	XL
+170–175	XXS	XXS	XXS	XXS	XS	XS	S	M	L	XL	XL
+175–180	XXS	XXS	XXS	XS	XS	S	M	L	XL	XL	XL
+180–185	XXS	XXS	XS	XS	S	M	L	XL	XL	XL	XL
+185–190	XXS	XS	XS	S	M	L	XL	XL	XL	XL	XXL
+≥190	XS	XS	S	M	L	XL	XL	XL	XL	XXL	XXL{%- endcapture -%}
+{%- capture real_meas -%}Size	Length (cm)	Chest (cm)
+XXS	71.12	109.22
+XS	72.39	114.30
+S	73.66	119.38
+M	74.93	124.46
+L	76.20	132.08
+XL	77.47	139.70
+XXL	78.74	147.32{%- endcapture -%}
+
+<div class="size-chart__panel" style="max-width: 390px; border: 1px solid rgba(var(--text-color), .14); border-radius: 12px; margin: 2rem auto;">
+  <p class="heading h6" style="margin: 0 0 1rem;">Essentials — Clothing</p>
+
+  <section class="size-chart__section">
+    <h2 class="size-chart__heading">Measurements</h2>
+    {% render 'size-chart-table', raw: real_meas, caption: 'Garment measured flat, in centimetres.' %}
+  </section>
+
+  <section class="size-chart__section">
+    <h2 class="size-chart__heading">Find your size</h2>
+    {% render 'size-chart-grid', raw: real_grid, caption: 'Height down the side, weight across the top. Swipe the table sideways.' %}
+  </section>
+</div>

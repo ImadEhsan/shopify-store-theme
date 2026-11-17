@@ -1,0 +1,55 @@
+{%- comment -%}
+  The review-photo lightbox. One per reviews instance; pdp-reviews.js finds it
+  inside its own root by data attribute and fills it from the clicked
+  thumbnail. Same shape as the UGC carousel's so the two read as one
+  component.
+
+  Lifted out of pdp-reviews.liquid because the section now renders two
+  instances of the panel - the inline band and the popup - and each needs a
+  lightbox of its own. Position: fixed, so it stacks above whichever wrapper
+  it sits in - over the page inline, over the dialog in the popup.
+
+  Accepts nothing.
+{%- endcomment -%}
+
+<div class="revbox" data-pdp-reviews-box hidden>
+  <div class="revbox__panel" role="dialog" aria-modal="true" aria-label="Review photo">
+    <button type="button" class="revbox__close" data-pdp-reviews-box-close aria-label="Close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+
+    <div class="revbox__media">
+      {%- comment -%}
+        Holds the stage while the full-size photo decodes. The stage has a
+        size of its own either way, so this is what is in it rather than
+        what gives it its height - and it never shows for a photo already
+        in cache, which is every neighbour the JS has prefetched.
+      {%- endcomment -%}
+      <span class="pdp-reviews__skel revbox__skel" data-pdp-reviews-box-skel aria-hidden="true" hidden></span>
+      <img data-pdp-reviews-box-img alt="" width="900" height="900">
+      <video data-pdp-reviews-box-vid playsinline controls preload="none" hidden></video>
+      {%- comment -%}
+        Review video is Cloudflare Stream, which hands back a player page
+        rather than a file, so it plays in its own frame. src is set and
+        cleared by the JS - leaving it set would keep the video playing
+        after the lightbox closes.
+      {%- endcomment -%}
+      <iframe data-pdp-reviews-box-embed
+              title="Review video"
+              loading="lazy"
+              allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
+              allowfullscreen
+              hidden></iframe>
+    </div>
+
+    <div class="revbox__nav">
+      <button type="button" class="pdp-reviews__arrow" data-pdp-reviews-box-prev aria-label="Previous photo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+      </button>
+      <span data-pdp-reviews-box-count aria-live="polite"></span>
+      <button type="button" class="pdp-reviews__arrow" data-pdp-reviews-box-next aria-label="Next photo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+      </button>
+    </div>
+  </div>
+</div>

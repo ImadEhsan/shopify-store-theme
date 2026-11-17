@@ -1,0 +1,345 @@
+/* Worn by the community.
+   Mobile first. Two queries, not one: the spec (line 373) defines three column
+   widths, so 561px and 901px both earn their place. */
+
+.ugc { padding-block: 0; border-top: 0; }  /* spec line 365, verbatim */
+.ugc__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px var(--cau-s4);
+  margin-bottom: var(--cau-s4);
+}
+.ugc__title { margin: 0; font-size: 1.25rem; letter-spacing: -.02em; }
+.ugc__handle {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: .875rem;
+  font-weight: 700;
+  color: var(--cau-ink-900);
+  text-decoration: underline;
+  text-decoration-color: var(--cau-hairline);
+  text-underline-offset: 3px;
+}
+.ugc__handle:hover { text-decoration-color: currentColor; }
+.ugc__glyph { width: 18px; height: 18px; flex: 0 0 auto; }
+
+/* Arrows are desktop only; Task 6 adds them to the DOM. */
+/* The spec hides these below 901px, where the prototype relies on swipe alone.
+   Shown at every width on request, so there is a control that does not depend
+   on the gesture working. The JS still hides them when there is nothing to
+   scroll. */
+.ugc__arrows { display: inline-flex; gap: 8px; margin-inline-start: auto; }
+
+.ugc__track {
+  --ugc-gap: 10px;
+  --ugc-col: 62%;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: var(--ugc-col);
+  gap: var(--ugc-gap);
+  overflow-x: auto;
+  /* Explicit. With overflow-x set and overflow-y left alone, the spec computes
+     overflow-y to auto as well, making this a scroll container on BOTH axes -
+     and a touch drag then has two candidate directions, which phones resolve
+     towards the vertical. That is why swiping the carousel did nothing on a
+     phone while the wheel and the arrows worked on desktop. */
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  /* Bleed to the page gutter so a tile can sit flush to the screen edge. */
+  margin-inline: calc(-1 * var(--container-gutter));
+  padding-inline: var(--container-gutter);
+  scroll-padding-inline: var(--container-gutter);
+}
+.ugc__track::-webkit-scrollbar { display: none; }
+
+/* Grab-and-pull on pointer devices. Snapping is suspended mid-drag so it does
+   not fight the pointer, and comes back on release so the rail still settles. */
+@media (hover: hover) and (pointer: fine) {
+  .ugc__track { cursor: grab; }
+  .ugc__track.is-dragging { cursor: grabbing; scroll-snap-type: none; scroll-behavior: auto; user-select: none; }
+}
+
+.ugc__tile {
+  position: relative;
+  display: block;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-radius: var(--cau-r-lg);
+  background: var(--cau-mist);
+  scroll-snap-align: start;
+  color: inherit;
+  text-decoration: none;
+}
+.ugc__media { position: absolute; inset: 0; }
+.ugc__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform .3s ease;
+}
+.ugc__tile:hover .ugc__media img { transform: scale(1.04); }
+
+/* The gradient is a pseudo-element so it sits above the image but below the text. */
+.ugc__tile::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(to top, rgba(0, 0, 0, .58), rgba(0, 0, 0, 0) 46%);
+}
+
+.ugc__badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 9px;
+  border-radius: var(--cau-r-pill);
+  background: rgba(0, 0, 0, .55);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  color: #fff;
+  font-size: .6875rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.ugc__play { width: 9px; height: 11px; flex: 0 0 auto; }
+
+.ugc__caption {
+  position: absolute;
+  z-index: 2;
+  left: 12px;
+  right: 12px;
+  bottom: 11px;
+  display: grid;
+  gap: 1px;
+  color: #fff;
+}
+.ugc__caption-main {
+  font-size: .75rem;
+  font-weight: 700;
+  line-height: 1.3;
+  /* Review Focus 5: a long caption clamps instead of growing the tile. */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.ugc__caption-sub { font-size: .6875rem; font-weight: 600; opacity: .8; }
+
+@media screen and (min-width: 561px) {
+  .ugc__track { --ugc-col: calc((100% - 1.4 * var(--ugc-gap)) / 2.4); }
+}
+
+@media screen and (min-width: 901px) {
+  .ugc__title { font-size: 1.5rem; }
+  .ugc__track {
+    --ugc-gap: 14px;
+    --ugc-col: calc((100% - 3 * var(--ugc-gap)) / 4);
+    margin-inline: 0;
+    padding-inline: 0;
+    scroll-padding-inline: 0;
+  }
+  /* Heading left, handle and arrows right. The auto margin goes on the handle
+     because it is the first of the two in the DOM: it absorbs all the free space,
+     and the arrows ride along beside it. An auto margin on both would split the
+     space between them and strand the handle mid-row. Desktop only — below 901px
+     the head wraps, and a right-aligned link on its own line reads as a mistake. */
+  .ugc__handle { margin-inline-start: auto; }
+  .ugc__arrows { display: inline-flex; gap: 8px; margin-inline-start: 0; }
+}
+
+/* Pre-flight ruling: b9ebd82 capped and centred `.pdp-v2 .product` and the breadcrumb at
+   --cau-pdp-max. This section renders outside .pdp-v2, so without the same cap its container
+   runs ~170px wider on each side than the buy box directly above it, and spec line 365's
+   "directly under the buy box" stops reading. */
+@media screen and (min-width: 1080px) {
+  .ugc .container { max-width: calc(var(--cau-pdp-max) + var(--container-gutter) * 2); }
+}
+
+
+/* Editor-only: shows Kyle which slots are still empty. request.design_mode
+   keeps these out of the live storefront entirely. */
+.ugc__tile--empty {
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 8px;
+  background: var(--cau-mist);
+  box-shadow: inset 0 0 0 1px var(--cau-hairline);
+  color: var(--cau-ink-300);
+}
+.ugc__tile--empty::after { content: none; }
+.ugc__tile--empty .ugc__glyph { width: 26px; height: 26px; }
+.ugc__tile--empty span { font-size: .6875rem; font-weight: 700; letter-spacing: .08em; }
+
+.ugc__progress {
+  overflow: hidden;
+  height: 3px;
+  margin-top: var(--cau-s3);
+  border-radius: var(--cau-r-pill);
+  background: var(--cau-hairline);
+}
+.ugc__progress[hidden] { display: none; }
+.ugc__progress span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--cau-ink-900);
+}
+.ugc__arrows[hidden] { display: none; }
+.ugc__arrow {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1.5px solid var(--cau-hairline);
+  border-radius: var(--cau-r-pill);
+  background: var(--cau-paper);
+  color: var(--cau-ink-900);
+  cursor: pointer;
+  transition: border-color .15s ease;
+}
+.ugc__arrow:hover { border-color: var(--cau-ink-900); }
+.ugc__arrow svg { width: 16px; height: 16px; }
+
+/* ---------------------------------------------------------------------------
+   Lightbox. Ported from the prototype's #ugcModal (.ugcbox__* rules), with its
+   bare --ink-700 / --paper / --r-lg variables mapped onto the --cau-* tokens.
+   The prototype fades via .modal.open; here the dialog is held by the [hidden]
+   attribute instead, so the panel animates in on mount and there is no state
+   class to keep in sync.
+   --------------------------------------------------------------------------- */
+
+.ugcbox {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(10, 10, 12, .46);
+  overscroll-behavior: contain;
+}
+.ugcbox[hidden] { display: none; }
+
+.ugcbox__panel {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(280px, 340px);
+  max-width: min(100%, 1100px);
+  max-height: calc(100dvh - 40px);
+  overflow: hidden;
+  border: 1px solid var(--cau-hairline);
+  border-radius: var(--cau-r-lg);
+  background: var(--cau-paper);
+  box-shadow: 0 30px 80px -30px rgba(0, 0, 0, .5);
+  animation: ugcbox-in .22s cubic-bezier(.32, .72, 0, 1);
+}
+@keyframes ugcbox-in { from { transform: scale(.96); } to { transform: scale(1); } }
+@media (prefers-reduced-motion: reduce) { .ugcbox__panel { animation: none; } }
+
+.ugcbox__media {
+  position: relative;
+  height: min(calc(100dvh - 80px), 820px);
+  aspect-ratio: 4 / 5;
+  background: #000;
+  touch-action: pan-y;
+}
+.ugcbox__media img,
+.ugcbox__media video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.ugcbox__media img[hidden], .ugcbox__media video[hidden] { display: none; }
+.ugcbox__media .ugc__badge { left: 12px; right: auto; top: 12px; }
+
+.ugcbox__close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: var(--cau-r-pill);
+  background: rgba(255, 255, 255, .94);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  color: var(--cau-ink-900);
+  cursor: pointer;
+}
+.ugcbox__close svg { width: 17px; height: 17px; }
+
+.ugcbox__body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: var(--cau-s6);
+  overflow: auto;
+}
+.ugcbox__user { display: flex; align-items: center; gap: 10px; font-size: .9375rem; padding-right: 40px; }
+.ugcbox__cap { margin: 0; color: var(--cau-ink-700); font-size: .9375rem; line-height: 1.55; }
+.ugcbox__cap[hidden] { display: none; }
+
+.ugcbox__shop {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid var(--cau-hairline);
+  border-radius: var(--cau-r-md);
+  background: var(--cau-panel);
+  color: inherit;
+  text-decoration: none;
+  transition: border-color .15s ease;
+}
+.ugcbox__shop[hidden] { display: none; }
+.ugcbox__shop:hover { border-color: var(--cau-ink-900); }
+.ugcbox__shop img { width: 48px; height: 48px; flex: 0 0 auto; border-radius: 6px; object-fit: cover; background: var(--cau-mist); }
+.ugcbox__sp { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.ugcbox__sp b { font-size: .8125rem; line-height: 1.3; }
+.ugcbox__sp span { font-size: .8125rem; font-weight: 600; color: var(--cau-ink-400); }
+.ugcbox__shopcta { font-size: .8125rem; font-weight: 700; white-space: nowrap; }
+
+.ugcbox__nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: auto;
+  font-size: .8125rem;
+  color: var(--cau-ink-400);
+  font-variant-numeric: tabular-nums;
+}
+.ugcbox__ig {
+  font-size: .8125rem;
+  font-weight: 600;
+  color: var(--cau-ink-400);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.ugcbox__ig:hover { color: var(--cau-ink-900); }
+
+/* The tile is a control now, so it needs the button reset. */
+.ugc__tile { padding: 0; border: 0; font: inherit; text-align: inherit; cursor: pointer; width: 100%; }
+.ugc__tile--empty { cursor: default; }
+
+@media screen and (max-width: 560px) {
+  .ugcbox { padding: 12px; }
+  .ugcbox__panel { width: 100%; grid-template-columns: 1fr; max-height: calc(100dvh - 24px); overflow: auto; }
+  .ugcbox__media { width: 100%; height: auto; max-height: 62dvh; }
+  .ugcbox__body { padding: var(--cau-s4) var(--cau-s4) var(--cau-s6); overflow: visible; }
+}
+
+/* Pairs with tabindex="0" on the track: a focusable scroll container that shows
+   no focus ring is worse than one that is not focusable. Inset because both the
+   track and the tiles clip overflow, which would eat an outset ring. */
+.ugc__track:focus-visible { outline: 2px solid var(--cau-ink-900); outline-offset: -2px; }
+.ugc__tile:focus-visible { outline: 2px solid var(--cau-ink-900); outline-offset: -2px; }

@@ -1,0 +1,61 @@
+{%- comment -%}
+  Verified by the team, and the trust links under it.
+
+  In: block (required)
+
+  The returns wording deliberately differs from the prototype. The prototype
+  said "14-day size exchange"; the published refund policy says a strict
+  no-return policy with a 9% handling fee and store credit. The page states
+  what the policy states.
+
+  The seal falls back to the same artwork the gallery badge uses, so the panel
+  works before anyone opens the theme editor.
+{%- endcomment -%}
+
+{%- if block.settings.verified_text != blank -%}
+  <div class="pdp-v2__verified" {{ block.shopify_attributes }}>
+    {%- if block.settings.verified_seal != blank -%}
+      {{ block.settings.verified_seal | image_url: width: 104 | image_tag: class: 'pdp-v2__verified-seal', loading: 'lazy', width: 52, height: 52, alt: '' }}
+    {%- else -%}
+      <img class="pdp-v2__verified-seal" src="{{ 'pdp-seal.png' | asset_url }}" width="52" height="52" alt="" loading="lazy">
+    {%- endif -%}
+    <p>
+      {%- if block.settings.verified_lead != blank -%}<b>{{ block.settings.verified_lead | escape }}</b> {% endif -%}
+      {{ block.settings.verified_text | escape }}
+      {%- if block.settings.verified_link_label != blank -%}
+        <a href="{{ block.settings.verified_link | default: '#verify' }}">{{ block.settings.verified_link_label | escape }}</a>
+      {%- endif -%}
+    </p>
+  </div>
+{%- endif -%}
+
+{%- if block.settings.microtrust != blank -%}
+  {%- comment -%}
+    Each line is "text|url|icon". The icon keyword is optional and falls back
+    to the van, which is the one most of these lines are about. The glyphs are
+    the prototype's own, kept as a small named set so a merchant picks a word
+    rather than pasting SVG into a setting.
+  {%- endcomment -%}
+  {%- assign trust_rows = block.settings.microtrust | strip | newline_to_br | split: '<br />' -%}
+  <div class="pdp-v2__microtrust">
+    {%- for row in trust_rows -%}
+      {%- assign cell = row | strip | split: '|' -%}
+      {%- if cell[0] != blank -%}
+        {%- assign icon = cell[2] | default: 'van' | strip | downcase -%}
+        <a href="{{ cell[1] | default: '#shipping' | strip }}">
+          {%- case icon -%}
+            {%- when 'box' -%}
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7"/><path d="M3 7l3-4h12l3 4"/><path d="M9 11a3 3 0 0 0 6 0"/></svg>
+            {%- when 'shield' -%}
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.4-3.1 7.9-8 9-4.9-1.1-8-4.6-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg>
+            {%- when 'clock' -%}
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+            {%- else -%}
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7h13v8H3z"/><path d="M16 10h3l2 3v2h-5z"/><circle cx="7" cy="18" r="1.6"/><circle cx="17" cy="18" r="1.6"/></svg>
+          {%- endcase -%}
+          {{ cell[0] | strip | escape }}
+        </a>
+      {%- endif -%}
+    {%- endfor -%}
+  </div>
+{%- endif -%}

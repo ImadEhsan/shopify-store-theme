@@ -1,0 +1,838 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "slideshow": {
+      "type": "slideshow",
+      "blocks": {
+        "image_UGX9JA": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/slider-sale-desktop.png",
+            "mobile_image": "shopify://shop_images/slider-sale-mobile.png",
+            "text_position": "middle_center",
+            "subheading": "",
+            "title": "",
+            "button_1_text": "",
+            "button_1_link": "shopify://collections/christmas-sale",
+            "button_2_text": "",
+            "button_2_link": "",
+            "text_color": "#ffffff",
+            "button_background": "#ffffff",
+            "button_text_color": "#000000",
+            "overlay_color": "#000000",
+            "overlay_opacity": 0
+          }
+        },
+        "image_DLht7w": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/slider-sneakers-desktop.png",
+            "mobile_image": "shopify://shop_images/slider-sneakers-mobile.png",
+            "text_position": "middle_center",
+            "subheading": "",
+            "title": "",
+            "button_1_text": "",
+            "button_1_link": "shopify://collections/eofy-2026",
+            "button_2_text": "",
+            "button_2_link": "",
+            "text_color": "#ffffff",
+            "button_background": "#ffffff",
+            "button_text_color": "#000000",
+            "overlay_color": "#000000",
+            "overlay_opacity": 0
+          }
+        },
+        "image_b4GKdJ": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/slider-essentials-desktop.png",
+            "mobile_image": "shopify://shop_images/slider-essentials-mobile.png",
+            "text_position": "middle_center",
+            "subheading": "",
+            "title": "",
+            "button_1_text": "",
+            "button_1_link": "shopify://collections/essentials",
+            "button_2_text": "",
+            "button_2_link": "",
+            "text_color": "#ffffff",
+            "button_background": "#ffffff",
+            "button_text_color": "#000000",
+            "overlay_color": "#000000",
+            "overlay_opacity": 0
+          }
+        },
+        "image_KKYpBX": {
+          "type": "image",
+          "disabled": true,
+          "settings": {
+            "text_position": "middle_center",
+            "subheading": "",
+            "title": "",
+            "button_1_text": "",
+            "button_1_link": "",
+            "button_2_text": "",
+            "button_2_link": "",
+            "text_color": "#ffffff",
+            "button_background": "#ffffff",
+            "button_text_color": "#000000",
+            "overlay_color": "#000000",
+            "overlay_opacity": 0
+          }
+        },
+        "image_EVc6AH": {
+          "type": "image",
+          "disabled": true,
+          "settings": {
+            "text_position": "middle_center",
+            "subheading": "",
+            "title": "",
+            "button_1_text": "",
+            "button_1_link": "shopify://collections/labubu",
+            "button_2_text": "",
+            "button_2_link": "",
+            "text_color": "#ffffff",
+            "button_background": "#ffffff",
+            "button_text_color": "#000000",
+            "overlay_color": "#000000",
+            "overlay_opacity": 0
+          }
+        }
+      },
+      "block_order": [
+        "image_UGX9JA",
+        "image_DLht7w",
+        "image_b4GKdJ",
+        "image_KKYpBX",
+        "image_EVc6AH"
+      ],
+      "settings": {
+        "section_height": "medium",
+        "transition_type": "fade",
+        "show_initial_transition": false,
+        "autoplay": true,
+        "cycle_speed": 8,
+        "background": "#ffffff"
+      }
+    },
+    "custom_html_mFQm67": {
+      "type": "custom-html",
+      "name": "Custom HTML",
+      "settings": {
+        "subheading": "",
+        "title": "",
+        "html": "<div class=\"sticker-row-1\">\n<img class=\"sticker-shipping\" src=\"https://cdn.shopify.com/s/files/1/0583/5839/8999/files/20260118_Sticker_Shipping.png?v=1768995698\">\n</div>\n<div class=\"sticker-row-2\">\n<img class=\"sticker-authentic\" src=\"https://cdn.shopify.com/s/files/1/0583/5839/8999/files/CoppedAU_Authentic_Sticker.png?v=1782639801\">\n</div>",
+        "background_type": "full_width",
+        "add_vertical_spacing": false,
+        "background": "rgba(0,0,0,0)",
+        "text_color": "rgba(0,0,0,0)"
+      }
+    },
+    "featured-collections": {
+      "type": "featured-collections",
+      "blocks": {
+        "collection-1": {
+          "type": "collection",
+          "settings": {
+            "collection": "eofy-2026",
+            "label": "Sale",
+            "button_text": "View all",
+            "button_url": ""
+          }
+        }
+      },
+      "block_order": [
+        "collection-1"
+      ],
+      "custom_css": [],
+      "settings": {
+        "subheading": "",
+        "title": "STEALS",
+        "content": "",
+        "products_count": 15,
+        "mobile_products_per_row": "2",
+        "products_per_row": 5,
+        "stack_products": false,
+        "show_cta": false,
+        "background": "rgba(0,0,0,0)",
+        "text_color": "rgba(0,0,0,0)",
+        "button_background": "rgba(0,0,0,0)",
+        "button_text_color": "rgba(0,0,0,0)"
+      }
+    },
+    "1762671569f3599575": {
+      "type": "_blocks",
+      "blocks": {
+        "ai_gen_block_34d1e71_HDkbBH": {
+          "type": "ai_gen_block_34d1e71",
+          "settings": {
+            "logo_width": 140,
+            "logo_height": 50,
+            "logo_spacing": 100,
+            "padding_top": 40,
+            "padding_bottom": 40,
+            "animation_speed": 25,
+            "background_color": "#282828",
+            "grayscale_amount": 100,
+            "hover_opacity": 70,
+            "logo_1": "shopify://shop_images/brand-logo-1.png",
+            "collection_1": "",
+            "logo_2": "shopify://shop_images/brand-logo-2.png",
+            "collection_2": "",
+            "logo_3": "shopify://shop_images/brand-logo-3.png",
+            "collection_3": "",
+            "logo_4": "shopify://shop_images/brand-logo-4.png",
+            "collection_4": "",
+            "logo_5": "shopify://shop_images/brand-logo-5.png",
+            "collection_5": "",
+            "logo_6": "shopify://shop_images/brand-logo-6.png",
+            "collection_6": "",
+            "logo_7": "shopify://shop_images/brand-logo-7.png",
+            "collection_7": "",
+            "logo_8": "shopify://shop_images/brand-logo-8.png",
+            "collection_8": ""
+          },
+          "blocks": {}
+        }
+      },
+      "block_order": [
+        "ai_gen_block_34d1e71_HDkbBH"
+      ],
+      "name": "Logo Carousel",
+      "settings": {
+        "include_horizontal_margins": false,
+        "include_vertical_margins": false
+      }
+    },
+    "multi_column_trust_qzPcAL": {
+      "type": "multi-column-trust",
+      "blocks": {
+        "item_wj3tff": {
+          "type": "item",
+          "settings": {
+            "image": "shopify://shop_images/icon-shipping-white.png",
+            "image_width": 100,
+            "image_border": "rgba(0,0,0,0)",
+            "title": "Free Shipping",
+            "content": "<p>Free shipping on all orders over $300, Australia wide.</p>",
+            "link_text": "",
+            "link_url": "",
+            "link_style": "link",
+            "text_alignment": "center",
+            "vertical_alignment": "start"
+          }
+        },
+        "item_ApjYdG": {
+          "type": "item",
+          "settings": {
+            "image": "shopify://shop_images/icon-authentic-white.png",
+            "image_width": 100,
+            "image_border": "rgba(0,0,0,0)",
+            "title": "Authenticity",
+            "content": "<p>All items are verified by us with 100% Authenticity guarantee.</p>",
+            "link_text": "",
+            "link_url": "",
+            "link_style": "link",
+            "text_alignment": "center",
+            "vertical_alignment": "start"
+          }
+        },
+        "item_zG4YzE": {
+          "type": "item",
+          "settings": {
+            "image": "shopify://shop_images/icon-returns-white.png",
+            "image_width": 100,
+            "image_border": "rgba(0,0,0,0)",
+            "title": "Friendly Support",
+            "content": "<p>Got a question? Our team is here to help.</p>",
+            "link_text": "",
+            "link_url": "",
+            "link_style": "link",
+            "text_alignment": "center",
+            "vertical_alignment": "start"
+          }
+        },
+        "item_7HWRjG": {
+          "type": "item",
+          "settings": {
+            "image": "shopify://shop_images/icon-secure-payment-white.png",
+            "image_width": 100,
+            "image_border": "rgba(0,0,0,0)",
+            "title": "Secure payments",
+            "content": "<p>Shop confidently knowing your payment is secure.</p>",
+            "link_text": "",
+            "link_url": "",
+            "link_style": "link",
+            "text_alignment": "center",
+            "vertical_alignment": "start"
+          }
+        }
+      },
+      "block_order": [
+        "item_wj3tff",
+        "item_ApjYdG",
+        "item_zG4YzE",
+        "item_7HWRjG"
+      ],
+      "name": "Multi-column-trust",
+      "settings": {
+        "reveal_on_scroll": true,
+        "stack_items": true,
+        "subheading": "",
+        "title": "",
+        "content": "",
+        "column_alignment": "left",
+        "mobile_item_size": "small",
+        "desktop_item_size": "large",
+        "spacing": "tight",
+        "background": "rgba(0,0,0,0)",
+        "text_color": "rgba(0,0,0,0)"
+      }
+    },
+    "featured-product": {
+      "type": "featured-product",
+      "blocks": {
+        "variant-picker": {
+          "type": "variant_picker",
+          "settings": {
+            "hide_sold_out_variants": false,
+            "selector_mode": "dropdown",
+            "color_mode": "dropdown",
+            "variant_image_options": "",
+            "size_chart_page": ""
+          }
+        },
+        "quantity-selector": {
+          "type": "quantity_selector",
+          "settings": {}
+        },
+        "buy-buttons": {
+          "type": "buy_buttons",
+          "settings": {
+            "show_payment_button": true,
+            "show_gift_card_recipient": false,
+            "atc_button_background": "#282828",
+            "atc_button_text_color": "#ffffff",
+            "buy_now_button_background": "rgba(0,0,0,0)",
+            "buy_now_button_text_color": "rgba(0,0,0,0)"
+          }
+        }
+      },
+      "block_order": [
+        "variant-picker",
+        "quantity-selector",
+        "buy-buttons"
+      ],
+      "settings": {
+        "product": "fear-of-god-essentials-fleece-hoodie-black-white-fw24",
+        "subheading": "",
+        "title": "COP OF THE MONTH",
+        "show_vendor": true,
+        "show_sku": false,
+        "show_badges": false,
+        "show_taxes_included": false,
+        "show_product_rating": false,
+        "show_share_buttons": false,
+        "help_page": "",
+        "enable_video_autoplay": true,
+        "enable_video_looping": false,
+        "enable_image_zoom": true,
+        "show_thumbnails_on_mobile": false,
+        "desktop_thumbnails_position": "left",
+        "transition_effect": "slide",
+        "background": "rgba(0,0,0,0)",
+        "text_color": "rgba(0,0,0,0)"
+      }
+    },
+    "1762681355c8d69da1": {
+      "type": "_blocks",
+      "blocks": {
+        "ai_gen_block_d65132a_Y4bcYg": {
+          "type": "ai_gen_block_d65132a",
+          "settings": {
+            "slide_1_enabled": true,
+            "slide_1_title": "WEAR IT YOUR WAY",
+            "slide_1_description": "Every month we hook someone up with a free piece. Drop your details and tell us what you're feeling.",
+            "slide_video_1": "shopify://files/videos/Sunglasses_On__How_to_Nail_the_Sophisticated_Street_Style.mp4",
+            "slide_1_product_text": "Cop The Look",
+            "slide_1_product_link": "shopify://products/fear-of-god-essentials-crewneck-stretch-limo-ss22",
+            "slide_1_social_text": "Put Me On",
+            "slide_1_social_link": "https://docs.google.com/forms/d/e/1FAIpQLScFHAvhpriE4xU4ymzfArjCWNc-Jj-EL7W25OMAADGllIPVgw/viewform?usp=header",
+            "slide_2_enabled": false,
+            "slide_2_title": "From our community",
+            "slide_2_description": "This is some text about the user, the post, and/or the product. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.",
+            "slide_video_2": "shopify://files/videos/Sunglasses_On__How_to_Nail_the_Sophisticated_Street_Style.mp4",
+            "slide_2_product_text": "Shop Now",
+            "slide_2_product_link": "https://coppedau.com.au/",
+            "slide_2_social_text": "Follow on",
+            "slide_2_social_link": "https://coppedau.com.au/",
+            "slide_3_enabled": false,
+            "slide_3_title": "",
+            "slide_3_description": "",
+            "slide_3_product_text": "",
+            "slide_3_product_link": "",
+            "slide_3_social_text": "",
+            "slide_3_social_link": "",
+            "slide_4_enabled": false,
+            "slide_4_title": "",
+            "slide_4_description": "",
+            "slide_4_product_text": "",
+            "slide_4_product_link": "",
+            "slide_4_social_text": "",
+            "slide_4_social_link": "",
+            "slide_5_enabled": false,
+            "slide_5_title": "",
+            "slide_5_description": "",
+            "slide_5_product_text": "",
+            "slide_5_product_link": "",
+            "slide_5_social_text": "",
+            "slide_5_social_link": ""
+          },
+          "blocks": {}
+        }
+      },
+      "block_order": [
+        "ai_gen_block_d65132a_Y4bcYg"
+      ],
+      "custom_css": [],
+      "name": "UGC",
+      "settings": {
+        "include_horizontal_margins": false,
+        "include_vertical_margins": false
+      }
+    },
+    "c067a4f9-70c0-45a6-ba9e-95202571ab93": {
+      "type": "rich-text",
+      "settings": {
+        "custom_class": ".rich-text {  padding-top: 40px;}",
+        "subheading": "",
+        "title": "WHAT YOU SAY MATTERS MOST!",
+        "content": "",
+        "button_text": "",
+        "button_link": "",
+        "background_type": "full_width",
+        "text_width": "fill",
+        "text_position": "center",
+        "text_alignment": "center",
+        "background": "rgba(0,0,0,0)",
+        "text_color": "#282828",
+        "button_background": "rgba(0,0,0,0)",
+        "button_text_color": "rgba(0,0,0,0)",
+        "padding_top": 16,
+        "padding_bottom": 0,
+        "mbl_padding_top": 20,
+        "mbl_padding_bottom": 20
+      }
+    },
+    "170303643748f5799f": {
+      "type": "apps",
+      "name": "Reviews",
+      "settings": {
+        "custom_class": "",
+        "include_horizontal_margins": false,
+        "include_vertical_margins": false
+      }
+    },
+    "featured_collections_z434AB": {
+      "type": "featured-collections",
+      "blocks": {
+        "collection_attiYc": {
+          "type": "collection",
+          "settings": {
+            "collection": "essentials",
+            "label": "",
+            "button_text": "View all",
+            "button_url": "shopify://collections/essentials"
+          }
+        }
+      },
+      "block_order": [
+        "collection_attiYc"
+      ],
+      "name": "Featured collections",
+      "settings": {
+        "subheading": "",
+        "title": "FEAR OF GOD",
+        "content": "",
+        "products_count": 8,
+        "mobile_products_per_row": "2",
+        "products_per_row": 5,
+        "stack_products": false,
+        "show_cta": false,
+        "background": "rgba(0,0,0,0)",
+        "text_color": "rgba(0,0,0,0)",
+        "button_background": "rgba(0,0,0,0)",
+        "button_text_color": "rgba(0,0,0,0)"
+      }
+    },
+    "promo_cards_pXmaKL": {
+      "type": "promo-cards",
+      "blocks": {
+        "card_QJwQHA": {
+          "type": "card",
+          "settings": {
+            "collection": "dunk",
+            "label": "New in",
+            "title": "Sneakers",
+            "button_text": "Shop now",
+            "link": ""
+          }
+        },
+        "card_R8jn6y": {
+          "type": "card",
+          "settings": {
+            "collection": "essentials",
+            "label": "Everyday",
+            "title": "Essentials",
+            "button_text": "Shop now",
+            "link": ""
+          }
+        },
+        "card_YQQYMr": {
+          "type": "card",
+          "settings": {
+            "collection": "christmas-sale",
+            "label": "Up to 40% off",
+            "title": "Sale",
+            "button_text": "Shop now",
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "card_QJwQHA",
+        "card_R8jn6y",
+        "card_YQQYMr"
+      ],
+      "name": "Promo cards",
+      "settings": {
+        "subheading": "Shop by category",
+        "heading": "Find your fit",
+        "columns_desktop": 3,
+        "card_shape": "portrait",
+        "mobile_scroll": true,
+        "text_color": "#ffffff",
+        "overlay_opacity": 45,
+        "padding_top": 48,
+        "padding_bottom": 48
+      }
+    },
+    "eccb554c-7973-4a82-bba0-78f8cfaf89d4": {
+      "type": "multi-column",
+      "blocks": {
+        "template--15027316064279__eccb554c-7973-4a82-bba0-78f8cfaf89d4-167075275178751870-1": {
+          "type": "item",
+          "settings": {
+            "image": "shopify://shop_images/collection-geedup.png",
+            "image_width": 100,
+            "image_border": "rgba(0,0,0,0)",
+            "title": "GEEDUP",
+            "content": "<p>Synonymous with street and hip-hop culture,</p>",
+            "link_text": "",
+            "link_url": "shopify://collections/geedup",
+            "link_style": "link",
+            "text_alignment": "left",
+            "vertical_alignment": "start"
+          }
+        },
+        "template--15027316064279__eccb554c-7973-4a82-bba0-78f8cfaf89d4-167075275178751870-2": {
+          "type": "item",
+          "settings": {
+            "image": "shopify://shop_images/collection-essentials.png",
+            "image_width": 100,
+            "image_border": "rgba(0,0,0,0)",
+            "title": "Essentials Fear of God",
+            "content": "<p>Laid-back streetwear staples built for everyday.</p>",
+            "link_text": "",
+            "link_url": "shopify://collections/essentials",
+            "link_style": "link",
+            "text_alignment": "left",
+            "vertical_alignment": "start"
+          }
+        },
+        "template--15027316064279__eccb554c-7973-4a82-bba0-78f8cfaf89d4-167075275178751870-3": {
+          "type": "item",
+          "settings": {
+            "image": "shopify://shop_images/collection-dunk.png",
+            "image_width": 100,
+            "image_border": "rgba(0,0,0,0)",
+            "title": "Nike Dunk",
+            "content": "<p>Sneakers that define culture, only from Nike.</p>",
+            "link_text": "",
+            "link_url": "shopify://collections/dunk",
+            "link_style": "link",
+            "text_alignment": "left",
+            "vertical_alignment": "start"
+          }
+        },
+        "item_c4PnGA": {
+          "type": "item",
+          "settings": {
+            "image": "shopify://shop_images/collection-tn.png",
+            "image_width": 100,
+            "image_border": "rgba(0,0,0,0)",
+            "title": "Nike Tns",
+            "content": "<p>Build your fit from the base. Start with something iconic.</p>",
+            "link_text": "",
+            "link_url": "shopify://collections/tn",
+            "link_style": "link",
+            "text_alignment": "left",
+            "vertical_alignment": "start"
+          }
+        }
+      },
+      "block_order": [
+        "template--15027316064279__eccb554c-7973-4a82-bba0-78f8cfaf89d4-167075275178751870-1",
+        "template--15027316064279__eccb554c-7973-4a82-bba0-78f8cfaf89d4-167075275178751870-2",
+        "template--15027316064279__eccb554c-7973-4a82-bba0-78f8cfaf89d4-167075275178751870-3",
+        "item_c4PnGA"
+      ],
+      "name": "Collections",
+      "settings": {
+        "reveal_on_scroll": true,
+        "stack_items": false,
+        "subheading": "",
+        "title": "Collections",
+        "content": "",
+        "column_alignment": "left",
+        "mobile_item_size": "medium",
+        "desktop_item_size": "medium",
+        "spacing": "normal",
+        "background": "rgba(0,0,0,0)",
+        "text_color": "rgba(0,0,0,0)"
+      }
+    },
+    "slideshow_nnYCJk": {
+      "type": "slideshow",
+      "blocks": {
+        "image_RpTNU9": {
+          "type": "image",
+          "settings": {
+            "text_position": "middle_center",
+            "subheading": "",
+            "title": "",
+            "button_1_text": "",
+            "button_1_link": "shopify://collections/christmas-sale",
+            "button_2_text": "",
+            "button_2_link": "",
+            "text_color": "#ffffff",
+            "button_background": "#ffffff",
+            "button_text_color": "#000000",
+            "overlay_color": "#000000",
+            "overlay_opacity": 0
+          }
+        }
+      },
+      "block_order": [
+        "image_RpTNU9"
+      ],
+      "disabled": true,
+      "name": "Slideshow",
+      "settings": {
+        "section_height": "medium",
+        "transition_type": "fade",
+        "show_initial_transition": false,
+        "autoplay": false,
+        "cycle_speed": 4,
+        "background": "rgba(0,0,0,0)"
+      }
+    },
+    "custom_html_XRye6n": {
+      "type": "custom-html",
+      "disabled": true,
+      "name": "Custom HTML",
+      "settings": {
+        "subheading": "",
+        "title": "",
+        "html": "<div class=\"sticker-row-3\">\n<img class=\"sticker-exchange\" src=\"https://cdn.shopify.com/s/files/1/0583/5839/8999/files/20260118_Sticker_exchange.png?v=1768995698\">\n</div>\n<div class=\"sticker-row-4\">\n<img class=\"sticker-payment\" src=\"https://cdn.shopify.com/s/files/1/0583/5839/8999/files/20260118_Sticker_Checkout.png?v=1768995698\">\n</div>",
+        "background_type": "full_width",
+        "add_vertical_spacing": false,
+        "background": "rgba(0,0,0,0)",
+        "text_color": "rgba(0,0,0,0)"
+      }
+    },
+    "featured_collections_zGm9zh": {
+      "type": "featured-collections",
+      "blocks": {
+        "collection_rCDwXb": {
+          "type": "collection",
+          "settings": {
+            "collection": "trending-mens",
+            "label": "Mens",
+            "button_text": "",
+            "button_url": ""
+          }
+        },
+        "collection_DY4pxg": {
+          "type": "collection",
+          "settings": {
+            "collection": "trending-womens-1",
+            "label": "Womens",
+            "button_text": "",
+            "button_url": ""
+          }
+        }
+      },
+      "block_order": [
+        "collection_rCDwXb",
+        "collection_DY4pxg"
+      ],
+      "name": "Shop all",
+      "settings": {
+        "subheading": "",
+        "title": "TRENDING",
+        "content": "",
+        "products_count": 8,
+        "mobile_products_per_row": "2",
+        "products_per_row": 5,
+        "stack_products": false,
+        "show_cta": false,
+        "background": "rgba(0,0,0,0)",
+        "text_color": "rgba(0,0,0,0)",
+        "button_background": "rgba(0,0,0,0)",
+        "button_text_color": "rgba(0,0,0,0)"
+      }
+    },
+    "image_with_text_9CiPiK": {
+      "type": "image-with-text",
+      "blocks": {
+        "item_YtAiRC": {
+          "type": "item",
+          "settings": {
+            "image": "shopify://shop_images/promo-authentic.png",
+            "tab_label": "Item",
+            "subheading": "",
+            "title": "COP WITH CONFIDENCE",
+            "content": "<p>At CoppedAU, every item is 100% verified and sourced from trusted retailers. Drops are limited, so secure your pair today knowing every purchase is backed by our authenticity guarantee.</p>",
+            "button_text": "Shop now",
+            "button_link": "shopify://collections/best-sellers-2025"
+          }
+        }
+      },
+      "block_order": [
+        "item_YtAiRC"
+      ],
+      "name": "Image with text",
+      "settings": {
+        "reveal_on_scroll": true,
+        "background_type": "full_width",
+        "background_overlap": "image",
+        "image_position": "left",
+        "text_alignment": "left",
+        "cycle_speed": 20,
+        "accent_background": "rgba(0,0,0,0)",
+        "text_color": "rgba(0,0,0,0)",
+        "button_background": "rgba(0,0,0,0)",
+        "button_text_color": "rgba(0,0,0,0)"
+      }
+    },
+    "multi_column_trust_Dx6WKR": {
+      "type": "multi-column-trust",
+      "blocks": {
+        "item_4phTeT": {
+          "type": "item",
+          "settings": {
+            "image_width": 100,
+            "image_border": "rgba(0,0,0,0)",
+            "title": "Free Shipping",
+            "content": "<p>Free shipping on all orders over $300, Australia wide.</p>",
+            "link_text": "",
+            "link_url": "",
+            "link_style": "link",
+            "text_alignment": "center",
+            "vertical_alignment": "start"
+          }
+        },
+        "item_WAUL4z": {
+          "type": "item",
+          "settings": {
+            "image_width": 100,
+            "image_border": "rgba(0,0,0,0)",
+            "title": "Authenticity",
+            "content": "<p>All items are verified by us with 100% Authenticity guarantee.</p>",
+            "link_text": "",
+            "link_url": "",
+            "link_style": "link",
+            "text_alignment": "center",
+            "vertical_alignment": "start"
+          }
+        },
+        "item_jVXCyx": {
+          "type": "item",
+          "settings": {
+            "image_width": 100,
+            "image_border": "rgba(0,0,0,0)",
+            "title": "Free exchange",
+            "content": "<p>We offer free size exchanges, so you can find the right fit.</p>",
+            "link_text": "",
+            "link_url": "",
+            "link_style": "link",
+            "text_alignment": "center",
+            "vertical_alignment": "start"
+          }
+        },
+        "item_D7NVG9": {
+          "type": "item",
+          "settings": {
+            "image_width": 100,
+            "image_border": "rgba(0,0,0,0)",
+            "title": "Secure payments",
+            "content": "<p>Shop confidently knowing your payment is secure.</p>",
+            "link_text": "",
+            "link_url": "",
+            "link_style": "link",
+            "text_alignment": "center",
+            "vertical_alignment": "start"
+          }
+        }
+      },
+      "block_order": [
+        "item_4phTeT",
+        "item_WAUL4z",
+        "item_jVXCyx",
+        "item_D7NVG9"
+      ],
+      "disabled": true,
+      "name": "Multi-column-trust",
+      "settings": {
+        "reveal_on_scroll": true,
+        "stack_items": true,
+        "subheading": "",
+        "title": "",
+        "content": "",
+        "column_alignment": "left",
+        "mobile_item_size": "small",
+        "desktop_item_size": "large",
+        "spacing": "tight",
+        "background": "rgba(0,0,0,0)",
+        "text_color": "rgba(0,0,0,0)"
+      }
+    }
+  },
+  "order": [
+    "slideshow",
+    "custom_html_mFQm67",
+    "featured-collections",
+    "1762671569f3599575",
+    "multi_column_trust_qzPcAL",
+    "featured-product",
+    "1762681355c8d69da1",
+    "c067a4f9-70c0-45a6-ba9e-95202571ab93",
+    "170303643748f5799f",
+    "featured_collections_z434AB",
+    "promo_cards_pXmaKL",
+    "eccb554c-7973-4a82-bba0-78f8cfaf89d4",
+    "slideshow_nnYCJk",
+    "custom_html_XRye6n",
+    "featured_collections_zGm9zh",
+    "image_with_text_9CiPiK",
+    "multi_column_trust_Dx6WKR"
+  ]
+}

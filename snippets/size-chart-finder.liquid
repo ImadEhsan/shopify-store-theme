@@ -1,0 +1,72 @@
+{%- comment -%}
+  Find my size: two dropdowns and an answer.
+
+  In: raw          (required) the grid text — the same the grid renders from
+      measurements (optional) the measurements text, so the answer can show
+                   what that size actually measures
+      row_label    (optional) label for the first axis, e.g. "Your height"
+      col_label    (optional) label for the second axis, e.g. "Your weight"
+      id_suffix    (optional) keeps ids unique when several are on a page
+
+  Labels fall back to the grid's own corner cell and a generic word, so a
+  chart with no labels set still works — it just reads less warmly.
+
+  The selects carry indexes into the parsed rows, not labels, so a heading
+  containing "|" or "~" cannot break the lookup.
+{%- endcomment -%}
+
+{%- capture sc_rows -%}{%- render 'size-chart-parse', raw: raw -%}{%- endcapture -%}
+{%- assign sc_rows = sc_rows | strip -%}
+{%- assign sc_row_list = sc_rows | split: '~~' -%}
+
+{%- capture sc_meas -%}{%- render 'size-chart-parse', raw: measurements -%}{%- endcapture -%}
+{%- assign sc_meas = sc_meas | strip -%}
+
+{%- if sc_row_list.size > 1 -%}
+  {%- assign head = sc_row_list[0] | split: '||' -%}
+  {%- if head.size > 1 -%}
+    {%- assign sfx = id_suffix | default: 'sc' -%}
+    {%- assign row_name = row_label | default: head[0] | default: 'Row' -%}
+    {%- assign col_name = col_label | default: 'Measurement' -%}
+
+    <div class="size-chart__finder"
+         data-size-finder
+         data-grid="{{ sc_rows | escape }}"
+         data-measurements="{{ sc_meas | escape }}">
+
+      <div class="size-chart__finder-fields">
+        <p class="size-chart__finder-field">
+          <label class="size-chart__finder-label" for="size-finder-row-{{ sfx }}">{{ row_name | escape }}</label>
+          <select class="size-chart__finder-select" id="size-finder-row-{{ sfx }}" data-size-finder-row>
+            <option value="-1">Select</option>
+            {%- for row in sc_row_list offset: 1 -%}
+              {%- assign cells = row | split: '||' -%}
+              <option value="{{ forloop.index }}">{{ cells[0] | escape }}</option>
+            {%- endfor -%}
+          </select>
+        </p>
+
+        <p class="size-chart__finder-field">
+          <label class="size-chart__finder-label" for="size-finder-col-{{ sfx }}">{{ col_name | escape }}</label>
+          <select class="size-chart__finder-select" id="size-finder-col-{{ sfx }}" data-size-finder-col>
+            <option value="-1">Select</option>
+            {%- for cell in head offset: 1 -%}
+              <option value="{{ forloop.index }}">{{ cell | escape }}</option>
+            {%- endfor -%}
+          </select>
+        </p>
+      </div>
+
+      <div class="size-chart__answer" data-size-finder-answer role="status" aria-live="polite">
+        <p class="size-chart__answer-empty" data-size-finder-empty>Pick both to see your size</p>
+
+        <div class="size-chart__answer-result" data-size-finder-result hidden>
+          <p class="size-chart__answer-caption">Your size is</p>
+          <p class="size-chart__answer-size" data-size-finder-size></p>
+          <p class="size-chart__answer-context" data-size-finder-context></p>
+          <p class="size-chart__answer-measures" data-size-finder-measures hidden></p>
+        </div>
+      </div>
+    </div>
+  {%- endif -%}
+{%- endif -%}

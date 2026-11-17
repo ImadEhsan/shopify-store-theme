@@ -1,0 +1,49 @@
+{%- comment -%}
+  Renders tab-separated text as a horizontally scrolling grid with the
+  first column pinned. Used for wide charts (height vs weight).
+  In: raw (required), caption (optional)
+
+  Same three rules as size-chart-table: capture the parser's output rather
+  than including it, escape every cell, and address body cells by index so
+  a short row keeps its padding.
+{%- endcomment -%}
+
+{%- capture sc_rows -%}{%- render 'size-chart-parse', raw: raw -%}{%- endcapture -%}
+{%- assign sc_row_list = sc_rows | strip | split: '~~' -%}
+
+{%- if sc_row_list.size > 1 -%}
+  {%- assign head = sc_row_list[0] | split: '||' -%}
+  {%- assign col_count = head.size -%}
+
+  {%- if caption != blank -%}
+    <p class="size-chart__caption">{{ caption | escape }}</p>
+  {%- endif -%}
+
+  <div class="size-chart__scroller" tabindex="0" role="region" aria-label="{{ caption | default: 'Size grid' | escape }}">
+    <table class="size-chart__grid">
+      <thead>
+        <tr>
+          {%- for cell in head -%}
+            <th scope="col" class="size-chart__gth{% if forloop.first %} size-chart__gth--pin{% endif %}">{{ cell | escape }}</th>
+          {%- endfor -%}
+        </tr>
+      </thead>
+      <tbody>
+        {%- for row in sc_row_list offset: 1 -%}
+          {%- assign cells = row | split: '||' -%}
+          <tr>
+            {%- for i in (1..col_count) -%}
+              {%- assign idx = forloop.index0 -%}
+              {%- assign cell = cells[idx] | default: '' -%}
+              {%- if forloop.first -%}
+                <th scope="row" class="size-chart__gth size-chart__gth--pin">{{ cell | escape }}</th>
+              {%- else -%}
+                <td class="size-chart__gtd">{{ cell | escape }}</td>
+              {%- endif -%}
+            {%- endfor -%}
+          </tr>
+        {%- endfor -%}
+      </tbody>
+    </table>
+  </div>
+{%- endif -%}

@@ -1,0 +1,322 @@
+{%- comment -%}
+  The details + About this piece (matching PDP prototype).
+
+  One parser splits the single description field:
+  any "Key: value" line becomes a Specs row and is taken out of the prose.
+{%- endcomment -%}
+
+{%- assign source = product.description -%}
+{%- assign has_text = source | strip_html | strip -%}
+{%- if has_text != blank -%}
+{% capture nl %}
+{% endcapture %}
+{%- liquid
+  assign mark = '%%cau-line%%'
+  assign inline_tags = ' strong b em i u s a span font small sup sub mark br '
+
+  assign marked = source | replace: '</p>', '</p>%%cau-line%%' | replace: '</li>', '</li>%%cau-line%%' | replace: '</div>', '</div>%%cau-line%%'
+  assign marked = marked | replace: '</h1>', '</h1>%%cau-line%%' | replace: '</h2>', '</h2>%%cau-line%%' | replace: '</h3>', '</h3>%%cau-line%%'
+  assign marked = marked | replace: '</h4>', '</h4>%%cau-line%%' | replace: '</h5>', '</h5>%%cau-line%%' | replace: '</h6>', '</h6>%%cau-line%%'
+  assign marked = marked | replace: '<br', '%%cau-line%%<br'
+  assign chunks = marked | split: mark
+
+  # Pass 1: flag each line. "s" spec, "n" anything else.
+  assign flags = ''
+  assign spec_count = 0
+  assign in_group = false
+  for chunk in chunks
+    assign flag = 'n'
+    assign text = chunk | strip_html | replace: '&nbsp;', ' ' | strip
+    assign head = chunk | slice: 0, 3
+    assign last_char = text | slice: -1
+    assign grouped = false
+    if in_group and head == '<br'
+      assign grouped = true
+    endif
+    if grouped == false and text contains ':'
+      assign raw_key = text | split: ':' | first
+      assign key = raw_key | strip
+      assign cut = raw_key.size | plus: 1
+      assign value = text | slice: cut, 1000 | strip
+      assign key_ok = true
+      if key.size == 0 or key.size >= 30 or value.size == 0 or value.size >= 120
+        assign key_ok = false
+      endif
+      if key_ok
+        assign first_char = key | slice: 0
+        assign first_up = first_char | upcase
+        assign first_down = first_char | downcase
+        if first_up == first_down
+          assign key_ok = false
+        endif
+      endif
+      if key_ok
+        for d in (0..9)
+          assign digit = d | append: ''
+          if key contains digit
+            assign key_ok = false
+            break
+          endif
+        endfor
+      endif
+      if key_ok
+        assign key_probe = key | replace: ' / ', ' '
+        assign words = key_probe | split: ' '
+        if words.size > 3 or key contains 'TCG'
+          assign key_ok = false
+        endif
+      endif
+      if key_ok
+        assign flag = 's'
+        assign spec_count = spec_count | plus: 1
+      endif
+    endif
+    if grouped == false
+      assign in_group = false
+      if last_char == ':'
+        assign in_group = true
+      endif
+    endif
+    assign flags = flags | append: flag
+  endfor
+
+  assign show_specs = false
+  if section.settings.show_specs and spec_count >= 2
+    assign show_specs = true
+  endif
+-%}
+
+{%- comment -%} Pass 2: rebuild the prose, collect the rows. {%- endcomment -%}
+{%- capture prose -%}
+  {%- liquid
+    assign prev_removed = false
+    assign in_faq = false
+    for chunk in chunks
+      assign i = forloop.index0
+      assign flag = flags | slice: i
+      assign next_i = i | plus: 1
+      assign next_flag = flags | slice: next_i
+      assign text = chunk | strip_html | replace: '&nbsp;', ' ' | strip
+
+      if section.settings.strip_faq
+        assign is_head_probe = false
+        if chunk contains '<h1' or chunk contains '<h2' or chunk contains '<h3' or chunk contains '<h4' or chunk contains '<strong'
+          assign is_head_probe = true
+        endif
+        assign text_up = text | remove: ':' | strip | upcase
+        if is_head_probe and text_up == 'FAQ' or text_up == 'FREQUENTLY ASKED QUESTIONS' or text_up == 'COMMON QUESTIONS'
+          assign in_faq = true
+        endif
+      endif
+
+      assign drop = false
+      if in_faq
+        assign is_new_head = false
+        if chunk contains '<h1' or chunk contains '<h2' or chunk contains '<h3' or chunk contains '<h4'
+          assign text_up = text | remove: ':' | strip | upcase
+          if text_up != 'FAQ' and text_up != 'FREQUENTLY ASKED QUESTIONS' and text_up != 'COMMON QUESTIONS'
+            assign is_new_head = true
+          endif
+        endif
+        if is_new_head
+          assign in_faq = false
+        else
+          assign drop = true
+        endif
+      endif
+
+      if drop == false and show_specs
+        if flag == 's'
+          assign drop = true
+        elsif next_flag == 's' and text.size > 0 and text.size <= 40 and chunk contains '</strong>'
+          assign before_bold = chunk | split: '<strong' | first | strip_html | strip
+          assign after_bold = chunk | append: ' ' | split: '</strong>' | last | strip_html | strip
+          if before_bold == blank and after_bold == blank
+            assign drop = true
+          endif
+        endif
+
+        if drop == false and text.size > 0 and text.size <= 60
+          assign is_head = false
+          if chunk contains '<h1' or chunk contains '<h2' or chunk contains '<h3' or chunk contains '<h4'
+            assign is_head = true
+          endif
+          if is_head
+            assign span_has_prose = false
+            for j in (1..60)
+              assign k = i | plus: j
+              assign f = flags | slice: k
+              if f == ''
+                break
+              endif
+              assign nxt = chunks[k]
+              if nxt contains '<h1' or nxt contains '<h2' or nxt contains '<h3' or nxt contains '<h4'
+                break
+              endif
+              if f == 'n'
+                assign nxt_text = nxt | strip_html | replace: '&nbsp;', ' ' | strip
+                if nxt_text.size > 0
+                  assign span_has_prose = true
+                  break
+                endif
+              endif
+            endfor
+            if span_has_prose == false
+              assign drop = true
+            endif
+          endif
+        endif
+      endif
+
+      if drop
+        assign parts = chunk | split: '<'
+        for part in parts
+          if forloop.first
+            continue
+          endif
+          assign tag_inner = part | split: '>' | first
+          assign tag_name = tag_inner | split: ' ' | first | remove: '/' | strip | downcase
+          assign first_letter = tag_name | slice: 0
+          if tag_name == blank or tag_name == 'br' or first_letter == '!'
+            continue
+          endif
+          assign padded = ' ' | append: tag_name | append: ' '
+          if inline_tags contains padded
+            assign closer = '</' | append: tag_name | append: '>'
+            assign opener_bare = '<' | append: tag_name | append: '>'
+            assign opener_attr = '<' | append: tag_name | append: ' '
+            assign close_slash = tag_inner | slice: 0
+            if close_slash == '/'
+              if chunk contains opener_bare or chunk contains opener_attr
+                continue
+              endif
+            elsif chunk contains closer
+              continue
+            endif
+          endif
+          echo '<' | append: tag_inner | append: '>'
+        endfor
+        assign prev_removed = true
+      else
+        assign out = chunk
+        assign head = chunk | slice: 0, 3
+        if prev_removed and head == '<br'
+          assign br_tag = chunk | split: '>' | first | append: '>'
+          assign out = chunk | remove_first: br_tag
+        endif
+        echo out
+        assign prev_removed = false
+      endif
+    endfor
+  -%}
+{%- endcapture -%}
+
+{%- capture empty_ul_nl -%}<ul>{{ nl }}</ul>{%- endcapture -%}
+{%- assign prose = prose | remove: '<li></li>' | remove: '<p></p>' | remove: '<ul></ul>' | remove: empty_ul_nl | remove: '<div></div>' -%}
+
+{{ 'product-description.css' | asset_url | stylesheet_tag }}
+
+<section class="pdp-desc" id="details">
+  <div class="container">
+    {%- if show_specs -%}
+      <div class="pdp-desc__pair">
+        <div class="pdp-desc__col pdp-desc__col--specs" id="specs">
+          {%- if section.settings.specs_heading != blank -%}
+            <h2 class="pdp-desc__title">{{ section.settings.specs_heading | escape }}</h2>
+          {%- endif -%}
+          {%- if section.settings.specs_lead != blank -%}
+            <p class="pdp-desc__lead">{{ section.settings.specs_lead | escape }}</p>
+          {%- endif -%}
+          <dl class="pdp-specs pdp-v2__tnum">
+            {%- for chunk in chunks -%}
+              {%- assign flag = flags | slice: forloop.index0 -%}
+              {%- if flag == 's' -%}
+                {%- liquid
+                  assign text = chunk | strip_html | replace: '&nbsp;', ' ' | strip
+                  assign raw_key = text | split: ':' | first
+                  assign cut = raw_key.size | plus: 1
+                  assign value = text | slice: cut, 1000 | strip
+                -%}
+                <div class="pdp-specs__row">
+                  <dt>{{ raw_key | strip }}</dt>
+                  <dd>{{ value }}</dd>
+                </div>
+              {%- endif -%}
+            {%- endfor -%}
+          </dl>
+        </div>
+
+        <div class="pdp-desc__col pdp-desc__col--prose" id="description">
+          {%- if section.settings.description_heading != blank -%}
+            <h2 class="pdp-desc__title">{{ section.settings.description_heading | escape }}</h2>
+          {%- endif -%}
+          <div class="pdp-desc__prose rte">{{ prose }}</div>
+        </div>
+      </div>
+    {%- else -%}
+      <div class="pdp-desc__single" id="description">
+        {%- if section.settings.description_heading != blank -%}
+          <h2 class="pdp-desc__title">{{ section.settings.description_heading | escape }}</h2>
+        {%- endif -%}
+        <div class="pdp-desc__prose rte">{{ prose }}</div>
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "The details & about",
+  "tag": "section",
+  "class": "shopify-section--product-description",
+  "enabled_on": { "templates": ["product"] },
+  "settings": [
+    {
+      "type": "header",
+      "content": "The details (Specs)"
+    },
+    {
+      "type": "text",
+      "id": "specs_heading",
+      "label": "Specs heading",
+      "default": "The details"
+    },
+    {
+      "type": "text",
+      "id": "specs_lead",
+      "label": "Specs lead text",
+      "default": "The facts first — everything you'd want to check before you cop."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_specs",
+      "label": "Show specs",
+      "info": "Lines written as \"Key: value\" in the product description move into a specs table. Needs at least two such lines.",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "About this piece (Description)"
+    },
+    {
+      "type": "text",
+      "id": "description_heading",
+      "label": "Description heading",
+      "default": "About this piece"
+    },
+    {
+      "type": "checkbox",
+      "id": "strip_faq",
+      "label": "Remove duplicate FAQ from description",
+      "default": true,
+      "info": "Hides FAQ headings and questions embedded in the description text, so they don't duplicate the Common Questions section."
+    }
+  ],
+  "presets": [
+    {
+      "name": "The details & about"
+    }
+  ]
+}
+{% endschema %}

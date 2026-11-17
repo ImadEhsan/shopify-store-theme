@@ -1,0 +1,1205 @@
+/* Reviews. The heading and rating summary are the original section; everything
+   from .pdp-reviews__panel down is the list we now render ourselves from Loox's
+   Storefront API.
+
+   Mobile first: one column, summary wrapping under the heading. From 901px the
+   summary sits beside the heading and the cards go two-up, matching the UGC
+   carousel's breakpoint so the two sections change shape together. */
+
+.pdp-reviews {
+  padding-block: var(--cau-section-pad) 0;
+  scroll-margin-top: calc(var(--cau-header-h) + var(--cau-s4));
+}
+
+/* ── Heading row ─────────────────────────────────────────────────────────── */
+
+.pdp-reviews__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px var(--cau-s4);
+}
+
+.pdp-reviews__title {
+  margin: 0;
+  font-size: clamp(1.25rem, 3vw, 1.5rem);
+  font-weight: 700;
+  letter-spacing: -.02em;
+  color: var(--cau-ink-900);
+}
+
+/* ── Summary panel ───────────────────────────────────────────────────────── */
+
+.pdp-reviews__panel { margin-top: var(--cau-s4); }
+.pdp-reviews__panel[hidden] { display: none; }
+
+.pdp-reviews__top {
+  display: flex;
+  align-items: center;
+  gap: var(--cau-s6);
+  flex-wrap: wrap;
+  margin: var(--cau-s3) 0 var(--cau-s6);
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.pdp-reviews__big {
+  display: flex;
+  align-items: center;
+  gap: var(--cau-s4);
+}
+
+.pdp-reviews__avg {
+  font-size: 3rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -.03em;
+  color: var(--cau-ink-900);
+}
+
+.pdp-reviews__score-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.pdp-reviews__bigstars { align-self: auto; font-size: 16px; line-height: 1; }
+
+.pdp-reviews__basis {
+  font-size: .875rem;
+  color: var(--cau-ink-400);
+}
+
+@media screen and (max-width: 560px) {
+  .pdp-reviews__avg {
+    font-size: 2.5rem;
+  }
+}
+
+/* ── Rating breakdown, which is also the star filter ─────────────────────── */
+
+.pdp-reviews__dist {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 2px;
+  width: 100%;
+}
+
+.pdp-reviews__distrow {
+  width: 100%;
+  list-style: none;
+}
+
+.pdp-reviews__distbtn {
+  display: grid;
+  grid-template-columns: 34px 1fr 2.5rem;
+  align-items: center;
+  gap: var(--cau-s3);
+  width: 100%;
+  padding: 5px 8px;
+  border: 0;
+  border-radius: var(--cau-r-sm);
+  background: none;
+  font: inherit;
+  font-size: .8125rem;
+  color: var(--cau-ink-700);
+  cursor: pointer;
+  text-align: start;
+  transition: background-color .15s ease;
+}
+.pdp-reviews__distbtn:hover:not(:disabled) { background: var(--cau-mist); }
+.pdp-reviews__distbtn:disabled { cursor: default; opacity: .45; }
+.pdp-reviews__distbtn.is-on { background: var(--cau-mist); }
+.pdp-reviews__distbtn.is-on .pdp-reviews__distlabel { color: var(--cau-ink-900); }
+
+.pdp-reviews__distlabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.pdp-reviews__distlabel span { color: var(--cau-rating); }
+
+.pdp-reviews__bar {
+  display: block;
+  min-width: 0;
+  width: 100%;
+  height: 6px;
+  border-radius: var(--cau-r-pill);
+  background: var(--cau-rating-empty);
+  overflow: hidden;
+}
+.pdp-reviews__bar > span {
+  --w: 0%;
+  display: block;
+  height: 100%;
+  width: var(--w);
+  border-radius: inherit;
+  background: var(--cau-rating);
+  /* Bars grow from nothing on first paint, and again on every filter change.
+     Suppressed under reduced-motion at the foot of this file. */
+  transition: width .5s cubic-bezier(.32, .72, 0, 1);
+}
+
+.pdp-reviews__distnum { text-align: end; color: var(--cau-ink-400); font-weight: 600; }
+
+/* ── Trust badge ─────────────────────────────────────────────────────────── */
+
+.pdp-reviews__trust {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: var(--cau-r-md);
+  background: var(--cau-mist);
+  border: 1px solid var(--cau-hairline);
+  margin-top: 4px;
+}
+.pdp-reviews__trusticon {
+  width: 22px;
+  height: 22px;
+  flex: 0 0 22px;
+  color: #166534;
+}
+.pdp-reviews__trusttext {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.pdp-reviews__trusttitle {
+  font-size: .8125rem;
+  font-weight: 700;
+  color: var(--cau-ink-900);
+  line-height: 1.2;
+}
+.pdp-reviews__trustsub {
+  font-size: .6875rem;
+  color: var(--cau-ink-500);
+  line-height: 1.2;
+}
+
+/* ── Filter state and sort ───────────────────────────────────────────────── */
+
+.pdp-reviews__tools {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--cau-s3);
+  margin-block: var(--cau-s4);
+}
+
+.pdp-reviews__clear {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px 5px 12px;
+  border: 1px solid var(--cau-ink-900);
+  border-radius: var(--cau-r-pill);
+  background: var(--cau-ink-900);
+  color: var(--cau-paper);
+  font: inherit;
+  font-size: .8125rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.pdp-reviews__clear[hidden] { display: none; }
+.pdp-reviews__clear svg { width: 12px; height: 12px; }
+
+.pdp-reviews__sortwrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  /* Pushed to the end on its own, so the clear pill keeps the start. */
+  margin-inline-start: auto;
+  font-size: .8125rem;
+}
+
+.pdp-reviews__sortlabel {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  font-size: .75rem;
+  color: var(--cau-ink-400);
+}
+
+.pdp-reviews__sort {
+  padding: 7px 10px;
+  border: 1px solid var(--cau-hairline);
+  border-radius: var(--cau-r-md);
+  background: var(--cau-paper);
+  font: inherit;
+  font-size: .8125rem;
+  font-weight: 600;
+  color: var(--cau-ink-900);
+  cursor: pointer;
+}
+
+/* ── Cards ───────────────────────────────────────────────────────────────── */
+
+.pdp-reviews__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--cau-s4);
+}
+
+@media screen and (max-width: 900px) {
+  .pdp-reviews__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* position: relative anchors the card's absolutely positioned bits - the
+   screen-reader rating in particular. Without it they resolve against <body>,
+   which the slider rail's overflow does not clip, so a card scrolled off the
+   end of the rail dragged the whole page sideways. */
+.pdp-reviews__card {
+  position: relative;
+  border: 1px solid var(--cau-hairline);
+  border-radius: var(--cau-r-lg);
+  padding: var(--cau-s6);
+  background: var(--cau-paper);
+}
+
+.pdp-reviews__whead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--cau-s3);
+}
+
+.pdp-reviews__who {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.pdp-reviews__name {
+  font-weight: 700;
+  font-size: .9375rem;
+  color: var(--cau-ink-900);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pdp-reviews__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex: 0 0 auto;
+  padding: 2px 7px;
+  border-radius: var(--cau-r-pill);
+  background: var(--cau-mist);
+  font-size: .6875rem;
+  font-weight: 700;
+  color: var(--cau-ink-700);
+}
+.pdp-reviews__badge svg { width: 11px; height: 11px; }
+
+.pdp-reviews__cardrating { flex: 0 0 auto; }
+
+/* The stars are aria-hidden, so the rating is carried by text only a screen
+   reader sees. */
+.pdp-reviews__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.pdp-reviews__date {
+  margin-top: 4px;
+  font-size: .75rem;
+  color: var(--cau-ink-300);
+}
+
+.pdp-reviews__body {
+  margin: 10px 0 0;
+  font-size: .875rem;
+  line-height: 1.55;
+  color: var(--cau-ink-700);
+  /* Review bodies have no length limit and one essay should not set the height
+     of a whole row of cards. */
+  overflow-wrap: break-word;
+}
+
+.pdp-reviews__highlights {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.pdp-reviews__highlights li {
+  padding: 3px 8px;
+  border-radius: var(--cau-r-pill);
+  background: var(--cau-panel);
+  border: 1px solid var(--cau-hairline);
+  font-size: .6875rem;
+  font-weight: 600;
+  color: var(--cau-ink-500);
+}
+
+/* ── Review media ────────────────────────────────────────────────────────── */
+
+.pdp-reviews__media {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: var(--cau-s3);
+}
+
+.pdp-reviews__thumb {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  padding: 0;
+  border: 1px solid var(--cau-hairline);
+  border-radius: var(--cau-r-md);
+  background: var(--cau-mist);
+  overflow: hidden;
+  cursor: pointer;
+}
+.pdp-reviews__thumb img,
+.pdp-reviews__thumb video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.pdp-reviews__play {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(10, 10, 12, .28);
+}
+.pdp-reviews__play::after {
+  content: "";
+  width: 0;
+  height: 0;
+  border-inline-start: 11px solid #fff;
+  border-block: 7px solid transparent;
+  /* Nudged right: an equilateral triangle reads off-centre when centred on
+     its bounding box. */
+  margin-inline-start: 3px;
+}
+
+/* ── Store reply ─────────────────────────────────────────────────────────── */
+
+.pdp-reviews__reply {
+  margin-top: var(--cau-s4);
+  padding: var(--cau-s3) var(--cau-s4);
+  border-inline-start: 2px solid var(--cau-ink-900);
+  border-radius: 0 var(--cau-r-md) var(--cau-r-md) 0;
+  background: var(--cau-panel);
+}
+.pdp-reviews__replywho {
+  display: block;
+  font-size: .6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--cau-ink-900);
+}
+.pdp-reviews__reply p {
+  margin: 4px 0 0;
+  font-size: .8125rem;
+  line-height: 1.5;
+  color: var(--cau-ink-700);
+}
+
+/* ── Load more, status line ──────────────────────────────────────────────── */
+
+.pdp-reviews__note {
+  margin: var(--cau-s4) 0 0;
+  font-size: .875rem;
+  color: var(--cau-ink-400);
+}
+.pdp-reviews__note[hidden] { display: none; }
+
+.pdp-reviews__more {
+  display: block;
+  margin: var(--cau-s6) auto 0;
+  min-height: 46px;
+  padding-inline: var(--cau-s8);
+  border: 1.5px solid var(--cau-ink-900);
+  border-radius: var(--cau-r-pill);
+  background: var(--cau-paper);
+  font: inherit;
+  font-size: .875rem;
+  font-weight: 700;
+  color: var(--cau-ink-900);
+  cursor: pointer;
+  transition: background-color .2s ease, color .2s ease;
+}
+.pdp-reviews__more[hidden] { display: none; }
+.pdp-reviews__more:hover:not(:disabled) { background: var(--cau-ink-900); color: var(--cau-paper); }
+.pdp-reviews__more:disabled { opacity: .6; cursor: default; }
+
+.pdp-reviews__arrow {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border: 1px solid var(--cau-hairline);
+  border-radius: 50%;
+  background: var(--cau-paper);
+  color: var(--cau-ink-900);
+  cursor: pointer;
+  transition: border-color .15s ease;
+}
+.pdp-reviews__arrow svg { width: 18px; height: 18px; }
+.pdp-reviews__arrow:hover:not(:disabled) { border-color: var(--cau-ink-900); }
+.pdp-reviews__arrow:disabled { opacity: .35; cursor: default; }
+
+/* ── Slider ──────────────────────────────────────────────────────────────── */
+
+.pdp-reviews__arrows { display: inline-flex; gap: 8px; }
+.pdp-reviews__arrows[hidden] { display: none; }
+
+/* Same element as the grid, re-laid as a rail. Everything here is scoped to
+   the modifier so the grid layout is untouched. */
+.pdp-reviews--slider .pdp-reviews__grid {
+  --rev-col: 84%;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: var(--rev-col);
+  overflow-x: auto;
+  /* Explicit. With overflow-x set and overflow-y left alone the spec computes
+     overflow-y to auto as well, making this a scroll container on both axes -
+     and a touch drag then has two candidate directions, which phones resolve
+     towards the vertical. Same trap the UGC rail hit. */
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  /* Bleed to the page gutter so a card can sit flush to the screen edge.
+     --container-gutter, not --cau-gutter: the rail sits inside Focal's
+     .container, and that is the padding being cancelled. */
+  margin-inline: calc(-1 * var(--container-gutter));
+  padding-inline: var(--container-gutter);
+  scroll-padding-inline: var(--container-gutter);
+  /* The cards carry a border; without this the rail clips their focus ring. */
+  padding-block: 2px;
+}
+.pdp-reviews--slider .pdp-reviews__grid::-webkit-scrollbar { display: none; }
+
+.pdp-reviews--slider .pdp-reviews__card {
+  scroll-snap-align: start;
+  /* A rail row is as tall as its tallest card, which is what we want: the
+     cards line up rather than stepping. */
+  height: 100%;
+}
+
+/* Grab-and-pull on pointer devices. Snapping is suspended mid-drag so it does
+   not fight the pointer, and comes back on release. */
+@media (hover: hover) and (pointer: fine) {
+  .pdp-reviews--slider .pdp-reviews__grid { cursor: grab; }
+  .pdp-reviews--slider .pdp-reviews__grid.is-dragging {
+    cursor: grabbing;
+    scroll-snap-type: none;
+    scroll-behavior: auto;
+    user-select: none;
+  }
+}
+
+.pdp-reviews__progress {
+  overflow: hidden;
+  height: 3px;
+  margin-top: var(--cau-s4);
+  border-radius: var(--cau-r-pill);
+  background: var(--cau-hairline);
+}
+.pdp-reviews__progress[hidden] { display: none; }
+.pdp-reviews__progress span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--cau-ink-900);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .pdp-reviews__progress span { transition: transform .15s linear; }
+}
+
+/* ── Lightbox ────────────────────────────────────────────────────────────── */
+
+/* The page's scrollbar gutter is held open at all times. The two dialogs
+   below lock the page while they are up, and with no gutter already reserved
+   the scrollbar's disappearance widens the viewport and shoves the whole page
+   sideways at the exact moment the dialog animates in. Where this is not
+   supported, lockScroll() measures the shift and pads by it instead. */
+html { scrollbar-gutter: stable; }
+
+.pdp-reviews-locked {
+  overflow: hidden;
+  padding-inline-end: var(--pdp-lock-gutter, 0px);
+}
+
+.revbox {
+  position: fixed;
+  inset: 0;
+  z-index: 95;
+  display: grid;
+  place-items: center;
+  padding: var(--cau-s4);
+  background: rgba(10, 10, 12, .88);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+.revbox[hidden] { display: none; }
+
+.revbox__panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--cau-s3);
+  width: min(90vw, 440px);
+  max-width: 100%;
+}
+
+.revbox__close {
+  position: absolute;
+  top: 12px;
+  inset-inline-end: 12px;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, .25);
+  border-radius: 50%;
+  background: rgba(10, 10, 12, .75);
+  color: #fff;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  cursor: pointer;
+  transition: background .15s ease, transform .15s ease, border-color .15s ease;
+}
+.revbox__close:hover {
+  background: rgba(10, 10, 12, .95);
+  border-color: rgba(255, 255, 255, .5);
+  transform: scale(1.06);
+}
+.revbox__close svg { width: 16px; height: 16px; }
+
+.revbox__media {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: min(72vh, 520px);
+  max-width: 100%;
+  border-radius: var(--cau-r-lg);
+  overflow: hidden;
+  background: #000;
+  border: 1px solid rgba(255, 255, 255, .12);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, .7);
+}
+.revbox__media img,
+.revbox__media video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.revbox__media [hidden] { display: none; }
+
+.revbox__nav {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cau-s3);
+  padding: 6px 14px;
+  border-radius: var(--cau-r-pill);
+  background: rgba(255, 255, 255, .12);
+  border: 1px solid rgba(255, 255, 255, .18);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: #fff;
+  font-size: .8125rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.revbox__nav .pdp-reviews__arrow {
+  width: 30px;
+  height: 30px;
+  border: 1px solid rgba(255, 255, 255, .2);
+  background: rgba(255, 255, 255, .15);
+  color: #fff;
+}
+.revbox__nav .pdp-reviews__arrow:hover:not(:disabled) {
+  background: rgba(255, 255, 255, .32);
+  border-color: rgba(255, 255, 255, .4);
+}
+.revbox__nav .pdp-reviews__arrow:disabled {
+  opacity: .3;
+  cursor: default;
+}
+
+/* ── Focus, motion, desktop ──────────────────────────────────────────────── */
+
+.pdp-reviews__distbtn:focus-visible,
+.pdp-reviews__thumb:focus-visible,
+.pdp-reviews__more:focus-visible,
+.pdp-reviews__clear:focus-visible,
+.pdp-reviews__sort:focus-visible,
+.pdp-reviews__arrow:focus-visible,
+.revbox__close:focus-visible {
+  outline: 2px solid var(--cau-ink-900);
+  outline-offset: 2px;
+}
+.pdp-reviews__arrow:focus-visible,
+.revbox__close:focus-visible { outline-color: var(--cau-paper); }
+
+@media (prefers-reduced-motion: reduce) {
+  .pdp-reviews__bar > span { transition: none; }
+}
+
+@media screen and (min-width: 901px) {
+  .pdp-reviews__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+  /* grid-auto-columns wins over grid-template-columns for the implicit columns
+     the rail creates, but the template above would still size the first two.
+     Clearing it keeps every card on one measure. */
+  .pdp-reviews--slider .pdp-reviews__grid {
+    --rev-col: calc((100% - var(--cau-s4) * 2) / 3);
+    grid-template-columns: none;
+  }
+}
+
+/* Theme editor only: shown when the section has no publicStoreId and so has
+   nothing to fetch. Never reaches the storefront - see the section's guard. */
+.pdp-reviews__setup {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--cau-s2);
+  margin: var(--cau-s4) 0 0;
+  padding: var(--cau-s3) var(--cau-s4);
+  border: 1px dashed var(--cau-hairline);
+  border-radius: var(--cau-r-md);
+  background: var(--cau-panel);
+  font-size: .8125rem;
+  line-height: 1.5;
+  color: var(--cau-ink-500);
+}
+.pdp-reviews__setup svg { width: 15px; height: 15px; flex: 0 0 auto; margin-top: 2px; }
+.pdp-reviews__setup b { color: var(--cau-ink-900); }
+
+/* ── Loading placeholders ────────────────────────────────────────────────── */
+
+/* A placeholder card borrows .pdp-reviews__card for its frame, so it lines up
+   with the real thing exactly - same border, radius and padding. Only the
+   contents differ. */
+.pdp-reviews__card--skel {
+  /* Roughly a real card with a two-line body. Without it the rail would still
+     step as short and long reviews swap in. */
+  min-height: 168px;
+}
+
+.pdp-reviews__skel {
+  display: block;
+  height: 10px;
+  border-radius: var(--cau-r-pill);
+  background: var(--cau-mist);
+  /* The sweep is a moving highlight over that flat base. background-position
+     animates on the compositor far more cheaply than width or opacity. */
+  background-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, .85) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  background-repeat: no-repeat;
+  animation: pdp-reviews-sweep 1.3s ease-in-out infinite;
+}
+
+.pdp-reviews__skel--name { width: 38%; height: 13px; }
+.pdp-reviews__skel--stars { width: 76px; height: 13px; }
+.pdp-reviews__skel--date { width: 24%; height: 9px; margin-top: 10px; }
+
+.pdp-reviews__skellines {
+  display: grid;
+  gap: 8px;
+  margin-top: 16px;
+}
+/* The last line stops short, the way a paragraph's last line does. */
+.pdp-reviews__skellines .pdp-reviews__skel:last-child { width: 62%; }
+
+/* Staggered, so the card reads as one surface being filled rather than three
+   bars blinking in lockstep. */
+.pdp-reviews__skellines .pdp-reviews__skel:nth-child(2) { animation-delay: .1s; }
+.pdp-reviews__skellines .pdp-reviews__skel:nth-child(3) { animation-delay: .2s; }
+
+@keyframes pdp-reviews-sweep {
+  from { background-position: 150% 0; }
+  to   { background-position: -50% 0; }
+}
+
+/* A sweep that never stops is exactly what this setting is for. The bars stay,
+   so the layout still holds - they just sit still. */
+@media (prefers-reduced-motion: reduce) {
+  .pdp-reviews__skel { animation: none; background-image: none; }
+}
+
+/* Fills the stage while the full-size photo decodes, so the lightbox opens
+   at its final size with something in it. It borrows the card skeleton's
+   sweep, re-based for a dark surface - and has to sit after that rule in the
+   file to override its pill shape and light fill. */
+.revbox__skel {
+  position: absolute;
+  inset: 0;
+  height: auto;
+  border-radius: var(--cau-r-md);
+  background-color: rgba(255, 255, 255, .07);
+  background-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, .16) 50%,
+    transparent 100%
+  );
+}
+
+/* Cloudflare Stream's player, which arrives as a frame rather than a file. It
+   fills the same stage as a photo; 16/9 is the player's own letterboxing, and
+   portrait clips letterbox inside that. */
+.revbox__media iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  border-radius: var(--cau-r-md);
+  background: var(--cau-ink-900);
+}
+.revbox__media iframe[hidden] { display: none; }
+
+/* ── The popup ───────────────────────────────────────────────────────────── */
+
+.revmodal {
+  position: fixed;
+  inset: 0;
+  /* Under .revbox (95): a review photo opens on top of this dialog. */
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  padding: var(--cau-s4);
+  background: rgba(10, 10, 12, .6);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+.revmodal[hidden] { display: none; }
+
+.revmodal__panel {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 1040px;
+  height: min(88dvh, 760px);
+  border-radius: var(--cau-r-lg);
+  background: var(--cau-paper);
+  box-shadow: 0 32px 80px -20px rgba(10, 10, 12, .5);
+  overflow: hidden;
+}
+
+.revmodal__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--cau-s4);
+  flex: 0 0 auto;
+  padding: var(--cau-s4) var(--cau-s6);
+  border-bottom: 1px solid var(--cau-hairline);
+  background: var(--cau-paper);
+}
+
+.revmodal__title {
+  margin: 0;
+  font-size: clamp(1.125rem, 2vw, 1.3125rem);
+  font-weight: 700;
+  letter-spacing: -.02em;
+  color: var(--cau-ink-900);
+}
+
+.revmodal__close {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 1px solid var(--cau-hairline);
+  border-radius: 50%;
+  background: var(--cau-paper);
+  color: var(--cau-ink-900);
+  cursor: pointer;
+  transition: border-color .15s ease, background-color .15s ease, transform .15s ease;
+}
+.revmodal__close:hover {
+  border-color: var(--cau-ink-900);
+  background: var(--cau-mist);
+  transform: scale(1.04);
+}
+.revmodal__close svg { width: 18px; height: 18px; }
+.revmodal__close:focus-visible { outline: 2px solid var(--cau-ink-900); outline-offset: 2px; }
+
+.revmodal__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  padding: 0;
+  display: flex;
+}
+
+.revmodal .pdp-reviews__panel {
+  margin-top: 0;
+  width: 100%;
+  height: 100%;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .revmodal__panel { animation: revmodal-panel-in .22s cubic-bezier(.32, .72, 0, 1); }
+}
+@keyframes revmodal-panel-in { from { opacity: 0; transform: translateY(12px); } }
+
+/* Phones: a bottom sheet rather than a centred card */
+@media screen and (max-width: 900px) {
+  .revmodal {
+    place-items: end center;
+    padding: 0;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background: rgba(10, 10, 12, .64);
+  }
+  .revmodal__panel {
+    max-width: none;
+    height: 90dvh;
+    border-radius: 20px 20px 0 0;
+  }
+  .revmodal__head { padding: var(--cau-s3) var(--cau-s4); }
+  .revmodal__body {
+    display: block;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 18px 16px 32px;
+    background: #FAF9F8;
+  }
+  .revmodal .pdp-reviews__panel {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .revmodal .pdp-reviews__top {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 18px 16px;
+    background: #FFFFFF;
+    border-radius: 14px;
+    border: 1px solid var(--cau-hairline);
+  }
+  .revmodal .pdp-reviews__main {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 0;
+  }
+  .revmodal .pdp-reviews__grid {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-inline: 0;
+    padding-inline: 0;
+  }
+  .revmodal .pdp-reviews__card {
+    height: auto !important;
+    padding: 18px 18px;
+    border-radius: 14px;
+    background: #FFFFFF;
+    border: 1px solid var(--cau-hairline);
+    box-shadow: 0 1px 3px rgba(10, 10, 12, 0.04);
+  }
+  .revmodal .pdp-reviews__thumb {
+    width: 76px;
+    height: 76px;
+    border-radius: 10px;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .revmodal__panel { animation-name: revmodal-sheet-in; }
+  }
+}
+@keyframes revmodal-sheet-in { from { transform: translateY(100%); } }
+
+/* ── The popup's two-column layout (Desktop) ────────────────────────────── */
+
+@media screen and (min-width: 901px) {
+  .revmodal__body {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+  }
+
+  .revmodal .pdp-reviews__panel {
+    display: grid;
+    grid-template-columns: 320px minmax(0, 1fr);
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    align-items: stretch;
+  }
+
+  /* Left column: Score, Breakdown, and Trust Badge */
+  .revmodal .pdp-reviews__top {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding: 28px 24px;
+    border-inline-end: 1px solid var(--cau-hairline);
+    border-bottom: 0;
+    background: #FFFFFF;
+    overflow-y: auto;
+    align-items: stretch;
+  }
+
+  .revmodal .pdp-reviews__big {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    column-gap: 16px;
+    row-gap: 4px;
+  }
+
+  .revmodal .pdp-reviews__avg {
+    font-size: 3.5rem;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -.03em;
+    color: var(--cau-ink-900);
+  }
+
+  .revmodal .pdp-reviews__dist {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .revmodal .pdp-reviews__distrow {
+    width: 100%;
+  }
+
+  .revmodal .pdp-reviews__distbtn {
+    display: grid;
+    grid-template-columns: 36px 1fr 28px;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 6px 10px;
+    border: 0;
+    border-radius: 8px;
+    background: none;
+    font: inherit;
+    font-size: .8125rem;
+    color: var(--cau-ink-700);
+    cursor: pointer;
+    text-align: start;
+    transition: background-color .15s ease;
+  }
+  .revmodal .pdp-reviews__distbtn:hover:not(:disabled) {
+    background: var(--cau-mist);
+  }
+  .revmodal .pdp-reviews__distbtn.is-on {
+    background: var(--cau-mist);
+    font-weight: 700;
+  }
+
+  .revmodal .pdp-reviews__bar {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    height: 7px;
+    border-radius: 999px;
+    background: #E5E5E3;
+    overflow: hidden;
+  }
+  .revmodal .pdp-reviews__bar > span {
+    display: block;
+    height: 100%;
+    width: var(--w);
+    border-radius: inherit;
+    background: var(--cau-rating);
+    transition: width .4s cubic-bezier(.32, .72, 0, 1);
+  }
+
+  /* Right column: Vertical Feed of natural-height cards with luxury contrast */
+  .revmodal .pdp-reviews__main {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
+    min-width: 0;
+    padding: 24px 32px 32px;
+    background: #FAF9F8;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: var(--cau-hairline) transparent;
+  }
+
+  .revmodal .pdp-reviews__tools {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-block-start: 0;
+    margin-block-end: 20px;
+    flex: 0 0 auto;
+  }
+
+  .revmodal .pdp-reviews__sortwrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .revmodal .pdp-reviews__sort {
+    padding: 7px 14px;
+    border: 1px solid var(--cau-hairline);
+    border-radius: 999px;
+    background: #FFFFFF;
+    font: inherit;
+    font-size: .8125rem;
+    font-weight: 600;
+    color: var(--cau-ink-900);
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  }
+
+  .revmodal .pdp-reviews__grid {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    margin-inline: 0;
+    padding-inline: 0;
+    scroll-padding-inline: 0;
+    flex: 0 0 auto;
+  }
+
+  /* Spacious, modern cards with generous padding & subtle elevation */
+  .revmodal .pdp-reviews__card {
+    height: auto !important;
+    min-height: 0;
+    border: 1px solid var(--cau-hairline);
+    border-radius: 16px;
+    background: #FFFFFF;
+    padding: 24px 26px;
+    box-shadow: 0 1px 4px rgba(10, 10, 12, 0.04), 0 4px 12px rgba(10, 10, 12, 0.02);
+    overflow: visible;
+    transition: border-color .15s ease, box-shadow .15s ease;
+  }
+  .revmodal .pdp-reviews__card:hover {
+    border-color: rgba(10, 10, 12, .2);
+    box-shadow: 0 4px 16px rgba(10, 10, 12, .06);
+  }
+
+  .revmodal .pdp-reviews__whead {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+  }
+
+  .revmodal .pdp-reviews__who {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .revmodal .pdp-reviews__name {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--cau-ink-900);
+    letter-spacing: -.01em;
+  }
+
+  .revmodal .pdp-reviews__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 9px;
+    border-radius: 999px;
+    background: #EEF7EE;
+    color: #166534;
+    font-size: .6875rem;
+    font-weight: 700;
+    letter-spacing: .02em;
+  }
+
+  .revmodal .pdp-reviews__cardrating {
+    flex: 0 0 auto;
+    font-size: 15px;
+  }
+
+  .revmodal .pdp-reviews__date {
+    margin-top: 5px;
+    font-size: .8125rem;
+    font-weight: 500;
+    color: var(--cau-ink-400);
+  }
+
+  .revmodal .pdp-reviews__body {
+    margin-top: 14px;
+    font-size: .9375rem;
+    line-height: 1.6;
+    color: var(--cau-ink-800);
+  }
+
+  .revmodal .pdp-reviews__highlights {
+    margin-top: 14px;
+    gap: 8px;
+  }
+
+  .revmodal .pdp-reviews__media {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 18px;
+  }
+
+  .revmodal .pdp-reviews__thumb {
+    width: 82px;
+    height: 82px;
+    border-radius: 12px;
+    border: 1px solid var(--cau-hairline);
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    transition: transform .2s ease, box-shadow .2s ease;
+  }
+  .revmodal .pdp-reviews__thumb:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(10, 10, 12, .14);
+  }
+
+  .revmodal .pdp-reviews__reply {
+    margin-top: 18px;
+    padding: 14px 18px;
+    border-radius: 12px;
+    background: var(--cau-mist);
+    border-inline-start: 3px solid var(--cau-ink-900);
+  }
+}
