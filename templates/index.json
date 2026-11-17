@@ -706,28 +706,32 @@
         "item_YtAiRC": {
           "type": "item",
           "settings": {
-            "image": "shopify://shop_images/promo-authentic.png",
+            "image": "shopify://shop_images/essentials-fleece-hoodie-black-white-fw24.png",
             "tab_label": "Item",
-            "subheading": "",
+            "subheading": "Authenticity guaranted",
             "title": "COP WITH CONFIDENCE",
             "content": "<p>At CoppedAU, every item is 100% verified and sourced from trusted retailers. Drops are limited, so secure your pair today knowing every purchase is backed by our authenticity guarantee.</p>",
             "button_text": "Shop now",
-            "button_link": "shopify://collections/best-sellers-2025"
+            "button_link": "shopify://collections/essentials"
           }
         }
       },
       "block_order": [
         "item_YtAiRC"
       ],
+      "custom_css": [
+        ".image-with-text__content-wrapper {padding: 8px 48px 48px;}",
+        "@media screen and (max-width: 740px) {.image-with-text__content-wrapper {padding: 0 24px 32px; }}"
+      ],
       "name": "Image with text",
       "settings": {
         "reveal_on_scroll": true,
-        "background_type": "full_width",
-        "background_overlap": "image",
-        "image_position": "left",
+        "background_type": "boxed",
+        "background_overlap": "text",
+        "image_position": "right",
         "text_alignment": "left",
         "cycle_speed": 20,
-        "accent_background": "rgba(0,0,0,0)",
+        "accent_background": "#E8E1D6",
         "text_color": "rgba(0,0,0,0)",
         "button_background": "rgba(0,0,0,0)",
         "button_text_color": "rgba(0,0,0,0)"
