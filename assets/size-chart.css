@@ -5,6 +5,7 @@
   border-collapse: collapse;
   font-variant-numeric: tabular-nums;
 }
+
 .size-chart__caption {
   caption-side: top;
   text-align: left;
@@ -12,6 +13,7 @@
   color: rgba(var(--text-color), 0.65);
   padding-bottom: 0.75rem;
 }
+
 .size-chart__th {
   text-align: right;
   font-size: 0.75rem;
@@ -22,16 +24,19 @@
   padding: 0 0 0.5rem;
   white-space: nowrap;
 }
+
 .size-chart__th--row,
 .size-chart__rowhead {
   text-align: left;
 }
+
 .size-chart__rowhead {
   font-size: 0.875rem;
   font-weight: 700;
   padding: 0.6875rem 0;
   border-top: 1px solid rgba(var(--text-color), 0.1);
 }
+
 .size-chart__td {
   text-align: right;
   font-size: 0.875rem;
@@ -45,10 +50,12 @@
   padding-bottom: 0.625rem;
   scrollbar-width: thin;
 }
+
 .size-chart__scroller:focus-visible {
   outline: 2px solid rgb(var(--text-color));
   outline-offset: 2px;
 }
+
 .size-chart__grid {
   /* Default is the honest one: natural width, no wrapping, and the scroller
      around it takes over. Squeezing 12 columns into a phone makes every cell
@@ -58,6 +65,7 @@
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
 }
+
 .size-chart__grid .size-chart__gth--pin {
   white-space: nowrap;
 }
@@ -70,13 +78,16 @@
     table-layout: fixed;
     white-space: normal;
   }
+
   /* Wide enough for the header, not just the body labels. "Measurement" is
      0.8125rem bold - about 88px - while 4.75rem left only ~66px of content box
      after the right padding. With white-space: nowrap and table-layout: fixed
      the overflow could not wrap, so it crossed the pinned column's border
      instead. The body labels (Chest, Shoulder) always fitted, which is why only
      the header row showed it. */
-  .size-chart__grid .size-chart__gth--pin { width: 7rem; }
+  .size-chart__grid .size-chart__gth--pin {
+    width: 7rem;
+  }
 
   /* The label is merchant-editable (size-chart-finder.liquid:30 defaults it to
      "Measurement"), so it can always be set longer than any width chosen here.
@@ -117,6 +128,7 @@
   padding-right: 0.625rem;
   border-right: 1px solid rgba(var(--text-color), 0.12);
 }
+
 tbody .size-chart__gth--pin {
   font-size: 0.875rem;
   color: rgb(var(--text-color));
@@ -124,6 +136,7 @@ tbody .size-chart__gth--pin {
   padding-bottom: 0.5625rem;
   border-top: 1px solid rgba(var(--text-color), 0.1);
 }
+
 .size-chart__gtd {
   text-align: center;
   font-size: 0.875rem;
@@ -148,8 +161,15 @@ tbody .size-chart__gth--pin {
   cursor: pointer;
   color: inherit;
 }
-.size-chart__panel { padding: 1.25rem; }
-.size-chart__section + .size-chart__section { margin-top: 1.75rem; }
+
+.size-chart__panel {
+  padding: 1.25rem;
+}
+
+.size-chart__section+.size-chart__section {
+  margin-top: 1.75rem;
+}
+
 .size-chart__heading {
   margin: 0 0 0.1875rem;
   font-size: 0.8125rem;
@@ -176,7 +196,8 @@ tbody .size-chart__gth--pin {
 .popover.size-chart__popover {
   z-index: 60;
 }
-.popover.size-chart__popover > .popover__overlay {
+
+.popover.size-chart__popover>.popover__overlay {
   z-index: 59;
 }
 
@@ -192,6 +213,7 @@ tbody .size-chart__gth--pin {
    sheet stands, which is the correct pattern on a phone.
    --------------------------------------------------------------------------- */
 @media screen and (min-width: 1000px) {
+
   /* Centred with inset + auto margins, NOT transform. A transformed element
      becomes the containing block for position:fixed descendants, which would
      anchor the scrim to this box instead of the viewport. */
@@ -213,6 +235,7 @@ tbody .size-chart__gth--pin {
     transition: opacity 0.2s ease, visibility 0.2s;
     z-index: 100;
   }
+
   .popover.size-chart__popover[open] {
     opacity: 1;
     visibility: visible;
@@ -221,7 +244,7 @@ tbody .size-chart__gth--pin {
   /* Full-screen scrim. Focal hides the overlay on desktop; the size chart
      needs it back, because a centred modal over live page content without a
      scrim reads as a rendering fault. */
-  .popover.size-chart__popover > .popover__overlay {
+  .popover.size-chart__popover>.popover__overlay {
     display: block;
     position: fixed;
     inset: 0;
@@ -233,7 +256,8 @@ tbody .size-chart__gth--pin {
     transition: opacity 0.25s ease, visibility 0.25s;
     z-index: -1;
   }
-  .popover.size-chart__popover[open] > .popover__overlay {
+
+  .popover.size-chart__popover[open]>.popover__overlay {
     visibility: visible;
   }
 
@@ -244,8 +268,9 @@ tbody .size-chart__gth--pin {
 }
 
 @media screen and (prefers-reduced-motion: reduce) {
+
   .popover.size-chart__popover,
-  .popover.size-chart__popover > .popover__overlay {
+  .popover.size-chart__popover>.popover__overlay {
     transition: none;
   }
 }
@@ -258,6 +283,7 @@ tbody .size-chart__gth--pin {
    without scrolling and the modal looks composed rather than overflowing.
    --------------------------------------------------------------------------- */
 @media screen and (min-width: 1000px) {
+
   /* Header stays put; only the content scrolls. */
   /* Focal hides .popover__header above 1000px — fine for a small anchored
      menu, but this is a modal and needs its title and close button. */
@@ -271,19 +297,25 @@ tbody .size-chart__gth--pin {
     padding: 1.125rem 1.5rem;
     border-bottom: 1px solid rgba(var(--text-color), 0.12);
   }
+
   .popover.size-chart__popover .popover__title {
     margin: 0;
     text-align: left;
   }
+
   .popover.size-chart__popover .popover__close-button {
     margin-inline-start: auto;
     margin-inline-end: -0.5rem;
   }
-  .popover.size-chart__popover .size-chart__panel { padding: 1.75rem; }
+
+  .popover.size-chart__popover .size-chart__panel {
+    padding: 1.75rem;
+  }
 
   .popover.size-chart__popover .size-chart__table {
     width: auto;
   }
+
   .popover.size-chart__popover .size-chart__th:not(:first-child),
   .popover.size-chart__popover .size-chart__td:not(:first-child) {
     padding-left: 1.5rem;
@@ -293,7 +325,10 @@ tbody .size-chart__gth--pin {
 
 /* Measurements read better with a little breathing room between rows and a
    tint on the size column, at any width. */
-.size-chart__rowhead { white-space: nowrap; }
+.size-chart__rowhead {
+  white-space: nowrap;
+}
+
 .size-chart__table tbody tr:nth-child(odd) th,
 .size-chart__table tbody tr:nth-child(odd) td {
   background: rgba(var(--text-color), 0.025);
@@ -306,6 +341,7 @@ tbody .size-chart__gth--pin {
   justify-content: space-between;
   gap: 1rem;
 }
+
 .size-option__stock {
   /* Pushed right by its own margin rather than the row's justify-content, so
      it stays on the right even on the selected row, which also holds a tick. */
@@ -320,11 +356,13 @@ tbody .size-chart__gth--pin {
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
+
 .size-option__stock--out {
   background: transparent;
   border: 1px solid rgba(var(--text-color), 0.18);
   color: rgba(var(--text-color), 0.5);
 }
+
 .size-option__stock--low {
   /* The theme's Error colour, so it follows the merchant's palette rather
      than hard-coding a red that fights it. */
@@ -345,6 +383,7 @@ tbody .size-chart__gth--pin {
   align-items: center;
   gap: 0.5rem;
 }
+
 .product-form__option-info .size-chart__trigger {
   margin-block: -0.625rem;
 }
@@ -357,6 +396,7 @@ tbody .size-chart__gth--pin {
 .combo-box__option-item.size-option {
   padding-inline-end: 2.625rem;
 }
+
 .combo-box__option-item.size-option[aria-selected="true"]::after {
   position: absolute;
   inset-inline-end: 1.125rem;
@@ -371,21 +411,41 @@ tbody .size-chart__gth--pin {
 .product-form[data-size-first="locked"] .product-form__payment-container .shopify-payment-button {
   display: none;
 }
+
 .product-form[data-size-first="locked"] [data-product-add-to-cart-button] {
   opacity: 0.55;
   cursor: not-allowed;
 }
+
 /* On an early tap, draw the eye to the size row rather than throwing an error. */
 .product-form__option-selector[data-size-first-nudge] {
   animation: size-first-nudge 0.5s ease;
 }
+
 @keyframes size-first-nudge {
-  0%, 100% { transform: translateX(0); }
-  20%, 60% { transform: translateX(-5px); }
-  40%, 80% { transform: translateX(5px); }
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  20%,
+  60% {
+    transform: translateX(-5px);
+  }
+
+  40%,
+  80% {
+    transform: translateX(5px);
+  }
 }
+
 @media screen and (prefers-reduced-motion: reduce) {
-  .product-form__option-selector[data-size-first-nudge] { animation: none; outline: 2px solid rgb(var(--text-color)); outline-offset: 4px; }
+  .product-form__option-selector[data-size-first-nudge] {
+    animation: none;
+    outline: 2px solid rgb(var(--text-color));
+    outline-offset: 4px;
+  }
 }
 
 /* Finder — two dropdowns derived from the grid's own headings. */
@@ -394,13 +454,18 @@ tbody .size-chart__gth--pin {
   flex-direction: column;
   gap: 0.875rem;
 }
-.size-chart__finder-field { margin: 0; }
+
+.size-chart__finder-field {
+  margin: 0;
+}
+
 .size-chart__finder-label {
   display: block;
   font-size: 0.8125rem;
   font-weight: 600;
   margin-bottom: 0.375rem;
 }
+
 .size-chart__finder-select {
   width: 100%;
   min-height: 48px;
@@ -412,6 +477,7 @@ tbody .size-chart__gth--pin {
   font: inherit;
   font-size: 0.9375rem;
 }
+
 /* The answer, as approved: caption, the size, what was chosen, and what that
    size measures. */
 .size-chart__answer {
@@ -422,29 +488,34 @@ tbody .size-chart__gth--pin {
   background: rgba(var(--text-color), 0.025);
   text-align: center;
 }
+
 .size-chart__answer-empty {
   margin: 0;
   padding: 0.75rem 0;
   font-size: 0.875rem;
   color: rgba(var(--text-color), 0.6);
 }
+
 .size-chart__answer-caption {
   margin: 0;
   font-size: 0.8125rem;
   color: rgba(var(--text-color), 0.7);
 }
+
 .size-chart__answer-size {
   margin: 0.375rem 0 0;
   font-size: 2.75rem;
   font-weight: 700;
   line-height: 1;
 }
+
 .size-chart__answer-context {
   margin: 0.625rem 0 0;
   font-size: 0.8125rem;
   color: rgba(var(--text-color), 0.6);
   font-variant-numeric: tabular-nums;
 }
+
 .size-chart__answer-measures {
   margin: 0.875rem 0 0;
   padding-top: 0.875rem;
@@ -473,6 +544,7 @@ tbody .size-chart__gth--pin {
   font-weight: 700;
   cursor: pointer;
 }
+
 .size-chart__nav--back {
   justify-content: flex-start;
   margin-top: 0;
@@ -484,6 +556,7 @@ tbody .size-chart__gth--pin {
   text-decoration: underline;
   text-underline-offset: 3px;
 }
+
 .size-chart__nav:focus-visible {
   outline: 2px solid rgb(var(--text-color));
   outline-offset: 2px;
@@ -494,6 +567,7 @@ tbody .size-chart__gth--pin {
     max-width: 420px;
     margin-inline: auto;
   }
+
   /* the panel itself is no longer the grid — the chart view is */
   .popover.size-chart__popover .size-chart__panel {
     display: block;
@@ -503,7 +577,9 @@ tbody .size-chart__gth--pin {
 /* The size-picker header is laid out by pdp.css as a three-column grid, which
    is what keeps "Size guide", the title and the close button on one row. The
    only rule left here is the hidden state, which the script toggles. */
-.combo-box__size-guide[hidden] { display: none; }
+.combo-box__size-guide[hidden] {
+  display: none;
+}
 
 
 /* ---- the size picker sheet itself, moved out of pdp.css ----
@@ -534,9 +610,12 @@ tbody .size-chart__gth--pin {
   background: var(--cau-hairline);
 }
 
-.combo-box.is-dragging { transition: none; }
+.combo-box.is-dragging {
+  transition: none;
+}
 
 @media screen and (max-width: 740px) {
+
   /* .select-wrapper matches joshtheme2025's `.select-wrapper .combo-box`,
      which squares the top and rounds the bottom. Equal specificity, and
      size-chart.css loads after it, so the tie falls this way. */
@@ -546,12 +625,17 @@ tbody .size-chart__gth--pin {
     box-shadow: 0 -18px 44px -18px rgba(10, 10, 12, .32);
   }
 
-  .combo-box[open] > .combo-box__overlay { opacity: 0; }
+  .combo-box[open]>.combo-box__overlay {
+    opacity: 0;
+  }
 }
 
 @media screen and (min-width: 741px) {
+
   /* Above Focal's switch the picker is a dropdown, not a sheet. */
-  .pdp-v2__grab { display: none; }
+  .pdp-v2__grab {
+    display: none;
+  }
 }
 
 
@@ -575,12 +659,12 @@ tbody .size-chart__gth--pin {
 @media screen and (min-width: 561px) {
   .combo-box.is-guide {
     position: fixed;
-    /* Horizontally centred by auto margins. Vertically pinned rather than
-       centred: auto margins cannot centre a max-content height, and the
-       transform that would do it becomes the containing block for the fixed
-       scrim inside this element. */
-    inset-block-start: clamp(24px, 9vh, 72px);
-    inset-block-end: auto;
+    /* Centred both ways by auto margins: top and bottom are 0, the height comes
+       from the content (max-content, capped by max-height), so margin-block:auto
+       splits the free space equally. No transform, so the fixed scrim inside
+       still covers the whole screen. */
+    inset-block: 0;
+    margin-block: auto;
     inset-inline: 0;
     margin-inline: auto;
     width: min(950px, 94vw);
@@ -593,8 +677,11 @@ tbody .size-chart__gth--pin {
     box-shadow: 0 30px 80px -30px rgba(0, 0, 0, .5);
     overflow: hidden;
   }
+
   /* The header carries Back and the close button, so it returns in guide mode. */
-  .combo-box.is-guide .combo-box__header { display: grid; }
+  .combo-box.is-guide .combo-box__header {
+    display: grid;
+  }
 
   /* [open] only: is-guide outlives a close, and a visible scrim on a closed
      picker swallows every click on the page. */
@@ -608,11 +695,14 @@ tbody .size-chart__gth--pin {
     opacity: 1;
     visibility: visible;
   }
+
   /* pdp.css rounds only the sheet's top corners below 741px at (0,3,0),
      which outranks a bare .combo-box.is-guide. Matched here so the modal is
      not a sheet with two square corners. */
   .pdp-v2 .select-wrapper .combo-box.is-guide,
-  .combo-box.is-guide { border-radius: var(--cau-r-lg, 13px); }
+  .combo-box.is-guide {
+    border-radius: var(--cau-r-lg, 13px);
+  }
 
   .combo-box.is-guide .size-chart__host {
     overflow: auto;
@@ -661,6 +751,7 @@ tbody .size-chart__gth--pin {
   background: transparent;
   box-shadow: none;
 }
+
 .combo-box__size-guide {
   position: static;
   inset-inline-start: auto;
@@ -683,7 +774,11 @@ tbody .size-chart__gth--pin {
   text-underline-offset: 4px;
   cursor: pointer;
 }
-.combo-box__size-guide:hover { color: var(--cau-ink-900); text-decoration-color: currentColor; }
+
+.combo-box__size-guide:hover {
+  color: var(--cau-ink-900);
+  text-decoration-color: currentColor;
+}
 
 .combo-box__title {
   justify-self: center;
@@ -694,6 +789,7 @@ tbody .size-chart__gth--pin {
   text-align: center;
   white-space: nowrap;
 }
+
 .combo-box__close-button {
   /* Relative, not static: Focal's .tap-area:before is absolute, and with a
      static button it sized itself to the fixed guide modal — the whole modal
@@ -709,19 +805,31 @@ tbody .size-chart__gth--pin {
   height: 36px;
   color: var(--cau-ink-900);
 }
-.combo-box__close-button svg { width: 16px; height: 16px; }
+
+.combo-box__close-button svg {
+  width: 16px;
+  height: 16px;
+}
 
 @media screen and (min-width: 741px) {
+
   /* Above Focal's switch the picker is a dropdown and has no header, so the
      "Size guide" button lives only on the sheet. The "Size chart" link beside
      the label is the way in at this width. */
-  .combo-box__header { display: none; }
+  .combo-box__header {
+    display: none;
+  }
 }
 
 /* The size guide lives inside the sheet as a second view. */
 .size-chart__host[hidden],
-.combo-box__option-list[hidden] { display: none; }
-.size-chart__host { padding: 0 20px 10px; }
+.combo-box__option-list[hidden] {
+  display: none;
+}
+
+.size-chart__host {
+  padding: 0 20px 10px;
+}
 
 /* On a phone the guide has to be its own scroller.
 
@@ -749,7 +857,11 @@ tbody .size-chart__gth--pin {
     touch-action: pan-x pan-y;
     padding-block-end: max(10px, env(safe-area-inset-bottom, 0px) + 10px);
   }
-  .size-chart__host .size-chart__panel { overflow: visible; }
+
+  .size-chart__host .size-chart__panel {
+    overflow: visible;
+  }
+
   .size-chart__host .size-chart__scroller {
     touch-action: pan-x pan-y;
     overscroll-behavior-x: contain;

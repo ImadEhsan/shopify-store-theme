@@ -52,7 +52,7 @@
           "settings": {
             "hide_sold_out_variants": false,
             "selector_mode": "dropdown",
-            "color_mode": "dropdown",
+            "color_mode": "swatch",
             "variant_image_options": "",
             "size_chart_page": ""
           }

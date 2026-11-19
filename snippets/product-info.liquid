@@ -141,6 +141,32 @@
       {%- endif -%}
     </div>
 
+    {%- comment -%} Variant metafield: one line per variant, only the selected one is visible {%- endcomment -%}
+    <div class="variant-color-description" data-variant-color-description>
+      {%- for v in product.variants -%}
+        {%- if v.metafields.custom.colour_description != blank -%}
+          <p
+            data-variant-id="{{ v.id }}"
+            {% unless v.id == product.selected_or_first_available_variant.id %}
+              hidden
+            {% endunless %}
+          >
+            {{ v.metafields.custom.colour_description.value }}
+          </p>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+
+    <script>
+      document.addEventListener('variant:changed', function (event) {
+        var variant = event.detail.variant;
+        if (!variant) return;
+        document.querySelectorAll('[data-variant-color-description] [data-variant-id]').forEach(function (p) {
+          p.hidden = String(p.dataset.variantId) !== String(variant.id);
+        });
+      });
+    </script>
+
     {%- comment -%}
       These sit outside .product-meta__price-list-container deliberately: Focal
       lays that container out as a flex row, so anything left inside it lands
