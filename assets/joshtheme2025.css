@@ -2084,3 +2084,21 @@ font-size: 10px;}
   opacity: 0.8;
   margin-top: 8px;
 }
+
+/* FIX: trust sections made the page wider than the screen.
+   Columns could not shrink below the icons' 300px natural width. */
+
+/* Mobile/tablet: 2 equal columns that are allowed to shrink */
+@media screen and (min-width: 320px) {
+  .shopify-section--multi-column.trust .multi-column__inner {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Desktop: 4 equal columns that share the available width */
+@media screen and (min-width: 1080px) {
+  .shopify-section--multi-column.trust .multi-column__item {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+}

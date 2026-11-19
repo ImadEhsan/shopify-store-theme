@@ -50,12 +50,25 @@
       }
     {%- endif -%}
   {%- endfor -%}
+
+    #shopify-section-{{ section.id }} .multi-column__image {
+    max-height: {{ section.settings.icon_size_mobile }}px;
+  }
+
+  @media screen and (min-width: 741px) {
+    #shopify-section-{{ section.id }} .multi-column__image {
+      max-height: {{ section.settings.icon_size }}px;
+    }
+  }
 </style>
 
 <section class="section trust-symbol-full {% unless blends_with_background %}section--flush{% endunless %}">
   <div class="section__color-wrapper">
     <div class="container {% unless blends_with_background %}vertical-breather{% endunless %}">
-      {%- if section.settings.title != blank or section.settings.subheading != blank or section.settings.content != blank -%}
+      {%- if section.settings.title != blank
+        or section.settings.subheading != blank
+        or section.settings.content != blank
+      -%}
         <header class="section__header {% if section.settings.content != blank %}section__header--tight{% endif %} section__header--{{ section.settings.column_alignment }}">
           <div class="text-container">
             {%- if section.settings.subheading != blank -%}
@@ -74,11 +87,23 @@
       {%- endif -%}
 
       {%- if section.blocks.size > 0 -%}
-        <multi-column {% if section.settings.stack_items %}stack{% endif %} {% if section.settings.reveal_on_scroll %}stagger-apparition{% endif %} class="multi-column multi-column--pocket-{{ section.settings.mobile_item_size }} multi-column--{{ section.settings.desktop_item_size }} multi-column--spacing-{{ section.settings.spacing }}">
+        <multi-column
+          {% if section.settings.stack_items %}
+            stack
+          {% endif %}
+          {% if section.settings.reveal_on_scroll %}
+            stagger-apparition
+          {% endif %}
+          class="multi-column multi-column--pocket-{{ section.settings.mobile_item_size }} multi-column--{{ section.settings.desktop_item_size }} multi-column--spacing-{{ section.settings.spacing }}"
+        >
           {%- assign align_arrows_on_image = true -%}
           {%- assign smallest_image_aspect_ratio = 0 -%}
 
-          <div {% unless section.settings.stack_items %}class="scroller"{% endunless %}>
+          <div
+            {% unless section.settings.stack_items %}
+              class="scroller"
+            {% endunless %}
+          >
             <scrollable-content class="multi-column__inner multi-column__inner--{{ section.settings.column_alignment }} {% unless section.settings.stack_items %}multi-column__inner--scroller{% endunless %}">
               {%- case section.settings.desktop_item_size -%}
                 {%- when 'pico' -%}
@@ -136,7 +161,10 @@
               {%- endcase -%}
 
               {%- assign desktop_items_per_row_minus_one = desktop_items_per_row | minus: 1 -%}
-              {%- assign gap_width = desktop_item_gap | divided_by: desktop_items_per_row | times: desktop_items_per_row_minus_one -%}
+              {%- assign gap_width = desktop_item_gap
+                | divided_by: desktop_items_per_row
+                | times: desktop_items_per_row_minus_one
+              -%}
 
               {%- for block in section.blocks -%}
                 {%- capture block_content -%}
@@ -181,7 +209,14 @@
                 {%- endcapture -%}
 
                 {%- if block_content != blank -%}
-                  <div id="block-{{ section.id }}-{{ block.id }}" class="multi-column__item multi-column__item--align-{{ block.settings.vertical_alignment }} {% if block.settings.link_url != blank %}image-zoom{% endif %}" {% if section.settings.reveal_on_scroll %}reveal{% endif %} {{ block.shopify_attributes }}>
+                  <div
+                    id="block-{{ section.id }}-{{ block.id }}"
+                    class="multi-column__item multi-column__item--align-{{ block.settings.vertical_alignment }} {% if block.settings.link_url != blank %}image-zoom{% endif %}"
+                    {% if section.settings.reveal_on_scroll %}
+                      reveal
+                    {% endif %}
+                    {{ block.shopify_attributes }}
+                  >
                     {{- block_content -}}
                   </div>
                 {%- endif -%}
@@ -189,7 +224,12 @@
             </scrollable-content>
 
             {%- unless section.settings.stack_items -%}
-              <prev-next-buttons class="multi-column__prev-next {% unless align_arrows_on_image %}multi-column__prev-next--no-image{% endunless %} hidden-pocket" {% if align_arrows_on_image %}style="--smallest-image-aspect-ratio: {{ smallest_image_aspect_ratio }}"{% endif %}>
+              <prev-next-buttons
+                class="multi-column__prev-next {% unless align_arrows_on_image %}multi-column__prev-next--no-image{% endunless %} hidden-pocket"
+                {% if align_arrows_on_image %}
+                  style="--smallest-image-aspect-ratio: {{ smallest_image_aspect_ratio }}"
+                {% endif %}
+              >
                 <button class="multi-column__arrow prev-next-button prev-next-button--prev" disabled>
                   <span class="visually-hidden">{{ 'general.accessibility.previous' | t }}</span>
                   {%- include 'icon' with 'nav-arrow-left', block: true, direction_aware: true -%}
@@ -437,6 +477,30 @@
         }
       ],
       "default": "normal"
+    },
+    {
+      "type": "header",
+      "content": "Icons"
+    },
+    {
+      "type": "range",
+      "id": "icon_size",
+      "label": "Icon size (desktop)",
+      "min": 20,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "icon_size_mobile",
+      "label": "Icon size (mobile)",
+      "min": 20,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 36
     },
     {
       "type": "header",
