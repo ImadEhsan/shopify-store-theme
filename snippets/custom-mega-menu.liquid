@@ -1,0 +1,90 @@
+{%- comment -%}
+  Custom mega menu panel.
+  In: link (the top menu link, e.g. "Shop"), block (custom_mega_menu block)
+  Columns come from the menu (level 2 = titles, level 3 = links),
+  products from a collection setting, promo from image/text settings.
+{%- endcomment -%}
+
+<div class="container">
+  <div class="custom-mega__inner">
+    {%- comment -%} 1. Link columns from the menu {%- endcomment -%}
+    {%- if link.links.size > 0 -%}
+      <div class="custom-mega__columns">
+        {%- for column in link.links -%}
+          <div class="custom-mega__column">
+            <a href="{{ column.url }}" class="custom-mega__title">{{ column.title }}</a>
+
+            {%- if column.links.size > 0 -%}
+              <ul class="custom-mega__links list--unstyled" role="list">
+                {%- for child in column.links -%}
+                  <li>
+                    <a href="{{ child.url }}" class="custom-mega__link">{{ child.title }}</a>
+                  </li>
+                {%- endfor -%}
+              </ul>
+            {%- endif -%}
+          </div>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+
+    {%- comment -%} 2. Featured products from a collection {%- endcomment -%}
+    {%- assign featured = block.settings.featured_collection -%}
+    {%- if featured != blank and featured.products_count > 0 -%}
+      {%- assign card_count = featured.products_count | at_most: block.settings.products_count -%}
+      <div class="custom-mega__products" style="--cards: {{ card_count }}">
+        <div class="custom-mega__products-head">
+          <span class="custom-mega__title">{{ block.settings.products_heading }}</span>
+          <a href="{{ featured.url }}" class="custom-mega__view-all">View all &rarr;</a>
+        </div>
+
+        <div class="custom-mega__grid">
+          {%- for product in featured.products limit: block.settings.products_count -%}
+            <a href="{{ product.url }}" class="custom-mega__card">
+              <div class="custom-mega__card-image">
+                {%- if product.featured_image -%}
+                  {{
+                    product.featured_image
+                    | image_url: width: 400
+                    | image_tag: loading: 'lazy', sizes: '160px', widths: '160,320,400', alt: product.title
+                  }}
+                {%- endif -%}
+              </div>
+              <span class="custom-mega__card-title">{{ product.title }}</span>
+              <span class="custom-mega__card-price">
+                {%- if product.compare_at_price > product.price -%}
+                  <span class="custom-mega__card-sale">{{ product.price | money }}</span>
+                  <s>{{ product.compare_at_price | money }}</s>
+                {%- else -%}
+                  {{ product.price | money }}
+                {%- endif -%}
+              </span>
+            </a>
+          {%- endfor -%}
+        </div>
+      </div>
+    {%- endif -%}
+
+    {%- comment -%} 3. Promo tile {%- endcomment -%}
+    {%- if block.settings.promo_image != blank -%}
+      <a href="{{ block.settings.promo_link | default: '#' }}" class="custom-mega__promo">
+        {{
+          block.settings.promo_image
+          | image_url: width: 600
+          | image_tag: loading: 'lazy', sizes: '280px', widths: '300,600', class: 'custom-mega__promo-image'
+        }}
+        <div class="custom-mega__promo-content">
+          {%- if block.settings.promo_heading != blank -%}
+            <span class="custom-mega__promo-heading">{{ block.settings.promo_heading }}</span>
+          {%- endif -%}
+          {%- if block.settings.promo_text != blank -%}
+            <span class="custom-mega__promo-text">{{ block.settings.promo_text }}</span>
+          {%- endif -%}
+          {%- if block.settings.promo_button != blank -%}
+            <span class="custom-mega__promo-button">{{ block.settings.promo_button }}</span>
+          {%- endif -%}
+        </div>
+      </a>
+    {%- endif -%}
+  </div>
+</div>

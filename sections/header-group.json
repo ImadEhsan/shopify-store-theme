@@ -99,19 +99,21 @@
       "blocks": {
         "mega_menu_iNETwB": {
           "type": "mega_menu",
-          "disabled": true,
           "settings": {
-            "menu_item": "",
+            "menu_item": "Shop",
             "images_position": "right",
-            "image_1_heading": "",
-            "image_1_text": "",
-            "image_1_link": "",
-            "image_2_heading": "",
-            "image_2_text": "",
-            "image_2_link": "",
-            "image_3_heading": "",
-            "image_3_text": "",
-            "image_3_link": "",
+            "image_1": "shopify://shop_images/mega-new-arrivals.png",
+            "image_1_heading": "New Arrivals",
+            "image_1_text": "Fresh drops this week",
+            "image_1_link": "shopify://collections/new-arrivals",
+            "image_2": "shopify://shop_images/mega-sale.png",
+            "image_2_heading": "Sale",
+            "image_2_text": "Up to 40% off",
+            "image_2_link": "shopify://collections/christmas-sale",
+            "image_3": "shopify://shop_images/mega-essentials.png",
+            "image_3_heading": "Essentials",
+            "image_3_text": "Everyday staples",
+            "image_3_link": "shopify://collections/essentials",
             "image_4_heading": "",
             "image_4_text": "",
             "image_4_link": "",
@@ -128,7 +130,7 @@
         "mega_menu_iNETwB"
       ],
       "custom_css": [
-        ".header .container,.header .header__wrapper {max-height: 70px;}"
+        ".header__wrapper {max-height: 70px;}"
       ],
       "settings": {
         "enable_sticky_header": true,

@@ -1,0 +1,214 @@
+/* Custom mega menu: everything is scoped to .custom-mega,
+   so Focal's own .mega-menu keeps its styles. */
+
+.custom-mega {
+    background: var(--custom-mega-bg, #fff);
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: 0 24px 40px -24px rgba(0, 0, 0, 0.25);
+}
+
+.custom-mega .container {
+    max-height: none;
+    /* never cut the panel (lesson from the 70px bug) */
+}
+
+.custom-mega__inner {
+    display: grid;
+    grid-template-columns: 1.4fr 1.6fr 1fr;
+    /* links | products | promo */
+    gap: 48px;
+    padding: 40px 0 44px;
+    max-height: 75vh;
+    overflow-y: auto;
+}
+
+/* 1. Link columns */
+.custom-mega__columns {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+}
+
+.custom-mega__title {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    color: #111;
+}
+
+.custom-mega__links li+li {
+    margin-top: 10px;
+}
+
+.custom-mega__link {
+    font-size: 14px;
+    color: #555;
+    transition: color 0.2s, padding-left 0.2s;
+}
+
+.custom-mega__link:hover {
+    color: #111;
+    padding-left: 4px;
+}
+
+/* 2. Products: the block is exactly as wide as its cards,
+   so "View all" always sits at the end of the row */
+.custom-mega__products {
+    width: max-content;
+    max-width: 100%;
+}
+
+.custom-mega__products-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+    margin-bottom: 14px;
+}
+
+.custom-mega__products-head .custom-mega__title {
+    margin-bottom: 0;
+    /* the head row handles the spacing */
+}
+
+.custom-mega__view-all {
+    font-size: 13px;
+    color: #555;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    white-space: nowrap;
+}
+
+.custom-mega__view-all:hover {
+    color: #111;
+}
+
+.custom-mega__grid {
+    display: grid;
+    grid-template-columns: repeat(var(--cards, 4), 148px);
+    gap: 16px;
+}
+
+.custom-mega__card {
+    display: block;
+    color: #111;
+}
+
+.custom-mega__card-image {
+    aspect-ratio: 1 / 1;
+    background: #f4f4f4;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.custom-mega__card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+
+.custom-mega__card:hover .custom-mega__card-image img {
+    transform: scale(1.05);
+}
+
+.custom-mega__card-title {
+    display: block;
+    font-size: 13px;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.custom-mega__card-price {
+    display: block;
+    font-size: 13px;
+    margin-top: 4px;
+    color: #555;
+}
+
+.custom-mega__card-sale {
+    color: #d8352a;
+    margin-right: 6px;
+}
+
+/* 3. Promo */
+.custom-mega__promo {
+    position: relative;
+    display: block;
+    border-radius: 14px;
+    overflow: hidden;
+    min-height: 260px;
+}
+
+.custom-mega__promo-image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.custom-mega__promo:hover .custom-mega__promo-image {
+    transform: scale(1.04);
+}
+
+.custom-mega__promo-content {
+    position: absolute;
+    inset: auto 0 0 0;
+    padding: 20px;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.6));
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.custom-mega__promo-heading {
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.custom-mega__promo-text {
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+.custom-mega__promo-button {
+    align-self: flex-start;
+    margin-top: 10px;
+    padding: 8px 16px;
+    background: #fff;
+    color: #111;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+/* Smaller desktops: drop the promo, keep links + products */
+@media screen and (max-width: 1199px) {
+    .custom-mega__inner {
+        display: grid;
+        grid-template-columns: auto auto minmax(260px, 320px);
+        /* links | products | promo */
+        justify-content: space-between;
+        align-items: start;
+        gap: 48px;
+        padding: 40px 0 44px;
+        max-height: 75vh;
+        overflow-y: auto;
+    }
+
+    .custom-mega__promo {
+        display: none;
+    }
+}

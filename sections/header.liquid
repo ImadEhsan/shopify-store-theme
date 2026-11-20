@@ -739,6 +739,84 @@ SEARCH DRAWER
           "label": "Link"
         }
       ]
+    },
+    {
+      "type": "custom_mega_menu",
+      "name": "Custom mega menu",
+      "settings": [
+        {
+          "type": "text",
+          "id": "menu_item",
+          "label": "Menu item",
+          "info": "Must match the menu label exactly, e.g. Shop"
+        },
+        {
+          "type": "header",
+          "content": "Featured products"
+        },
+        {
+          "type": "text",
+          "id": "products_heading",
+          "label": "Heading",
+          "default": "Trending now"
+        },
+        {
+          "type": "collection",
+          "id": "featured_collection",
+          "label": "Collection"
+        },
+        {
+          "type": "range",
+          "id": "products_count",
+          "label": "Products to show",
+          "min": 2,
+          "max": 4,
+          "step": 1,
+          "default": 4
+        },
+        {
+          "type": "header",
+          "content": "Promo"
+        },
+        {
+          "type": "image_picker",
+          "id": "promo_image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "promo_heading",
+          "label": "Heading",
+          "default": "Sale"
+        },
+        {
+          "type": "text",
+          "id": "promo_text",
+          "label": "Text",
+          "default": "Up to 40% off"
+        },
+        {
+          "type": "text",
+          "id": "promo_button",
+          "label": "Button text",
+          "default": "Shop now"
+        },
+        {
+          "type": "url",
+          "id": "promo_link",
+          "label": "Link"
+        },
+        {
+          "type": "header",
+          "content": "Style"
+        },
+        {
+          "type": "color",
+          "id": "background",
+          "label": "Background",
+          "default": "#ffffff"
+        }
+      ]
     }
   ]
 }
