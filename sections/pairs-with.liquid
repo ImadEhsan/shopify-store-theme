@@ -1,0 +1,45 @@
+{%- comment -%}
+  Practice 8: "Pairs well with" from the product metafield custom.pairs_with
+  (type: list of product references). Hidden when the list is empty.
+{%- endcomment -%}
+{%- assign pairs = product.metafields.custom.pairs_with.value -%}
+
+{%- if pairs != blank -%}
+  <style>
+    #shopify-section-{{ section.id }} .pairs-with { padding: 40px 0; }
+    #shopify-section-{{ section.id }} .pairs-with__title { margin-bottom: 20px; }
+    #shopify-section-{{ section.id }} .pairs-with__grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 24px 16px;
+    }
+    @media screen and (min-width: 1000px) {
+      #shopify-section-{{ section.id }} .pairs-with__grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    }
+  </style>
+
+  <section class="pairs-with">
+    <div class="container">
+      <h2 class="heading h3 pairs-with__title">{{ section.settings.title | escape }}</h2>
+
+      <div class="pairs-with__grid">
+        {%- for item in pairs limit: section.settings.limit -%}
+          {%- render 'product-item', product: item, sizes_attribute: '(max-width: 999px) 50vw, 25vw' -%}
+        {%- endfor -%}
+      </div>
+    </div>
+  </section>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Pairs well with",
+  "class": "shopify-section--pairs-with",
+  "settings": [
+    { "type": "text", "id": "title", "label": "Heading", "default": "Pairs well with" },
+    { "type": "range", "id": "limit", "label": "Products to show", "min": 2, "max": 8, "step": 1, "default": 4 }
+  ],
+  "enabled_on": { "templates": ["product"] },
+  "presets": [{ "name": "Pairs well with" }]
+}
+{% endschema %}

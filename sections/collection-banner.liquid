@@ -35,19 +35,22 @@
     </nav>
   {%- endcapture -%}
 
-  {%- if collection.image and section.settings.show_collection_image -%}
+  {%- comment -%} Practice 7: banner metafield first, normal collection image as fallback {%- endcomment -%}
+  {%- assign banner_image = collection.metafields.custom.banner.value | default: collection.image -%}
+
+  {%- if banner_image and section.settings.show_collection_image -%}
     <image-with-text-overlay
       reveal-on-scroll
       parallax
       class="image-overlay image-overlay--{{ section.settings.section_height }}"
       {% if section.settings.section_height == 'auto' %}
-        style="--image-aspect-ratio: {{ collection.image.aspect_ratio }}"
+        style="--image-aspect-ratio: {{ banner_image.aspect_ratio }}"
       {% endif %}
     >
       <div
         class="image-overlay__image-wrapper"
         {% if section.settings.section_height == 'auto' %}
-          style="padding-bottom: {{ 100.0 | divided_by: collection.image.aspect_ratio }}%"
+          style="padding-bottom: {{ 100.0 | divided_by: banner_image.aspect_ratio }}%"
         {% endif %}
       >
         {%- comment -%}Performance note: this image must not be lazyloaded as it contributes to the LCP{%- endcomment -%}
@@ -55,22 +58,22 @@
           {%- if section.settings.section_height != 'auto' -%}
             <source
               media="(max-width: 740px)"
-              srcset="{{ collection.image | image_url: width: 400, height: 600, crop: 'center' }} 400w, {{ collection.image | image_url: width: 600, height: 600, crop: 'center' }} 600w, {{ collection.image | image_url: width: 800, height: 600, crop: 'center' }} 800w, {{ collection.image | image_url: width: 1000, height: 600, crop: 'center' }} 1000w"
-              width="{{ collection.image.width }}"
-              height="{{ collection.image.height }}"
+              srcset="{{ banner_image | image_url: width: 400, height: 600, crop: 'center' }} 400w, {{ banner_image | image_url: width: 600, height: 600, crop: 'center' }} 600w, {{ banner_image | image_url: width: 800, height: 600, crop: 'center' }} 800w, {{ banner_image | image_url: width: 1000, height: 600, crop: 'center' }} 1000w"
+              width="{{ banner_image.width }}"
+              height="{{ banner_image.height }}"
             >
           {%- else -%}
             <source
               media="(max-width: 740px)"
-              srcset="{{ collection.image | image_url: width: 400 }} 400w, {{ collection.image | image_url: width: 600 }} 600w, {{ collection.image | image_url: width: 800 }} 800w, {{ collection.image | image_url: width: 1000 }} 1000w"
-              width="{{ collection.image.width }}"
-              height="{{ collection.image.height }}"
+              srcset="{{ banner_image | image_url: width: 400 }} 400w, {{ banner_image | image_url: width: 600 }} 600w, {{ banner_image | image_url: width: 800 }} 800w, {{ banner_image | image_url: width: 1000 }} 1000w"
+              width="{{ banner_image.width }}"
+              height="{{ banner_image.height }}"
             >
           {%- endif -%}
 
           {{-
-            collection.image
-            | image_url: width: collection.image.width
+            banner_image
+            | image_url: width: banner_image.width
             | image_tag:
               widths: '600,700,800,1000,1200,1400,1600,1800,2000,2200,2400,2600',
               class: 'image-overlay__image',

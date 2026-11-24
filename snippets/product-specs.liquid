@@ -1,0 +1,47 @@
+{%- comment -%}
+  Practice 5: product "Details" table from metafields.
+  Usage: {% render 'product-specs', product: product %}
+{%- endcomment -%}
+{%- assign m = product.metafields.custom -%}
+
+{%- if m.fit != blank or m.features != blank or m.country_of_origin != blank or m.care_guide != blank -%}
+  <div class="product-specs">
+    <p class="product-specs__title">Details</p>
+
+    <dl class="product-specs__list">
+      {%- if m.fit != blank -%}
+        <div class="product-specs__row">
+          <dt>Fit</dt>
+          <dd>{{ m.fit.value }}</dd>
+        </div>
+      {%- endif -%}
+
+      {%- if m.country_of_origin != blank -%}
+        <div class="product-specs__row">
+          <dt>Made in</dt>
+          <dd>{{ m.country_of_origin.value }}</dd>
+        </div>
+      {%- endif -%}
+
+      {%- if m.features != blank -%}
+        <div class="product-specs__row">
+          <dt>Features</dt>
+          <dd>
+            <ul>
+              {%- for feature in m.features.value -%}
+                <li>{{ feature }}</li>
+              {%- endfor -%}
+            </ul>
+          </dd>
+        </div>
+      {%- endif -%}
+    </dl>
+
+    {%- if m.care_guide != blank -%}
+      <div class="product-specs__care">
+        <p class="product-specs__subtitle">Care</p>
+        {{ m.care_guide | metafield_tag }}
+      </div>
+    {%- endif -%}
+  </div>
+{%- endif -%}

@@ -166,6 +166,8 @@
       {%- endif -%}
     {%- endfor -%}
 
+    {%- render 'product-specs', product: product -%}
+
     <script>
       document.addEventListener('variant:changed', function (event) {
         var variant = event.detail.variant;

@@ -2108,3 +2108,55 @@ font-size: 10px;}
   color: #6b6b6b;
   margin-top: 4px;
 }
+
+.product-specs {
+  margin-top: 16px;
+  padding: 14px 16px;
+  border: 1px solid rgb(var(--border-color));
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.product-specs__title,
+.product-specs__subtitle {
+  margin: 0 0 8px;
+  font-weight: 600;
+}
+
+.product-specs__list {
+  margin: 0;
+}
+
+.product-specs__row {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  gap: 12px;
+  padding: 6px 0;
+  border-top: 1px solid rgb(var(--border-color));
+}
+
+.product-specs__row:first-child {
+  border-top: 0;
+}
+
+.product-specs__row dt {
+  opacity: .7;
+}
+
+.product-specs__row dd {
+  margin: 0;
+}
+
+.product-specs__row ul {
+  margin: 0;
+  padding-left: 18px;
+  list-style: disc;
+}
+
+.product-specs__care {
+  margin-top: 10px;
+}
+
+.product-specs__care p {
+  margin: 0 0 6px;
+}

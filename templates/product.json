@@ -47,6 +47,12 @@
     "main": {
       "type": "main-product",
       "blocks": {
+        "text_b9jArc": {
+          "type": "text",
+          "settings": {
+            "text": "<p><strong>Fit:</strong>&nbsp;{{ product.metafields.custom.fit.value }}</p>"
+          }
+        },
         "variant_picker": {
           "type": "variant_picker",
           "settings": {
@@ -84,6 +90,12 @@
             "buy_now_button_text_color": "rgba(0,0,0,0)"
           }
         },
+        "text_EiabAg": {
+          "type": "text",
+          "settings": {
+            "text": "{{ product.metafields.custom.care_guide | metafield_tag }}"
+          }
+        },
         "pdp_bundle": {
           "type": "pdp_bundle",
           "settings": {
@@ -116,10 +128,12 @@
         }
       },
       "block_order": [
+        "text_b9jArc",
         "variant_picker",
         "pdp_signals",
         "dispatch_timer",
         "buy_buttons",
+        "text_EiabAg",
         "pdp_bundle",
         "pdp_verified"
       ],
@@ -320,6 +334,14 @@
         "lead": "Bought unseen? Here's the plain-English version, so there are no surprises.",
         "faq_heading": "Common questions"
       }
+    },
+    "pairs_with_GdyKBR": {
+      "type": "pairs-with",
+      "name": "Pairs well with",
+      "settings": {
+        "title": "Pairs well with",
+        "limit": 4
+      }
     }
   },
   "order": [
@@ -330,6 +352,7 @@
     "product_description",
     "pdp_reviews",
     "complete_fit",
+    "pairs_with_GdyKBR",
     "shipping_returns"
   ]
 }
