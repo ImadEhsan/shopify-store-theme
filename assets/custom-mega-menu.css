@@ -212,3 +212,24 @@
         display: none;
     }
 }
+
+/* Chevron on top-level nav items that have a dropdown */
+.header__linklist-item.has-dropdown {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.header__nav-chevron {
+    display: inline-flex;
+    transition: transform 0.25s ease;
+}
+
+.header__nav-chevron svg {
+    display: block;
+}
+
+/* Focal sets aria-expanded="true" when the panel opens, so the arrow flips */
+.header__linklist-link[aria-expanded="true"]+.header__nav-chevron {
+    transform: rotate(180deg);
+}

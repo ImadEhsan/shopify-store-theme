@@ -31,6 +31,12 @@
           {{- link.title -}}
         </a>
 
+        {%- if link.links.size > 0 or mega_menu_block != '' -%}
+          <span class="header__nav-chevron" aria-hidden="true">
+            {%- render 'icon' with 'chevron', width: 10, height: 7 -%}
+          </span>
+        {%- endif -%}
+
         {%- if mega_menu_block != '' and mega_menu_block.type == 'custom_mega_menu' -%}
           <div
             hidden

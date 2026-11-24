@@ -157,6 +157,15 @@
       {%- endfor -%}
     </div>
 
+    {%- comment -%} Practice 2: delivery message from a "ship:" tag {%- endcomment -%}
+    {%- for tag in product.tags -%}
+      {%- assign prefix = tag | slice: 0, 5 -%}
+      {%- if prefix == 'ship:' -%}
+        <p class="product-meta__ship-note">🚚 Ships in {{ tag | remove_first: 'ship:' }}</p>
+        {%- break -%}
+      {%- endif -%}
+    {%- endfor -%}
+
     <script>
       document.addEventListener('variant:changed', function (event) {
         var variant = event.detail.variant;
