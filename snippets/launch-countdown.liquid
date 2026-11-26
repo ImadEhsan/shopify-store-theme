@@ -1,0 +1,41 @@
+{%- comment -%}
+  Practice 9: launch countdown from product.metafields.custom.launch_date (Date and time).
+  Shows only while the launch is still in the future.
+{%- endcomment -%}
+{%- assign launch = product.metafields.custom.launch_date.value -%}
+
+{%- if launch != blank -%}
+  {%- assign launch_s = launch | date: '%s' | plus: 0 -%}
+  {%- assign now_s = 'now' | date: '%s' | plus: 0 -%}
+
+  {%- if launch_s > now_s -%}
+    <div class="launch-countdown" data-launch="{{ launch_s }}">
+      <p class="launch-countdown__label">🔥 Drops {{ launch | date: '%d %b, %I:%M %p' }}</p>
+      <p class="launch-countdown__timer" data-launch-timer></p>
+    </div>
+    <script>
+      (function () {
+        var box = document.currentScript.previousElementSibling;
+        var end = Number(box.dataset.launch) * 1000;
+        var out = box.querySelector('[data-launch-timer]');
+
+        function tick() {
+          var left = end - Date.now();
+          if (left <= 0) {
+            out.textContent = 'Live now. Refresh the page to shop.';
+            clearInterval(timer);
+            return;
+          }
+          var d = Math.floor(left / 86400000);
+          var h = Math.floor((left % 86400000) / 3600000);
+          var m = Math.floor((left % 3600000) / 60000);
+          var s = Math.floor((left % 60000) / 1000);
+          out.textContent = d + 'd ' + h + 'h ' + m + 'm ' + s + 's';
+        }
+
+        var timer = setInterval(tick, 1000);
+        tick();
+      })();
+    </script>
+  {%- endif -%}
+{%- endif -%}

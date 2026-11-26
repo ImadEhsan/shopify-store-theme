@@ -167,6 +167,7 @@
     {%- endfor -%}
 
     {%- render 'product-specs', product: product -%}
+    {%- render 'launch-countdown', product: product -%}
 
     <script>
       document.addEventListener('variant:changed', function (event) {
